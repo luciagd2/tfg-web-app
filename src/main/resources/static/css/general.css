@@ -1,0 +1,153 @@
+@charset "UTF-8";
+/*******************************************************************
+*** FICHERO PARA ESTABLECER UN ESTILO COMUN EN TODAS LAS PAGINAS ***
+********************************************************************/
+/****************************************************
+***** DEFINICION DE VARIABLES GLOBALES: COLORES *****
+*****************************************************/
+body {
+  background-color: #fff3dd;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+
+.main-content {
+  height: 100vh;
+  margin-top: 6vh;
+  display: flex !important;
+  flex-direction: column;
+}
+
+.container {
+  width: 100%;
+  max-width: 100%;
+  flex-grow: 1; /* Esto hace que la sección de contenido crezca para ocupar el resto del espacio */
+  overflow-y: auto; /* Habilita el scroll vertical solo en esta sección */
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.bg-body-tertiary {
+  background-color: #709279 !important;
+}
+
+.navbar-brand {
+  color: #d8e4d0;
+}
+
+.nav-link {
+  color: #d8e4d0;
+}
+
+.nav-link:hover {
+  color: #709279;
+  background-color: #d8e4d0;
+  border-radius: 0.5vh;
+}
+
+.navbar-nav .nav-link.active {
+  color: #d8e4d0;
+  font-weight: bold;
+}
+
+.navbar-nav .nav-link.active:hover {
+  color: #709279;
+  background-color: #d8e4d0;
+  border-radius: 0.5vh;
+}
+
+.navbar-expand-lg .navbar-collapse {
+  justify-content: flex-end;
+}
+
+.btn {
+  color: #d8e4d0;
+  background-color: #709279;
+  border-color: #709279;
+}
+
+.btn:hover {
+  color: #709279;
+  background-color: #d8e4d0;
+  border-color: #d8e4d0;
+}
+
+.icon-btn {
+  color: #709279;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.icon-btn:hover {
+  color: #d8e4d0;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.contenedor-cards {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  padding: 3vh 10vh;
+  justify-content: center;
+}
+
+.card {
+  margin-top: 2vh;
+  background-color: transparent;
+  border: none;
+}
+
+.card-body {
+  background-color: #709279;
+  color: #d8e4d0;
+  border-radius: 0.5rem;
+  margin-top: 1vh;
+}
+
+.card-patron {
+  color: #709279;
+  text-decoration: none;
+}
+
+.dificultad-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 1vh;
+}
+
+.precio-fav-guardar {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.btn.toggle-btn-fav, .btn.toggle-btn-guardar {
+  padding: 0;
+  color: #d8e4d0;
+  background-color: #709279;
+}
+
+.container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: #fff3dd;
+  border-radius: 10px;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}/*# sourceMappingURL=general.css.map */

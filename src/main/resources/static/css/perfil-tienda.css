@@ -1,0 +1,97 @@
+/*******************************************************************
+***** FICHERO PARA EL ESTILO DE LAS PAGINAS DE PERFIL Y TIENDA *****
+********************************************************************/
+/****************************************************
+***** DEFINICION DE VARIABLES GLOBALES: COLORES *****
+*****************************************************/
+.info-perfil {
+  margin-top: 1vh;
+}
+
+.nombre-usu {
+  color: #709279;
+}
+
+.badge {
+  color: #d8e4d0;
+}
+
+.btn:hover > .badge {
+  color: #709279;
+}
+
+.btn-ajustes {
+  background-color: #fff3dd;
+  color: #709279;
+  border: none;
+  margin: 0 !important;
+}
+
+.contenedor-biblioteca {
+  margin: 2vw 5vw 0;
+}
+
+.contenedor-btns-biblioteca {
+  display: flex;
+  justify-content: left;
+}
+
+.contenedor-btns {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modalSeguidores-content, .modal-perfil-content {
+  background-color: #d8e4d0;
+  color: #709279;
+}
+
+.contenedor-cards {
+  justify-content: left;
+  padding: 1rem;
+  border-top: 1px solid #709279;
+}
+
+.card {
+  margin-top: 0vh;
+  margin-bottom: 1vh;
+}
+
+.popover {
+  background-color: #d8e4d0;
+}
+
+.bs-popover-auto[data-popper-placement^=bottom] > .popover-arrow::after {
+  border-bottom-color: #d8e4d0 !important;
+}
+
+.text-popover {
+  display: flex;
+  flex-direction: column;
+}
+
+.boton-check {
+  background-color: #fff3dd;
+  border-color: #fff3dd;
+  color: #709279;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.btn-check:checked + .btn {
+  background-color: #709279;
+  border-color: #709279;
+  color: #d8e4d0;
+}
+
+.btn.boton-check:hover {
+  color: #709279;
+  background-color: #d8e4d0;
+}
+
+li {
+  border-radius: 0.5rem;
+}
+
+h3 {
+  color: #709279;
+}/*# sourceMappingURL=perfil-tienda.css.map */

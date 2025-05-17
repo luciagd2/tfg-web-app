@@ -1,0 +1,87 @@
+/******************************************************************
+********* FICHERO PARA EL ESTILO DE LA PAGINA DE BUSQUEDA *********
+*******************************************************************/
+/****************************************************
+***** DEFINICION DE VARIABLES GLOBALES: COLORES *****
+*****************************************************/
+.barra-busqueda {
+  background-color: #fff3dd !important;
+  display: flex;
+}
+
+.barra-busqueda .container-fluid {
+  justify-content: center;
+}
+
+.modal-title {
+  color: #d8e4d0;
+  font-weight: bold;
+}
+
+.modal-content {
+  background-color: #709279;
+  padding: 1vh;
+}
+
+.modal-header, .modal-footer {
+  border-color: #d8e4d0;
+}
+
+h5 {
+  color: #d8e4d0;
+}
+
+.seccion-categoria,
+.seccion-dificultad,
+.col-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.col-filtros {
+  padding-left: 5rem;
+  padding-right: 5rem;
+}
+
+.fila-categorias {
+  justify-content: space-around;
+}
+
+.fila-dificultad {
+  justify-content: space-around;
+}
+
+.toggle-btn {
+  background-color: #709279;
+  border-color: #d8e4d0;
+}
+
+.toggle-btn.active {
+  background-color: #d8e4d0;
+  border-color: #d8e4d0;
+  color: #709279;
+}
+
+.btn-categoria {
+  display: flex;
+  width: 17vh;
+  gap: 0.7vh;
+  align-items: center;
+  justify-content: center;
+}
+
+input[type=radio]:checked + label.btn-filtro {
+  background-color: #d8e4d0;
+  border: none;
+  border-radius: 0.3rem !important;
+  color: #709279;
+}
+
+.btn-filtro:hover {
+  color: #d8e4d0 !important;
+}
+
+input[type=radio]:checked + .btn-filtro:hover {
+  color: #709279 !important;
+}/*# sourceMappingURL=busqueda.css.map */

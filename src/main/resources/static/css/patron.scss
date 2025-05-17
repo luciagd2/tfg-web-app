@@ -1,0 +1,264 @@
+/***********************************************************
+***** FICHERO PARA ESTABLECER UN ESTILO COMUN EN TODAS ***** 
+*****    LAS PAGINAS RELACIONADAS CON LOS PATRONES     *****
+************************************************************/
+
+//Imports
+@import 'colores';
+
+
+//Contenedores
+.main-content{
+    margin-top: 0;
+}
+.contenedor{
+    width: 80%;
+    justify-self: center;
+}
+.row{
+    margin-top: 0.5vw;
+}
+.row-contenedor{
+    margin: 5vw 0 0 !important;
+}
+.div-tags{
+    display: flex;
+    flex-wrap: wrap;
+}
+.div-carousel{
+    object-fit: cover;
+    width: auto;
+    height: auto;
+    //max-width: 25vw;
+}
+.titulo-seccion{
+    display: flex;
+    align-content: center;
+}
+.div-btn-addSeccion{
+    margin-top: 0 !important;
+}
+.div-input-images{
+    display: flex;
+    flex-direction: row;
+}
+.input-group-imagen{
+    display: flex;
+    flex-direction: column;
+}
+col-info{
+    width: 70%;
+}
+.row-resenias{
+    flex-wrap: nowrap;
+}
+.creador{
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    color: $color-primario-oscuro;
+}
+.accordion-item-instrucciones{
+    margin-bottom: 8vh;
+    margin-top: 0;
+}
+//Cards
+.card-header{
+    background-color: none;
+}
+.card-info{
+    margin-top: 0;
+    background-color: $color-primario-claro;
+    border: none;
+    border-radius: 0.5rem;
+}
+.card-body{
+    background-color: $color-primario-claro;
+    color: $color-primario-oscuro;
+}
+
+.card-edicion, .card-edicion-body{
+    margin-top: 0;
+}
+
+#secciones-patron{
+    padding: 1rem;
+}
+.card-seccion, .card-body-seccion{
+    background-color: $color-primario-oscuro;
+    margin: 0;
+}
+.card-resenia, .card-body-resenia{
+    background-color: $color-primario-oscuro;
+    color: $color-primario-claro;
+}
+.card-body-resenia{
+    padding: 0.5rem;
+}
+.card-resenia{
+    padding: 0.5rem;
+    margin: 0;
+    max-width: 13rem;
+    
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+}
+#contenedorReseñas {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 1rem;
+}
+
+//Acordions
+.acordion-edicion{
+    width: 70%;
+    justify-self: center;
+}
+.accordion-item{
+    margin-top: 1vw;
+    border: none;
+    background-color: $color-primario-claro;
+    border-radius: 0.5rem;
+}
+.accordion-button{
+    background-color: $color-primario-oscuro !important;
+    color: $color-fondo !important;
+    font-weight: bold;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+.accordion-button.collapsed{
+    background-color: $color-primario-claro !important;
+    color: $color-primario-oscuro !important;
+    border-radius: 0.5rem !important;
+
+}
+.accordion-body{
+    background-color: $color-primario-claro;
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+.accordion-header-resenias{
+    display: flex;
+    justify-content: space-between;
+}
+.accordion-button::after{
+    //margin: 0;
+    color: $color-primario-oscuro;
+}
+//Textos
+.form-control, .form-select{
+    background-color: $color-fondo-claro;
+    border-color: $color-primario-claro;
+    margin: 0;
+}
+.titulo-info, .txt-info{
+    align-items: center;
+}
+.titulo-info{
+    color: $color-primario-oscuro;
+}
+.txt-info{
+    background-color: $color-primario-oscuro;
+    border-radius: 1.2vw;
+    color: $color-fondo;
+}
+
+.txt-tags{
+    background-color: $color-primario-oscuro;
+    border-radius: 1.2vw;
+    color: $color-fondo;
+    padding: 0.5rem;
+}
+.txt-titulo, .txt-subtitulo{
+    margin: 0 !important;
+}
+
+
+//Imagenes
+.img-usu{
+    width: 1.5vw;
+    height: 1.5vw;
+}
+.img-patron{
+    object-fit: cover;
+    width: 25vw;
+    height: auto;
+    padding-right: 4vh;
+    //border-radius: 3vh;
+}
+.img-preview{
+    border: 0 solid $color-primario-oscuro;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    max-width: 10rem;
+    max-height: 10rem;
+}
+.img-usu-resenia{
+    width: 1.5rem; 
+    height: 1.5rem; 
+    object-fit: cover;
+}
+.img-resenia{
+    max-width: 11rem;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+}
+
+//Botones
+.btn-addSeccion{
+    margin: 1.5rem;
+    margin-top: 0 !important;
+}
+.btn-nueva-resenia{
+    margin: 0;
+    justify-self: right;
+}
+
+//Otros
+p{
+    margin: 0.5rem;
+}
+h5{
+    color: $color-primario-oscuro;
+}
+input{
+    background-color: $color-fondo-claro;
+}
+.input-group-text{
+    background-color: $color-primario-claro;
+}
+.d-flex.flex-wrap {
+    flex-direction: row;
+}
+.comentario-resenia{
+    margin: 0;
+    padding-bottom: 0.5rem;
+}
+.input-group-text{
+    background-color: $color-primario-oscuro;
+    color: $color-primario-claro;
+}
+
+//Scrollbar para navegadores WebKit
+#contenedorReseñas::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+#contenedorReseñas::-webkit-scrollbar-track {
+    background: $color-primario-claro;
+    border-radius: 10px;
+}
+#contenedorReseñas::-webkit-scrollbar-track:hover {
+    background: $color-fondo;
+    border-radius: 10px;
+}
+#contenedorReseñas::-webkit-scrollbar-thumb {
+    background: $color-primario-oscuro;
+    border-radius: 10px;
+}

@@ -1,0 +1,145 @@
+/*******************************************************************
+*** FICHERO PARA ESTABLECER UN ESTILO COMUN EN TODAS LAS PAGINAS ***
+********************************************************************/
+
+//Imports
+@import 'colores';
+
+//CUERPO DE LA PAGINA
+body{
+    background-color: $color-fondo;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    top: 0;
+    height: 100%;
+}
+.main-content{
+    height: 100vh;
+    margin-top: 6vh;
+    display: flex !important;
+    flex-direction: column;
+}
+.container{
+    width: 100%;
+    max-width: 100%;
+    flex-grow: 1;  /* Esto hace que la sección de contenido crezca para ocupar el resto del espacio */
+    overflow-y: auto;  /* Habilita el scroll vertical solo en esta sección */
+    box-sizing: border-box;
+    margin: 0;
+}
+
+///BARRA DE NAVEGACION
+//Fondo
+.bg-body-tertiary {
+    background-color: $color-primario-oscuro !important;
+}
+//Marca
+.navbar-brand{
+    color: $color-primario-claro;
+}
+//Links no activos
+.nav-link{
+    color: $color-primario-claro;
+}
+.nav-link:hover{
+    color: $color-primario-oscuro;
+    background-color: $color-primario-claro;
+    border-radius: 0.5vh;
+}
+//Links activos
+.navbar-nav .nav-link.active{
+    color: $color-primario-claro;
+    font-weight: bold;
+}
+.navbar-nav .nav-link.active:hover{
+    color: $color-primario-oscuro;
+    background-color: $color-primario-claro;
+    border-radius: 0.5vh;
+}
+//Posicion
+.navbar-expand-lg .navbar-collapse {
+    justify-content: flex-end;
+}
+
+//Botones
+.btn{
+    color: $color-primario-claro;
+    background-color: $color-primario-oscuro;
+    border-color: $color-primario-oscuro;
+}
+
+.btn:hover{
+    color: $color-primario-oscuro;
+    background-color: $color-primario-claro;
+    border-color: $color-primario-claro;
+}
+
+.icon-btn{
+    color: $color-primario-oscuro;
+    background-color: transparent;
+    border-color: transparent;
+}
+.icon-btn:hover{
+    color: $color-primario-claro;
+    background-color: transparent;
+    border-color: transparent;
+}
+
+//CARDS
+.contenedor-cards{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    padding: 3vh 10vh;
+    justify-content: center;
+}
+.card{
+    margin-top: 2vh;
+    background-color: transparent;
+    border: none;
+}
+.card-body{
+    background-color: $color-primario-oscuro;
+    color: $color-primario-claro;
+    border-radius: 0.5rem;
+    margin-top: 1vh;
+}
+.card-patron{
+    color: $color-primario-oscuro;
+    text-decoration: none;
+}
+.dificultad-titulo{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 1vh;
+}
+.precio-fav-guardar{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.btn.toggle-btn-fav, .btn.toggle-btn-guardar{
+    padding: 0;
+    color: $color-primario-claro;
+    background-color: $color-primario-oscuro;
+}
+
+//Scroll
+.container::-webkit-scrollbar {
+    width: 8px;
+}
+.container::-webkit-scrollbar-track {
+    background: $color-fondo;
+    border-radius: 10px;
+}
+.container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+.container::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+}

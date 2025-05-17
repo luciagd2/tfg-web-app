@@ -1,0 +1,21 @@
+/****************************************************************
+***** FICHERO PARA EL ESTILO DE LA PAGINA DE NOTIFICACIONES *****
+*****************************************************************/
+
+//Imports
+@import 'colores';
+
+//Contenedores
+.lista-notificaciones{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    padding: 3vh 10vh;
+    justify-content: center;
+}
+
+li{
+    border-radius: 0.5rem;
+    color: $color-primario-oscuro !important;
+    background-color: $color-primario-claro !important;
+}

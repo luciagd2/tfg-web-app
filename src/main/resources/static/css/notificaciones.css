@@ -1,0 +1,19 @@
+/****************************************************************
+***** FICHERO PARA EL ESTILO DE LA PAGINA DE NOTIFICACIONES *****
+*****************************************************************/
+/****************************************************
+***** DEFINICION DE VARIABLES GLOBALES: COLORES *****
+*****************************************************/
+.lista-notificaciones {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  padding: 3vh 10vh;
+  justify-content: center;
+}
+
+li {
+  border-radius: 0.5rem;
+  color: #709279 !important;
+  background-color: #d8e4d0 !important;
+}/*# sourceMappingURL=notificaciones.css.map */

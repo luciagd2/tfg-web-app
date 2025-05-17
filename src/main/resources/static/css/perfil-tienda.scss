@@ -1,0 +1,92 @@
+/*******************************************************************
+***** FICHERO PARA EL ESTILO DE LAS PAGINAS DE PERFIL Y TIENDA *****
+********************************************************************/
+
+//Imports
+@import 'colores';
+
+//INFORMACION PERFIL
+.info-perfil{
+    margin-top: 1vh;
+}
+.nombre-usu{
+    color: $color-primario-oscuro;
+}
+.badge{
+    color: $color-primario-claro;
+}
+.btn:hover>.badge{
+    color: $color-primario-oscuro;
+}
+.btn-ajustes{
+    background-color: $color-fondo;
+    color: $color-primario-oscuro;
+    border: none;
+    margin: 0 !important;
+}
+
+//CONTENEDORES
+.contenedor-biblioteca{
+    margin: 2vw 5vw 0;
+}
+.contenedor-btns-biblioteca{
+    display: flex;
+    justify-content: left;
+}
+.contenedor-btns{
+    display: flex;
+    justify-content: space-between;
+}
+
+.modalSeguidores-content, .modal-perfil-content{
+    background-color: $color-primario-claro;
+    color: $color-primario-oscuro;
+}
+
+
+//CARDS
+.contenedor-cards{
+    justify-content: left;
+    padding: 1rem;
+    border-top: 1px solid $color-primario-oscuro;
+}
+.card{
+    margin-top: 0vh;
+    margin-bottom: 1vh;
+}
+.popover{
+    background-color: $color-primario-claro;
+}
+.bs-popover-auto[data-popper-placement^=bottom]>
+.popover-arrow::after{
+    border-bottom-color: $color-primario-claro !important;
+}
+.text-popover{
+    display: flex;
+    flex-direction: column;
+}
+
+//OPCIONES BIBLIOTECA
+.boton-check{
+    background-color: $color-fondo;
+    border-color: $color-fondo;
+    color: $color-primario-oscuro;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+.btn-check:checked+.btn{
+    background-color: $color-primario-oscuro;
+    border-color: $color-primario-oscuro;
+    color: $color-primario-claro;
+}
+.btn.boton-check:hover{
+    color: $color-primario-oscuro;
+    background-color: $color-primario-claro;
+}
+
+//OTROS
+li{
+    border-radius: 0.5rem;
+}
+h3{
+    color: $color-primario-oscuro;
+}

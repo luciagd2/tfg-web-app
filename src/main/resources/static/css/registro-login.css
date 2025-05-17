@@ -1,0 +1,54 @@
+/*****************************************************************
+***** FICHERO PARA ESTABLECER UN ESTILO COMUN EN LAS PAGINAS ***** 
+***********    DE REGISTRO, LOGIN y COMPLETAR PERFIL   ***********
+******************************************************************/
+/****************************************************
+***** DEFINICION DE VARIABLES GLOBALES: COLORES *****
+*****************************************************/
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.fondo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.fondo img {
+  height: 100%;
+  width: auto;
+  min-width: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+.wrapper {
+  align-content: center;
+}
+
+.formulario {
+  justify-self: center;
+  width: 30%;
+  padding: 1rem;
+  border-radius: 1rem;
+  color: #709279;
+  background-color: rgba(255, 254, 245, 0.9);
+}
+
+.input {
+  background-color: #fffbf3;
+}
+
+.img-preview {
+  max-width: 10rem;
+  max-height: 10rem;
+  margin-top: 0.5rem;
+  object-fit: cover;
+}/*# sourceMappingURL=registro-login.css.map */
