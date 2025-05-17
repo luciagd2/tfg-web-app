@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Ficheros css de Bootstrap -->
+    <link rel="stylesheet" href="css-bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="css-bootstrap/bootstrap-grid.min.css">
+
+    <!-- Ficheros css propios -->
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/patron.css">
+
+    <!-- Ficheros js de Bootstrap -->
+    <script defer src="js-bootstrap/bootstrap.bundle.min.js"></script>
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+
+    <title>Inicio</title>
+</head>
+<body class="wrapper overflow-hidden">
+    <!-- BARRA DE NAVEGACION -->
+    <div id="container-menu"></div>
+
+    <div class="main-content">
+        <div class="container">
+        <div class="contenedor">
+        <div class="row row-contenedor">
+            <!-- Columna Informacion -->
+            <div class="col-7">
+                <div class="card card-info">
+                    <div class="card-body">
+                        <h3 class="card-title"><!-- Aqui se rellena el titulo del patron --></h3>
+                        <h6 class="card-subtitle mb-2 text-body-secondary">
+                            <div class="d-flex gap-1 creador" id="creadorPatron" data-id-creador="" style="cursor:pointer;">
+                                <img src="imagenes/osito.jpg" alt="Perfil" class="rounded-circle img-usu">
+                                Nombre del Usuario
+                            </div>
+                        </h6>
+                        <p class="card-text">Descripcion</p>
+                        <div>
+                            <p class="card-precio">Precio</p>
+                            <a href="#" class="btn card-link">Enlace para empezar/comprar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion" id="accordionInformacion">
+                    <!-- Item 1: Informacion -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#panelInformacion" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                                Información
+                            </button>
+                        </h2>
+                        <div id="panelInformacion" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <!-- Aqui se rellena la informacion -->        
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 2: Materiales -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#panelMateriales" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                            Materiales
+                            </button>
+                        </h2>
+                        <div id="panelMateriales" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <!-- Aqui se rellena los materiales -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 3: Abreviaturas -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#panelAbreviaturas" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                            Abreviaturas
+                            </button>
+                        </h2>
+                        <div id="panelAbreviaturas" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col titulo-info">
+                                        <p>Abreviaturasssss</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 4: Reseñas -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#panelResenas" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                                Reseñas
+                                <span class="btn btn-outline-primary btn-sm me-auto ms-3 rounded-3 btn-nueva-resenia" data-bs-toggle="modal" data-bs-target="#modalReseña" onclick="event.stopPropagation()">
+                                    Añadir Reseña
+                                </span>
+                            </button>
+                        </h2>
+                        <div id="panelResenas" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <!-- Contenedor de las reseñas -->
+                                <div id="contenedorReseñas" class="row gap-2 row-resenias"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Item 5: Tags -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#panelTags" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                            Tags
+                            </button>
+                        </h2>
+                        <div id="panelTags" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <div class="div-tags gap-1">
+                                    <p class="txt-tags">osito</p>                                
+                                    <p class="txt-tags">fiesta</p>                                
+                                    <p class="txt-tags">lana de chenilla</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- /div info -->
+
+            <!-- Columna Fotos -->
+            <div class="col">
+                <!-- Imagen a la derecha -->
+                <div class="div-carousel">
+                    <div id="carouselFotos" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselFotos" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselFotos" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#carouselFotos" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        </div>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active" data-bs-interval="10000">
+                        <img src="imagenes/osito.jpg" class="d-block w-100 rounded-3" alt="...">
+                        </div>
+                        <div class="carousel-item" data-bs-interval="10000">
+                        <img src="imagenes/osito-izquierda.png" class="d-block w-100 rounded-3" alt="...">
+                        </div>
+                        <div class="carousel-item" data-bs-interval="10000">
+                        <img src="imagenes/osito-derecha.png" class="d-block w-100 rounded-3" alt="...">
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselFotos" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselFotos" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                    </div>
+                </div>
+            </div> <!-- /div fotos -->            
+
+        </div>
+        </div>    
+        </div>
+
+        <!-- MODAL PARA FORMULARIO DE RESEÑA -->
+        <div class="modal fade" id="modalReseña" tabindex="-1" aria-labelledby="modalReseñaLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalReseñaLabel">Añadir una Reseña</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+                    <input type="text" class="form-control" id="nombreUsuarioModal" placeholder="Tu nombre" required>
+    
+                    <label for="imagenPatron" class="form-label mt-3">Imagen del Patrón (opcional)</label>
+                    <input type="file" class="form-control" id="imagenPatronModal">
+    
+                    <label for="puntuacion" class="form-label mt-3">Puntuación</label>
+                    <select class="form-select" id="puntuacionModal">
+                        <option value="1">1 Estrella</option>
+                        <option value="2">2 Estrellas</option>
+                        <option value="3">3 Estrellas</option>
+                        <option value="4">4 Estrellas</option>
+                        <option value="5">5 Estrellas</option>
+                    </select>
+    
+                    <label for="comentario" class="form-label mt-3">Comentario (opcional)</label>
+                    <textarea class="form-control" id="comentarioModal" rows="3" placeholder="Deja tu comentario aquí"></textarea>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="agregarReseñaModal">Agregar Reseña</button>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>  
+    <script>
+        document.getElementById("agregarReseñaModal").addEventListener("click", function() {
+            // Recoger los valores del formulario
+            const nombreUsuario = document.getElementById("nombreUsuarioModal").value;
+            const imagenPatron = document.getElementById("imagenPatronModal").files[0];
+            const puntuacion = document.getElementById("puntuacionModal").value;
+            const comentario = document.getElementById("comentarioModal").value;
+
+            // Si el nombre de usuario y puntuación no están vacíos, agregar reseña
+            if (puntuacion) {
+                const contenedorReseñas = document.getElementById("contenedorReseñas");
+
+                // Crear una card para la reseña
+                const card = document.createElement("div");
+                card.classList.add("card", "mb-3", "card-resenia");
+
+                // Crear la cabecera con el nombre de usuario
+                const cardHeader = document.createElement("div");
+                cardHeader.classList.add("card-header", "d-flex", "align-items-center", "gap-1");
+                cardHeader.innerHTML = `
+                    <img src="https://via.placeholder.com/40" alt="Usuario" class="rounded-circle img-usu-resenia">
+                    <strong>${nombreUsuario}</strong>
+                `;
+                card.appendChild(cardHeader);
+
+                // Crear el cuerpo de la card
+                const cardBody = document.createElement("div");
+                cardBody.classList.add("card-body", "card-body-resenia");
+
+                // Si hay imagen del patrón
+                if (imagenPatron) {
+                    const image = document.createElement("img");
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        image.src = e.target.result;
+                        image.classList.add("img-fluid", "rounded", "mb-3", "img-resenia");
+                        cardBody.appendChild(image);
+                        // Crear las estrellas
+                        const estrellas = document.createElement("div");
+                        estrellas.classList.add("mb-2");
+                        for (let i = 1; i <= 5; i++) {
+                            const estrella = document.createElement("i");
+                            // Si la estrella está dentro de la puntuación, llenarla
+                            if (i <= puntuacion) {
+                                estrella.classList.add("bi", "bi-star-fill", "text-warning");
+                            } else {
+                                estrella.classList.add("bi", "bi-star", "text-muted");
+                            }
+                            estrellas.appendChild(estrella);
+                        }
+                        cardBody.appendChild(estrellas);
+                        // Crear el comentario
+                        if (comentario) {
+                            const textoComentario = document.createElement("p");
+                            textoComentario.classList.add("mb-0", "comentario-resenia");
+                            textoComentario.textContent = comentario;
+                            cardBody.appendChild(textoComentario);
+                        }
+                        card.appendChild(cardBody);
+                    };
+                    reader.readAsDataURL(imagenPatron);
+                }
+
+                else{
+                    // Crear las estrellas
+                    const estrellas = document.createElement("div");
+                    estrellas.classList.add("mb-2");
+                    for (let i = 1; i <= 5; i++) {
+                        const estrella = document.createElement("i");
+                        // Si la estrella está dentro de la puntuación, llenarla
+                        if (i <= puntuacion) {
+                            estrella.classList.add("bi", "bi-star-fill", "text-warning");
+                        } else {
+                            estrella.classList.add("bi", "bi-star", "text-muted");
+                        }
+                        estrellas.appendChild(estrella);
+                    }
+                    cardBody.appendChild(estrellas);
+                    // Crear el comentario
+                    if (comentario) {
+                        const textoComentario = document.createElement("p");
+                        textoComentario.classList.add("mb-0", "comentario-resenia");
+                        textoComentario.textContent = comentario;
+                        cardBody.appendChild(textoComentario);
+                    }
+                    card.appendChild(cardBody);
+                    }
+
+                // Agregar la card al contenedor de reseñas
+                contenedorReseñas.appendChild(card);
+
+                // Limpiar el formulario
+                document.getElementById("nombreUsuario").value = '';
+                document.getElementById("imagenPatron").value = '';
+                document.getElementById("puntuacion").value = '1';
+                document.getElementById("comentario").value = '';
+            }
+        });
+    </script>
+
+    <!-- Ficheros js propios -->
+    <script src="js/estructuras.js">/*Para el menu y para guardar el patron seleccionado*/</script>
+    <script src="js/datosPatron.js">/*Para los datos de prueba*/</script>
+    <script src="js/cargaDatosInfoPatron.js">//Para cargar de datos del patron</script>
+
+</body>
+</html>

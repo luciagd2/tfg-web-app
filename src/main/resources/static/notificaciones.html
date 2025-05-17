@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Ficheros css de Bootstrap -->
+    <link rel="stylesheet" href="css-bootstrap/bootstrap.min.css">
+
+    <!-- Ficheros css propios -->
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/notificaciones.css">
+
+    <!-- Ficheros js de Bootstrap -->
+    <script defer src="js-bootstrap/bootstrap.bundle.min.js"></script>
+
+    <!-- Ficheros js propios -->
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+
+    <title>Notificaciones</title>
+</head>
+<body class="wrapper overflow-hidden">
+    <!-- BARRA DE NAVEGACION -->
+    <div id="container-menu"></div>
+
+    <div class="main-content">
+        <ul class="list-group lista-notificaciones" id="listaNotificaciones"></ul>
+    </div>
+
+    <script src="js/estructuras.js"></script>
+    <script>
+        const plantillasNotificaciones = {
+            guardado: "Has guardado el patrón <strong>{patron}</strong> correctamente.",
+            compraExitosa: "Tu compra del patrón <strong>{patron}</strong> fue exitosa.",
+            patronGratis: "El patrón <strong>{patron}</strong> que tenías en favoritos ahora es gratis.",
+            cambioPrecio: "El patrón <strong>{patron}</strong> que tenías en favoritos ha cambiado de precio.",
+            nuevoPatronCreador: "<strong>{creador}</strong> ha publicado un nuevo patrón.",
+            actualizadoFavorito: "El patrón <strong>{patron}</strong> que tienes guardado ha sido actualizado por el creador.",
+            actualizadoComprado: "El patrón <strong>{patron}</strong> que tienes comprado ha sido actualizado por el creador.",
+            compraAlCreador: "<strong>{usuario}</strong> ha comprado tu patrón <strong>{patron}</strong>.",
+            guardadoAlCreador: "<strong>{usuario}</strong> ha guardado tu patrón <strong>{patron}</strong>.",
+            gustadoAlCreador: "A <strong>{usuario}</strong> le ha gustado tu patrón <strong>{patron}</strong>.",
+            calificacion: "Tu patrón <strong>{patron}</strong> ha sido calificado con <strong>{estrellas} estrellas</strong> por <strong>{usuario}</strong>.",
+            tendencia: "Tu patrón <strong>{patron}</strong> es tendencia."
+        };
+
+        const notificaciones = [
+            { id: "guardado", datos: { patron: "Osito Dormilón" } },
+            { id: "compraExitosa", datos: { patron: "Gorro de Invierno" } },
+            { id: "nuevoPatronCreador", datos: { creador: "AnaCrochet" } },
+            { id: "calificacion", datos: { patron: "Chaleco Vintage", usuario: "ArtistaCrochet", estrellas: 5 } },
+        ];
+
+
+        function renderNotificacionesDesdeId(lista, contenedorId) {
+            const contenedor = document.getElementById(contenedorId);
+            contenedor.innerHTML = ''; // limpiar
+
+            lista.forEach(({ id, datos }) => {
+                const plantilla = plantillasNotificaciones[id];
+                if (!plantilla) return;
+
+                let mensaje = plantilla;
+                for (const clave in datos) {
+                mensaje = mensaje.replace(new RegExp(`{${clave}}`, 'g'), datos[clave]);
+                }
+
+                const li = document.createElement('li');
+                li.className = 'list-group-item  mb-2';
+                li.innerHTML = mensaje;
+                contenedor.appendChild(li);
+            });
+        }
+
+        renderNotificacionesDesdeId(notificaciones, 'listaNotificaciones');
+
+      </script>
+      
+
+</body>
+</html>

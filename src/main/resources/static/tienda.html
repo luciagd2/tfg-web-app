@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Ficheros css de Bootstrap -->
+    <link rel="stylesheet" href="css-bootstrap/bootstrap.min.css">
+
+    <!-- Ficheros css propios -->
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/perfil-tienda.css">
+
+    <!-- Ficheros js: JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- Ficheros js de Bootstrap -->
+    <script defer src="js-bootstrap/bootstrap.bundle.min.js"></script>
+
+    <!-- Ficheros js propios -->
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+
+    <title>Tienda</title>
+</head>
+<body class="wrapper overflow-hidden">
+    <!-- BARRA DE NAVEGACION -->
+    <div id="container-menu"></div>
+
+    <div class="main-content">
+        <div class="container">
+            <!-- INFORMACION PERFIL -->
+            <div class="text-center info-perfil">
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <img src="imagenes/osito.jpg" alt="Perfil" class="rounded-circle" style="width: 60px; height: 60px;">
+                    <h2 class="ms-3 mb-0 nombre-usu">Nombre del Usuario</h2>
+                    <button class="btn btn-outline-secondary btn-sm btn-ajustes" data-bs-toggle="modal" data-bs-target="#editarPerfilModal">
+                        <i class="bi bi-gear-fill"></i>
+                    </button>
+                </div>
+                <p class="text-muted">Esta es la descripción del perfil. Algo breve que quieras poner debajo.</p>
+            
+                <!-- Botón de seguidores -->
+                <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalSeguidores">
+                    <i class="bi bi-people-fill"></i> Seguidores <span class="badge ms-1">123</span>
+                </button>
+
+            </div>
+            
+
+            <!-- OBCIONES TIENDA -->
+            <div class="contenedor-biblioteca">
+                <h3>Tienda</h3>
+                <div class="contenedor-btns">
+                    <div>
+                        <input type="radio" class="btn-check" name="tienda" id="publicados" autocomplete="off" checked>
+                        <label class="btn boton-check" for="publicados">
+                            <i class="bi bi-bookmark-fill"></i>
+                            Publicados
+                        </label>
+                
+                        <input type="radio" class="btn-check" name="tienda" id="borradores" autocomplete="off">
+                        <label class="btn boton-check" for="borradores">
+                            <i class="bi bi-cart-check-fill"></i>
+                            Borradores
+                        </label>
+                    </div>
+                        <a class="btn btn-primary boton-check" href="edicionPatron.html" role="button">
+                            <i class="bi bi-plus-circle"></i>
+                            Crear
+                        </a>
+                </div>
+                
+                <div class="contenedor-cards gap-4" id="contenedor-cards-tienda">
+                    <!-- CARDS DE LOS PATRONES AQUI -->
+                </div>
+            </div><!-- /contenedor-tienda -->
+            
+            <!-- OBCIONES BIBLIOTECA -->
+            <div class="contenedor-biblioteca">
+                <h3>Biblioteca</h3>
+                <div class="contenedor-btns-biblioteca">
+                    <input type="radio" class="btn-check" name="biblioteca" id="guardados" autocomplete="off" checked>
+                    <label class="btn boton-check" for="guardados">
+                        <i class="bi bi-bookmark-fill"></i>
+                        Guardados
+                    </label>
+                    
+                    <input type="radio" class="btn-check" name="biblioteca" id="comprados" autocomplete="off">
+                        <label class="btn boton-check" for="comprados">
+                        <i class="bi bi-cart-check-fill"></i>
+                        Comprados
+                    </label>
+                    
+                    <input type="radio" class="btn-check" name="biblioteca" id="favoritos" autocomplete="off">
+                    <label class="btn boton-check" for="favoritos">
+                        <i class="bi bi-heart-fill"></i>
+                        Favoritos
+                    </label>
+                </div>
+                <div class="contenedor-cards gap-4" id="contenedor-cards-biblioteca">
+                    <!-- CARDS DE LOS PATRONES AQUI -->
+                </div>
+
+            </div> <!-- /contenedor-biblioteca -->
+        </div>
+    </div> 
+
+    <!-- Modal Editar Perfil -->
+    <div class="modal fade" id="editarPerfilModal" tabindex="-1" aria-labelledby="editarPerfilModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content modal-perfil-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarPerfilModalLabel">Editar Perfil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarPerfil">
+                <div class="mb-3">
+                    <label for="nuevoNombre" class="form-label">Nombre de Usuario</label>
+                    <input type="text" class="form-control" id="nuevoNombre" placeholder="Nuevo nombre">
+                </div>
+                <div class="mb-3">
+                    <label for="nuevaImagen" class="form-label">Imagen de Perfil</label>
+                    <input type="file" class="form-control" id="nuevaImagen" accept="image/*">
+                </div>
+                <div class="mb-3">
+                    <label for="nuevaDescripcion" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="nuevaDescripcion" rows="3" placeholder="Escribe algo sobre ti..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SEGUIDORES -->
+    <div class="modal fade" id="modalSeguidores" tabindex="-1" aria-labelledby="modalSeguidoresLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+          <div class="modal-content modalSeguidores-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalSeguidoresLabel">Seguidores</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <ul class="list-group">
+                <li class="list-group-item d-flex align-items-center mb-2">
+                  <img src="imagenes/osito-derecha.png" alt="Usuario 1" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                  <span>usuario_1</span>
+                </li>
+                <li class="list-group-item d-flex align-items-center mb-2">
+                  <img src="imagenes/lana-y-espacio-abajo.jpg" alt="Usuario 2" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                  <span>usuario_2</span>
+                </li>
+                <!-- Añade más seguidores aquí -->
+              </ul>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <script src="js/estructuras.js"></script>
+    <script src="js/datosPatron.js"></script>
+    <script>
+        document.getElementById('formEditarPerfil').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const nuevoNombre = document.getElementById('nuevoNombre').value;
+        const nuevaImagen = document.getElementById('nuevaImagen').files[0];
+        const descripcion = document.getElementById('nuevaDescripcion').value;
+
+        if (nuevoNombre) {
+            document.querySelector('.nombre-usu').textContent = nuevoNombre;
+        }
+
+        if (nuevaImagen) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+            document.querySelector('.info-perfil img').src = e.target.result;
+            }
+            reader.readAsDataURL(nuevaImagen);
+        }
+
+        // Puedes hacer algo con la descripción, como guardarla o mostrarla en otro lugar
+        console.log("Descripción:", descripcion);
+
+        // Cierra el modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editarPerfilModal'));
+        modal.hide();
+        });
+    </script>
+</body>
+</html>

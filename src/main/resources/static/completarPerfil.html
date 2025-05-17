@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Ficheros css de Bootstrap -->
+    <link rel="stylesheet" href="css-bootstrap/bootstrap.min.css">
+
+    <!-- Ficheros css propios -->
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/registro-login.css">
+
+    <!-- Ficheros js de Bootstrap -->
+    <script defer src="js-bootstrap/bootstrap.bundle.min.js"></script>
+
+    <!-- Ficheros js propios -->
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <title>Completar Perfil</title>
+</head>
+<body class="wrapper overflow-hidden">
+  <div class="fondo">
+    <img src="imagenes/lana-y-espacio-abajo.jpg" alt="Fondo">
+  </div>
+
+  <div class="container formulario">
+    <h2 class="text-center mb-4">Completa tu Perfil</h2>
+    <form>
+      <div class="mb-3">
+        <label for="username" class="form-label">Nombre de usuario</label>
+        <input type="text" class="form-control" id="username" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="profile-image" class="form-label">Imagen de perfil</label>
+        <input class="form-control" type="file" id="profile-image" accept="image/*">
+        <img id="preview" class="img-preview rounded-circle d-block mx-auto d-none" alt="Vista previa" />
+      </div>
+
+      <div class="mb-3">
+        <label for="perfil-tipo" class="form-label">Tipo de perfil</label>
+        <select class="form-select" id="perfil-tipo" required>
+          <option value="">Selecciona una opción</option>
+          <option value="creador">Soy creador/a de patrones</option>
+          <option value="aficionado">Solo quiero explorar patrones</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Guardar Perfil</button>
+    </form>
+  </div>
+
+  <script>
+    const input = document.getElementById('profile-image');
+    const preview = document.getElementById('preview');
+
+    input.addEventListener('change', () => {
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+</body>
+</html>
