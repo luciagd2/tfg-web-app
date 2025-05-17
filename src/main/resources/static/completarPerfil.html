@@ -27,9 +27,9 @@
     <img src="imagenes/lana-y-espacio-abajo.jpg" alt="Fondo">
   </div>
 
-  <div class="container formulario">
+  <div class="container formulario" enctype="multipart/form-data">
     <h2 class="text-center mb-4">Completa tu Perfil</h2>
-    <form>
+    <form id="form-completar-perfil">
       <div class="mb-3">
         <label for="username" class="form-label">Nombre de usuario</label>
         <input type="text" class="form-control" id="username" required>
@@ -68,6 +68,48 @@
         };
         reader.readAsDataURL(file);
       }
+    });
+
+    // Capturamos el envío del formulario
+    document.getElementById("form-completar-perfil").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const usuario = JSON.parse(localStorage.getItem("usuario"));
+        if (!usuario) {
+            alert("Usuario no autenticado");
+            return;
+        }
+
+        const username = document.getElementById("username").value;
+        const tipoPerfil = document.getElementById("perfil-tipo").value;
+        const imagenInput = document.getElementById("profile-image");
+        const imagen = imagenInput.files[0];
+
+        const formData = new FormData();
+        formData.append("email", usuario.email);
+        formData.append("username", username);
+        formData.append("tipoPerfil", tipoPerfil);
+        if (imagen) {
+            formData.append("imagen", imagen);
+        }
+
+        try {
+            const response = await fetch("/api/usuarios/perfil", {
+                method: "POST",
+                body: formData,
+                credentials: "include"
+            });
+
+            if (response.ok) {
+                alert("Perfil guardado correctamente");
+                window.location.href = "inicio.html";
+            } else {
+                alert("Error al guardar perfil");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error de conexión");
+        }
     });
   </script>
 </body>
