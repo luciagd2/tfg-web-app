@@ -8,7 +8,7 @@ function cargarMenu() {
     const paginaActual = window.location.pathname.split("/").pop();
 
     // Obtener datos del usuario
-    const user = JSON.parse(localStorage.getItem("usuario"));
+    const user = JSON.parse(sessionStorage.getItem("usuario"));
 
     // Determinar las páginas debe mostrar
     let perfilPagina = "perfil.html";

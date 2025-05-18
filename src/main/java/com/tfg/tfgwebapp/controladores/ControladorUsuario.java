@@ -1,5 +1,6 @@
 package com.tfg.tfgwebapp.controladores;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import com.tfg.tfgwebapp.modelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
@@ -18,6 +19,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,11 +31,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/usuarios")
 public class ControladorUsuario {
+    //TODO: borrar, es solo para mensajes de log
+    private static final Logger logger = LoggerFactory.getLogger(ControladorUsuario.class);
+
     private final RepositorioUsuario repositorioUsuario;
     private final ServiciosUsuario serviciosUsuario;
     private final ServicioAutenticacion servicioAutenticacion;
@@ -46,10 +52,16 @@ public class ControladorUsuario {
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<String> registrar(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> registrar(@RequestBody Usuario usuario, HttpServletRequest request) {
         boolean registrado = serviciosUsuario.registrar(usuario);
         if (registrado) {
-            return ResponseEntity.ok("Usuario registrado correctamente");
+            // Autenticar al usuario después del registro
+            UserDetails userDetails = servicioAutenticacion.loadUserByUsername(usuario.getEmail());
+            Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+
+            return ResponseEntity.ok("Usuario registrado y autenticado correctamente");
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya existe");
         }
@@ -70,6 +82,13 @@ public class ControladorUsuario {
             // Guarda el contexto de seguridad en la sesión HTTP
             request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
+            // Nos aseguramos de que se crea correctamente la sesion y que los filtros de seguridad reconozcan esa sesion en las siguientes peticiones
+            try {
+                request.login(datos.get("email"), datos.get("password"));
+            } catch (ServletException e) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login fallido");
+            }
+
             return ResponseEntity.ok(user.get());
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
@@ -82,7 +101,8 @@ public class ControladorUsuario {
             @RequestParam String username,
             @RequestParam String tipoPerfil,
             @RequestParam(required = false) MultipartFile imagen
-    ) {
+    ) throws IOException {
+        logger.info("Entrando en el método completarPerfil");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
@@ -91,6 +111,7 @@ public class ControladorUsuario {
 
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
         if (!usuarioOpt.isPresent()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
         }
@@ -102,11 +123,18 @@ public class ControladorUsuario {
         usuario.setTipoPerfil(tipoPerfil);
 
         if (imagen != null && !imagen.isEmpty()) {
-            try {
-                usuario.setImagenPerfil(Arrays.toString(imagen.getBytes()));
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar la imagen");
-            }
+            // Define ruta y nombre
+            String carpetaDestino = "src/main/resources/static/imagenes/perfiles/";
+            // TODO: borrar la creacion de la carpeta, ya existe
+            File dir = new File(carpetaDestino);
+            if (!dir.exists()) dir.mkdirs();
+
+            String nombreArchivo = System.currentTimeMillis() + "_" + imagen.getOriginalFilename();
+            Path rutaArchivo = Paths.get(carpetaDestino, nombreArchivo);
+            Files.write(rutaArchivo, imagen.getBytes());
+
+            // Guarda la ruta relativa en el usuario
+            usuario.setImagenPerfil("./imagenes/perfiles" + nombreArchivo);
         }
 
         repositorioUsuario.save(usuario);
@@ -119,6 +147,7 @@ public class ControladorUsuario {
                                 @RequestParam("nombreUsuario") String nombreUsuario,
                                 @RequestParam("email") String email,
                                 Model model) {
+        logger.info("Entrando en el método guardarPerfil");
         try {
             // 1. Define ruta para guardar la imagen (puede ser carpeta en tu proyecto o ruta absoluta)
             String carpetaDestino = "imagenes/perfiles/";

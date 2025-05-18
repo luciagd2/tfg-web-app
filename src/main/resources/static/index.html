@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Ficheros css de Bootstrap -->
-    <link rel="stylesheet" href="css-bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="./css-bootstrap/bootstrap.min.css">
 
     <!-- Ficheros css propios -->
-    <link rel="stylesheet" href="css/general.css">
-    <link rel="stylesheet" href="css/registro-login.css">
+    <link rel="stylesheet" href="./css/general.css">
+    <link rel="stylesheet" href="./css/registro-login.css">
 
     <!-- Ficheros js de Bootstrap -->
-    <script defer src="js-bootstrap/bootstrap.bundle.min.js"></script>
+    <script defer src="./js-bootstrap/bootstrap.bundle.min.js"></script>
 
     <!-- Ficheros js propios -->
 
@@ -39,7 +39,7 @@
             <input type="password" class="form-control" id="password" required>
         </div>
         <button type="submit" class="btn btn-success w-100">Entrar</button>
-        <p class="text-center mt-3">¿No tienes cuenta? <a href="registro.html">Regístrate</a></p>
+        <p class="text-center mt-3">¿No tienes cuenta? <a href="/registro.html">Regístrate</a></p>
         </form>
     </div>
 
@@ -90,7 +90,7 @@
 
                 if (response.ok) {
                     const user = await response.json();
-                    localStorage.setItem("usuario", JSON.stringify(user));
+                    sessionStorage.setItem("usuario", JSON.stringify(user));
                     window.location.href = "inicio.html";
                 } else {
                     alert("Correo o contraseña incorrectos.");

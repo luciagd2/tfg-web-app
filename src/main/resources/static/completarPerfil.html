@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Ficheros css de Bootstrap -->
-    <link rel="stylesheet" href="css-bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/css-bootstrap/bootstrap.min.css">
 
     <!-- Ficheros css propios -->
-    <link rel="stylesheet" href="css/general.css">
-    <link rel="stylesheet" href="css/registro-login.css">
+    <link rel="stylesheet" href="/css/general.css">
+    <link rel="stylesheet" href="/css/registro-login.css">
 
     <!-- Ficheros js de Bootstrap -->
-    <script defer src="js-bootstrap/bootstrap.bundle.min.js"></script>
+    <script defer src="/js-bootstrap/bootstrap.bundle.min.js"></script>
 
     <!-- Ficheros js propios -->
 
@@ -36,8 +36,8 @@
       </div>
 
       <div class="mb-3">
-        <label for="profile-image" class="form-label">Imagen de perfil</label>
-        <input class="form-control" type="file" id="profile-image" accept="image/*">
+        <label for="imagen-perfil" class="form-label">Imagen de perfil</label>
+        <input class="form-control" type="file" id="imagen-perfil" accept="image/*">
         <img id="preview" class="img-preview rounded-circle d-block mx-auto d-none" alt="Vista previa" />
       </div>
 
@@ -55,8 +55,9 @@
   </div>
 
   <script>
-    const input = document.getElementById('profile-image');
+    const input = document.getElementById('imagen-perfil');
     const preview = document.getElementById('preview');
+    let srcImagen = '';
 
     input.addEventListener('change', () => {
       const file = input.files[0];
@@ -65,6 +66,7 @@
         reader.onload = e => {
           preview.src = e.target.result;
           preview.classList.remove('d-none');
+          srcImagen = preview.src;
         };
         reader.readAsDataURL(file);
       }
@@ -82,15 +84,19 @@
 
         const username = document.getElementById("username").value;
         const tipoPerfil = document.getElementById("perfil-tipo").value;
-        const imagenInput = document.getElementById("profile-image");
-        const imagen = imagenInput.files[0];
+        const imagenPerfil = document.getElementById("imagen-perfil").files[0];
 
         const formData = new FormData();
         formData.append("email", usuario.email);
         formData.append("username", username);
         formData.append("tipoPerfil", tipoPerfil);
-        if (imagen) {
-            formData.append("imagen", imagen);
+        if (imagenPerfil) {
+            formData.append("imagen", imagenPerfil);
+        }
+
+        // TODO: borrar, muestra todo lo que se ha añadido al FormData
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ':', pair[1]);
         }
 
         try {
@@ -104,7 +110,10 @@
                 alert("Perfil guardado correctamente");
                 window.location.href = "inicio.html";
             } else {
-                alert("Error al guardar perfil");
+                const errorText = await response.text(); // o .json() si sabes que es JSON
+                console.error("Estado:", response.status);
+                console.error("Respuesta:", errorText);
+                alert(`Error al guardar perfil: ${response.status}`);
             }
         } catch (error) {
             console.error(error);
