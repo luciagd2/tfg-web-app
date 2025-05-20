@@ -26,15 +26,4 @@ public class ServiciosUsuario {
         repositorioUsuario.save(usuario);
         return true;
     }
-
-    public void actualizarPerfil(Long id, String nombreUsuario, boolean esCreador, String imagenPerfil) {
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findById(id);
-        if (usuarioOpt.isPresent()) {
-            Usuario u = usuarioOpt.get();
-            u.setNombreUsuario(nombreUsuario);
-            u.setEsCreador(esCreador);
-            u.setImagenPerfil(imagenPerfil);
-            repositorioUsuario.save(u);
-        }
-    }
 }

@@ -32,8 +32,8 @@
             <!-- INFORMACION PERFIL -->
             <div class="text-center info-perfil">
                 <div class="d-flex align-items-center justify-content-center mb-2 gap-2">
-                    <img src="imagenes/osito.jpg" alt="Perfil" class="rounded-circle" style="width: 60px; height: 60px;">
-                    <h2 class="mb-0 nombre-usu">Nombre del Usuario</h2>
+                    <img id="img-perfil" src="imagenes/logo-usuario.png" alt="Perfil" class="rounded-circle" style="width: 60px; height: 60px;">
+                    <h2  id="nombre-usuario" class="mb-0 nombre-usu">Nombre del Usuario</h2>
                     <button class="btn btn-outline-secondary btn-sm btn-ajustes" data-bs-toggle="modal" data-bs-target="#editarPerfilModal">
                         <i class="bi bi-gear-fill"></i>
                     </button>
@@ -116,10 +116,6 @@
                     <label for="nuevaImagen" class="form-label">Imagen de Perfil</label>
                     <input type="file" class="form-control" id="nuevaImagen" accept="image/*">
                 </div>
-                <div class="mb-3">
-                    <label for="nuevaDescripcion" class="form-label">Descripción</label>
-                    <textarea class="form-control" id="nuevaDescripcion" rows="3" placeholder="Escribe algo sobre ti..."></textarea>
-                </div>
                 <button type="submit" class="btn btn-primary">Guardar cambios</button>
                 </form>
             </div>
@@ -129,31 +125,56 @@
 
     <script src="js/estructuras.js"></script>
     <script>
-        document.getElementById('formEditarPerfil').addEventListener('submit', function(e) {
-        e.preventDefault();
+        // INFORMACION DE PERFIL
+        document.getElementById('img-perfil').src = JSON.parse(sessionStorage.getItem("usuario")).imagenPerfil;
+        document.getElementById('nombre-usuario').innerText = JSON.parse(sessionStorage.getItem("usuario")).nombreUsuario;
 
-        const nuevoNombre = document.getElementById('nuevoNombre').value;
-        const nuevaImagen = document.getElementById('nuevaImagen').files[0];
-        const descripcion = document.getElementById('nuevaDescripcion').value;
+        // CAMBIO DE INFORMACION DE PERFIL CON EL MODAL
+        document.getElementById('formEditarPerfil').addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-        if (nuevoNombre) {
-            document.querySelector('.nombre-usu').textContent = nuevoNombre;
-        }
+            const nuevoNombre = document.getElementById('nuevoNombre').value;
+            const nuevaImagen = document.getElementById('nuevaImagen').files[0];
+            const formData = new FormData();
 
-        if (nuevaImagen) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-            document.querySelector('.info-perfil img').src = e.target.result;
+            if (nuevoNombre) {
+                document.querySelector('.nombre-usu').textContent = nuevoNombre;
+                formData.append("nombreUsuario", nuevoNombre);
             }
-            reader.readAsDataURL(nuevaImagen);
-        }
+            if (nuevaImagen) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.querySelector('.info-perfil img').src = e.target.result;
+                    formData.append("imagen", nuevaImagen);
+                }
+                reader.readAsDataURL(nuevaImagen);
+            }
 
-        // Puedes hacer algo con la descripción, como guardarla o mostrarla en otro lugar
-        console.log("Descripción:", descripcion);
+            try {
+                const response = await fetch("/api/usuarios/perfil/guardar", {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include"
+                });
 
-        // Cierra el modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editarPerfilModal'));
-        modal.hide();
+                if (response.ok) {
+                    alert("Perfil guardado correctamente");
+                    const user = await response.json();
+                    sessionStorage.setItem("usuario", JSON.stringify(user));
+                } else {
+                    const errorText = await response.text(); // o .json() si sabes que es JSON
+                    console.error("Estado:", response.status);
+                    console.error("Respuesta:", errorText);
+                    alert(`Error al guardar perfil: ${response.status}`);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error de conexión");
+            }
+
+            // Cierra el modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editarPerfilModal'));
+            modal.hide();
         });
     </script>
 

@@ -127,7 +127,7 @@ public class ControladorUsuario {
             Files.write(rutaArchivo, imagen.getBytes());
 
             // Guarda la ruta relativa en el usuario
-            usuario.setImagenPerfil("./imagenes/perfiles" + nombreArchivo);
+            usuario.setImagenPerfil("./imagenes/perfiles/" + nombreArchivo);
         }
 
         repositorioUsuario.save(usuario);
@@ -136,48 +136,45 @@ public class ControladorUsuario {
     }
 
     @PostMapping("/perfil/guardar")
-    public String guardarPerfil(@RequestParam("imagen") MultipartFile imagen,
-                                @RequestParam("nombreUsuario") String nombreUsuario,
-                                @RequestParam("email") String email,
-                                Model model) {
+    public ResponseEntity<?> guardarPerfil(@RequestParam(required = false) String nombreUsuario,
+                                @RequestParam(required = false) MultipartFile imagen,
+                                @RequestParam(required = false) String descripcionUsuario
+    ) throws IOException {
         logger.info("Entrando en el método guardarPerfil");
-        try {
-            // 1. Define ruta para guardar la imagen (puede ser carpeta en tu proyecto o ruta absoluta)
-            String carpetaDestino = "imagenes/perfiles/";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-            // Asegúrate que la carpeta exista (crearla si no)
-            File directorio = new File(carpetaDestino);
-            if (!directorio.exists()) {
-                directorio.mkdirs();
-            }
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
 
-            // 2. Crea un nombre único para la imagen para evitar sobreescritura
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        // Ahora actualizas el usuario con los datos recibidos
+        if (nombreUsuario != null && !nombreUsuario.isEmpty()) {
+            usuario.setNombreUsuario(nombreUsuario);
+        }
+        if (imagen != null && !imagen.isEmpty()) {
+            // Define ruta y nombre
+            String carpetaDestino = "src/main/resources/static/imagenes/perfiles/";
             String nombreArchivo = System.currentTimeMillis() + "_" + imagen.getOriginalFilename();
-
-            // 3. Guarda la imagen en disco
             Path rutaArchivo = Paths.get(carpetaDestino, nombreArchivo);
             Files.write(rutaArchivo, imagen.getBytes());
-
-            // 4. Guarda solo la ruta relativa en la base de datos
-            String rutaRelativa = carpetaDestino + nombreArchivo;
-
-            // 5. Crea o recupera el usuario, asigna la ruta de la imagen y demás datos
-            Usuario usuario = new Usuario();
-            usuario.setNombreUsuario(nombreUsuario);
-            usuario.setEmail(email);
-            usuario.setImagenPerfil(rutaRelativa);
-
-            // Aquí guardar el usuario usando tu servicio o repositorio
-            repositorioUsuario.save(usuario);
-
-            model.addAttribute("mensaje", "Perfil guardado correctamente");
-            return "exito";
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            model.addAttribute("error", "Error al guardar la imagen");
-            return "error";
+            // Guarda la ruta relativa en el usuario
+            usuario.setImagenPerfil("./imagenes/perfiles/" + nombreArchivo);
         }
+        if (descripcionUsuario != null && !descripcionUsuario.isEmpty()) {
+            usuario.setDescripcionUsuario(descripcionUsuario);
+        }
+        repositorioUsuario.save(usuario);
+
+        return ResponseEntity.ok(usuario);
     }
 
 }
