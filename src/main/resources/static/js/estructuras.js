@@ -9,11 +9,11 @@ function cargarMenu() {
 
     // Obtener datos del usuario
     const user = JSON.parse(sessionStorage.getItem("usuario"));
-    console.log(user.tipoPerfil)
+    console.log("Usuario creador: ",user.esCreador)
 
     // Determinar las páginas debe mostrar
     let perfilPagina = "perfil.html";
-    if (user.tipoPerfil === "creador") {
+    if (user.esCreador) {
       perfilPagina = "tienda.html";
     }
 

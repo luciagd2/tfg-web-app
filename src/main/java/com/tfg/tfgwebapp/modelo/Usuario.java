@@ -13,7 +13,7 @@ public class Usuario {
     private String password;
     private String nombreUsuario;
     private String descripcionUsuario;
-    private String tipoPerfil; // "normal", "tienda", etc.
+    private boolean esCreador;
     @Column(length = 500)
     private String imagenPerfil;
 
@@ -59,20 +59,12 @@ public class Usuario {
         this.descripcionUsuario = descripcionUsuario;
     }
 
-    public String getTipoPerfil() {
-        return tipoPerfil;
-    }
+    public boolean isEsCreador() { return esCreador;}
 
-    public void setTipoPerfil(String tipoPerfil) {
-        this.tipoPerfil = tipoPerfil;
-    }
+    public void setEsCreador(boolean esCreador) { this.esCreador = esCreador;}
 
-    public String getImagenPerfil() {
-        return imagenPerfil;
-    }
+    public String getImagenPerfil() { return imagenPerfil;}
 
-    public void setImagenPerfil(String imagenPerfil) {
-        this.imagenPerfil = imagenPerfil;
-    }
+    public void setImagenPerfil(String imagenPerfil) { this.imagenPerfil = imagenPerfil;}
 }
 

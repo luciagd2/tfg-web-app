@@ -45,8 +45,8 @@
         <label for="perfil-tipo" class="form-label">Tipo de perfil</label>
         <select class="form-select" id="perfil-tipo" required>
           <option value="">Selecciona una opción</option>
-          <option value="creador">Soy creador/a de patrones</option>
-          <option value="aficionado">Solo quiero explorar patrones</option>
+          <option value="true">Soy creador/a de patrones</option>
+          <option value="false">Solo quiero explorar patrones</option>
         </select>
       </div>
 
@@ -83,13 +83,17 @@
         }
 
         const username = document.getElementById("username").value;
-        const tipoPerfil = document.getElementById("perfil-tipo").value;
+        const esCreador = document.getElementById("perfil-tipo").value;
         const imagenPerfil = document.getElementById("imagen-perfil").files[0];
 
         const formData = new FormData();
         formData.append("email", usuario.email);
         formData.append("username", username);
-        formData.append("tipoPerfil", tipoPerfil);
+        if (esCreador === "true"){
+            formData.append("esCreador", true);
+        } else {
+            formData.append("esCreador", false);
+        }
         if (imagenPerfil) {
             formData.append("imagen", imagenPerfil);
         }
@@ -108,6 +112,8 @@
 
             if (response.ok) {
                 alert("Perfil guardado correctamente");
+                const user = await response.json();
+                sessionStorage.setItem("usuario", JSON.stringify(user));
                 window.location.href = "inicio.html";
             } else {
                 const errorText = await response.text(); // o .json() si sabes que es JSON

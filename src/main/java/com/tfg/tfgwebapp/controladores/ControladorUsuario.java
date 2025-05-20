@@ -6,9 +6,7 @@ import com.tfg.tfgwebapp.modelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
 import com.tfg.tfgwebapp.servicios.ServicioAutenticacion;
 import com.tfg.tfgwebapp.servicios.ServiciosUsuario;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +21,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,7 +29,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -96,7 +92,7 @@ public class ControladorUsuario {
     @PostMapping("/perfil")
     public ResponseEntity<?> completarPerfil(
             @RequestParam String username,
-            @RequestParam String tipoPerfil,
+            @RequestParam boolean esCreador,
             @RequestParam(required = false) MultipartFile imagen
     ) throws IOException {
         logger.info("Entrando en el método completarPerfil");
@@ -117,7 +113,7 @@ public class ControladorUsuario {
 
         // Ahora actualizas el usuario con los datos recibidos
         usuario.setNombreUsuario(username);
-        usuario.setTipoPerfil(tipoPerfil);
+        usuario.setEsCreador(esCreador);
 
         if (imagen != null && !imagen.isEmpty()) {
             // Define ruta y nombre
@@ -136,7 +132,7 @@ public class ControladorUsuario {
 
         repositorioUsuario.save(usuario);
 
-        return ResponseEntity.ok("Perfil actualizado correctamente");
+        return ResponseEntity.ok(usuario);
     }
 
     @PostMapping("/perfil/guardar")

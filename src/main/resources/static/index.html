@@ -92,8 +92,8 @@
                     const user = await response.json();
                     sessionStorage.setItem("usuario", JSON.stringify(user));
                     window.location.href = "inicio.html";
-                } else {
-                    alert("Correo o contraseña incorrectos.");
+                }  else {
+                    alert("Credenciales inválidas");
                 }
             } catch (err) {
                 console.error(err);
