@@ -51,6 +51,31 @@ public class ControladorUsuario {
         this.servicioAutenticacion = servicioAutenticacion;
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> datos, HttpServletRequest request) {
+        Optional<Usuario> user = serviciosUsuario.login(datos.get("email"), datos.get("password"));
+        System.out.println("Usuario: "+user);
+        System.out.println("Usuario presente: "+user.isPresent());
+
+        if (user.isPresent()) {
+            // Crea la autenticación con los detalles del usuario
+            UserDetails userDetails = servicioAutenticacion.loadUserByUsername(datos.get("email"));
+            Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            // Setea la autenticación en el contexto de seguridad
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            // Guarda el contexto de seguridad en la sesión HTTP
+            request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+
+            System.out.println("Respuesta login ok");
+            return ResponseEntity.ok(user.get());
+        } else {
+            System.out.println("Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        }
+    }
+
     @PostMapping("/registro")
     public ResponseEntity<?> registrar(@RequestBody Usuario usuario, HttpServletRequest request) {
         boolean registrado = serviciosUsuario.registrar(usuario);
@@ -64,34 +89,6 @@ public class ControladorUsuario {
             return ResponseEntity.ok("Usuario registrado y autenticado correctamente");
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya existe");
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> datos, HttpServletRequest request) {
-        Optional<Usuario> user = serviciosUsuario.login(datos.get("email"), datos.get("password"));
-
-        if (user.isPresent()) {
-            // Crea la autenticación con los detalles del usuario
-            UserDetails userDetails = servicioAutenticacion.loadUserByUsername(datos.get("email"));
-            Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-            // Setea la autenticación en el contexto de seguridad
-            SecurityContextHolder.getContext().setAuthentication(auth);
-
-            // Guarda el contexto de seguridad en la sesión HTTP
-            request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
-
-            // Nos aseguramos de que se crea correctamente la sesion y que los filtros de seguridad reconozcan esa sesion en las siguientes peticiones
-            try {
-                request.login(datos.get("email"), datos.get("password"));
-            } catch (ServletException e) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login fallido");
-            }
-
-            return ResponseEntity.ok(user.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
         }
     }
 

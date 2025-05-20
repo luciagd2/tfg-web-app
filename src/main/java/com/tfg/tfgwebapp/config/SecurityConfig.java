@@ -45,8 +45,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Crea sesión solo si es necesario
                 )
-                .formLogin(form -> form.disable()) // Desactiva login por formulario
-                .httpBasic(httpBasic -> httpBasic.disable()) // Desactiva auth básica
+                //.formLogin(form -> form.disable()) // Desactiva login por formulario
+                //.httpBasic(httpBasic -> httpBasic.disable()) // Desactiva auth básica
                 .build();
     }
 
