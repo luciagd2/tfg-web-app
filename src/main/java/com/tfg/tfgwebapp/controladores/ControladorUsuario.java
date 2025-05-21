@@ -1,8 +1,7 @@
 package com.tfg.tfgwebapp.controladores;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.ui.Model;
-import com.tfg.tfgwebapp.modelo.Usuario;
+import com.tfg.tfgwebapp.clasesDAO.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
 import com.tfg.tfgwebapp.servicios.ServicioAutenticacion;
 import com.tfg.tfgwebapp.servicios.ServiciosUsuario;

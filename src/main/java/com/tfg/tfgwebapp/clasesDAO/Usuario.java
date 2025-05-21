@@ -1,4 +1,4 @@
-package com.tfg.tfgwebapp.modelo;
+package com.tfg.tfgwebapp.clasesDAO;
 
 import jakarta.persistence.*;
 
