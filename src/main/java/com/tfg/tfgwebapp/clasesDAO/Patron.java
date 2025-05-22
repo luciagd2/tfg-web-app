@@ -12,26 +12,32 @@ public class Patron {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long idCreador;
 
     private String titulo;
     private double precio;
     private boolean publicado;
+
+    @JoinColumn(name = "idCreador") // FK a Usuario.id
+    private Long idCreador;
+    
     //Información
     @Enumerated(EnumType.STRING)
     private dificultad dificultad;
     private String descripcion;
     private enum idioma { Español, Inglés, Frances, Aleman};
     private enum unidad {Centímetros, Pulgadas}
+    
     //Materiales
     private String lanas;
     private String agujaGanchillo;
     private String agujadaLanera;
     private String otros;
+    
     //Otros
     private String abreviaturas;
-    @ElementCollection
-    // --> private List<String> tags;
+    
+    @OneToMany(mappedBy = "patron", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Resena> resenas = new ArrayList<>();
     //Instrucciones
 
 
