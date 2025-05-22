@@ -6,9 +6,6 @@ import javax.swing.*;
 
 @Entity
 public class Patron {
-    //Emunerates
-    private enum dificultad {Principiante, Intermedio, Avanzado};
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,10 +19,12 @@ public class Patron {
     
     //Información
     @Enumerated(EnumType.STRING)
-    private dificultad dificultad;
+    private Dificultad dificultad;
     private String descripcion;
-    private enum idioma { Español, Inglés, Frances, Aleman};
-    private enum unidad {Centímetros, Pulgadas}
+    @Enumerated(EnumType.STRING)
+    private Idioma idioma;
+    @Enumerated(EnumType.STRING)
+    private enum Unidad unidad;
     
     //Materiales
     private String lanas;
@@ -84,3 +83,22 @@ public class Patron {
 }
     */
 }
+
+public enum Dificultad {
+    Principiante, 
+    Intermedio, 
+    Avanzado
+}
+
+public enum Idioma {
+    Español, 
+    Inglés, 
+    Frances, 
+    Aleman
+}
+
+public enum Unidad {
+    Centímetros, 
+    Pulgadas
+}
+
