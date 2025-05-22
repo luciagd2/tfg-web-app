@@ -1,19 +1,11 @@
 package com.tfg.tfgwebapp.controladores;
 
-import org.slf4j.LoggerFactory;
 import com.tfg.tfgwebapp.clasesDAO.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
 import com.tfg.tfgwebapp.servicios.ServicioAutenticacion;
 import com.tfg.tfgwebapp.servicios.ServiciosUsuario;
+
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.*;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,11 +15,20 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import org.slf4j.Logger;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -46,6 +47,20 @@ public class ControladorUsuario {
         this.servicioAutenticacion = servicioAutenticacion;
     }
 
+    /**
+     * Maneja la solicitud de inicio de sesión de un usuario.
+     * <p>
+     * Verifica las credenciales recibidas (email y password), y si son válidas,
+     * establece la autenticación en el contexto de seguridad de Spring. En caso contrario,
+     * retorna un error HTTP 401.
+     *
+     * @param datos   Mapa que contiene las credenciales del usuario. Incluye:
+     *                "email": correo del usuario,
+     *                "password": contraseña del usuario
+     * @param request Objeto HttpServletRequest para acceder a la sesión y almacenar el contexto de seguridad
+     * @return Una respuesta HTTP 200 con el objeto {@link Usuario} autenticado si las credenciales son válidas,
+     *         o una respuesta HTTP 401 con un mensaje de error si son inválidas
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> datos, HttpServletRequest request) {
         Optional<Usuario> user = serviciosUsuario.login(datos.get("email"), datos.get("password"));
@@ -71,6 +86,19 @@ public class ControladorUsuario {
         }
     }
 
+    /**
+     * Maneja la solicitud de registro de un nuevo usuario.
+     * <p>
+     * Si el registro es exitoso, autentica automáticamente al usuario y guarda el
+     * contexto de seguridad en la sesión HTTP. En caso de que el usuario ya exista,
+     * devuelve una respuesta de conflicto.
+     *
+     * @param usuario Objeto {@link Usuario} recibido en el cuerpo de la petición. Debe contener
+     *                los datos necesarios para el registro (nombre, email, contraseña, etc.).
+     * @param request Objeto HttpServletRequest utilizado para establecer la sesión del usuario registrado.
+     * @return Una respuesta HTTP 200 si el usuario se registró y autenticó correctamente,
+     *         o HTTP 409 (Conflict) si el usuario ya existe en la base de datos.
+     */
     @PostMapping("/registro")
     public ResponseEntity<?> registrar(@RequestBody Usuario usuario, HttpServletRequest request) {
         boolean registrado = serviciosUsuario.registrar(usuario);
@@ -87,7 +115,20 @@ public class ControladorUsuario {
         }
     }
 
-
+    /**
+     * Completa el perfil del usuario autenticado.
+     * <p>
+     * Este método permite al usuario establecer un nombre de usuario personalizado,
+     * indicar si es creador y, opcionalmente, subir una imagen de perfil. La imagen se guarda
+     * localmente y su ruta relativa se almacena en el objeto {@link Usuario}.
+     *
+     * @param username   El nombre de usuario a establecer para el perfil.
+     * @param esCreador  Booleano que indica si el usuario desea marcarse como creador.
+     * @param imagen     (Opcional) Archivo de imagen para usar como foto de perfil.
+     * @return Una respuesta HTTP 200 con el usuario actualizado si la operación es exitosa,
+     *         o HTTP 401 si el usuario no está autenticado o no existe en la base de datos.
+     * @throws IOException Si ocurre un error al guardar el archivo de imagen en el sistema.
+     */
     @PostMapping("/perfil")
     public ResponseEntity<?> completarPerfil(
             @RequestParam String username,
@@ -134,6 +175,20 @@ public class ControladorUsuario {
         return ResponseEntity.ok(usuario);
     }
 
+    /**
+     * Actualiza el perfil del usuario autenticado.
+     * <p>
+     * Este endpoint permite modificar opcionalmente el nombre de usuario, la descripción
+     * y la imagen de perfil. Solo los campos enviados serán actualizados; los que no se
+     * incluyan en la petición permanecerán sin cambios.
+     *
+     * @param nombreUsuario       (Opcional) Nuevo nombre de usuario a guardar.
+     * @param imagen              (Opcional) Nueva imagen de perfil. Se guarda localmente y se almacena la ruta.
+     * @param descripcionUsuario  (Opcional) Nueva descripción personalizada del usuario.
+     * @return Una respuesta HTTP 200 con el objeto {@link Usuario} actualizado si la operación es exitosa,
+     *         o HTTP 401 si el usuario no está autenticado o no se encuentra en la base de datos.
+     * @throws IOException Si ocurre un error al guardar la imagen en el sistema de archivos.
+     */
     @PostMapping("/perfil/guardar")
     public ResponseEntity<?> guardarPerfil(@RequestParam(required = false) String nombreUsuario,
                                 @RequestParam(required = false) MultipartFile imagen,
