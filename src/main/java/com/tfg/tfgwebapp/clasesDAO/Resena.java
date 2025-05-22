@@ -1,3 +1,9 @@
+package com.tfg.tfgwebapp.clasesDAO;
+
+import jakarta.persistence.*;
+
+import javax.swing.*;
+
 @Entity
 public class Resena {
 
@@ -6,11 +12,11 @@ public class Resena {
     private Long idResena;
 
     @ManyToOne
-    @JoinColumn(name = "idPatron")
+    @JoinColumn(name = "idPatron") //clave foranea
     private Patron patron;
 
     @ManyToOne
-    @JoinColumn(name = "idUsuario")
+    @JoinColumn(name = "idUsuario") //clave foranea
     private Usuario usuario;
 
     private String imagen;
