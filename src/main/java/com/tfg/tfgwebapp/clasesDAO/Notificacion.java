@@ -15,7 +15,9 @@ import javax.swing.*;
     @JoinColumn(name = "idUsuario") //clave foranea
     private Usuario usuario;
 
-    private String tipo;
+    @Enumerated(EnumType.STRING)
+    private TipoNotificacion tipo;
+    
     private String mensaje;
 
     // campos adicionales según tipo
@@ -23,4 +25,19 @@ import javax.swing.*;
     private Long idUsuarioRelacionado;
 
     // getters y setters
+}
+
+public enum TipoNotificacion {
+    GUARDADO,
+    COMPRA_EXITOSA, 
+    PATRON_GRATIS, 
+    CAMBIO_PRECIO, 
+    NUEVO_PATRON_CREADOR,
+    ACTUALIZADO_FAVORITO, 
+    ACTUALIZADO_COMPRADO, 
+    COMPRA_AL_CREADOR, 
+    GUARDADO_AL_CREADOR,
+    GUSTADO_AL_CREADOR, 
+    CALIFICACION, 
+    TENDENCIA
 }
