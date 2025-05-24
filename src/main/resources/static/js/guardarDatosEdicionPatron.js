@@ -2,39 +2,68 @@
 **********     FICHERO PARA LAS FUNCIONES QUE DEFINEN COMO GUARDAR     **********
 **********         LOS DATOS DEL PATRON DE EDICIONPATRON.HTML          **********
 *********************************************************************************/
+//TODO: Eliminar el código anterior (comentado con ////)
+function guardarPatron(patron) {
 
-function guardarPatron() {
-  const patron = {};
+  console.log("Dentro de guardarPatron");
+  //const patron = {};
 
   // Título y autor
-  patron.titulo = document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value.trim();
+  ////patron.titulo = document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value.trim();
+  patron.setTitulo(document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value.trim());
+
+  //TODO: Eliminar, el usuario no cambia
+  /*
   patron.usuario = {
     nombre: document.querySelector('input[placeholder="Tu nombre o alias"]').value.trim(),
     imagen: localStorage.getItem("patronSeleccionado").usuario.imagen
   };
+  */
 
   // Información general
-  patron.informacion = {
+  ////
+  /*patron.informacion = {
     descripcion: document.querySelector('textarea[placeholder*="Breve"]').value.trim(),
     idioma: document.querySelector('select#idioma').value,
     unidad: document.querySelector('select#unidad').value,
     dificultad: document.querySelector('select#dificultad').value
   };
+  */
+  patron.setDescripcion(document.querySelector('textarea[placeholder*="Breve"]').value.trim());
+  patron.setIdioma(document.querySelector('select#idioma').value);
+  patron.setUnidad(document.querySelector('select#unidad').value);
+  patron.setDificultad(document.querySelector('select#dificultad').value);
 
   // Materiales
-  patron.materiales = {
+  ////
+  /*patron.materiales = {
     lanas: document.querySelector('input[placeholder*="Lana"]').value.trim(),
     agujaGanchillo: document.querySelector('input[placeholder*="5 mm"]').value.trim(),
     agujaLanera: document.querySelector('input[placeholder*="Sí / No"]').value.trim(),
     otros: document.querySelector('input[placeholder*="Marcadores"]').value.trim()
   };
+  */
+  patron.setLanas(document.querySelector('input[placeholder*="Lana"]').value.trim());
+  patron.setAgujaGanchillo(document.querySelector('input[placeholder*="5 mm"]').value.trim());
+  patron.setAgujadaLanera(document.querySelector('input[placeholder*="Sí / No"]').value.trim());
+  patron.setOtros(document.querySelector('input[placeholder*="Marcadores"]').value.trim());
 
   // Abreviaturas y tags
-  patron.abreviaturas = document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim();
-  patron.tags = document.querySelector('input[placeholder*="gorro"]').value.split(',').map(t => t.trim());
-
+  ////patron.abreviaturas = document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim();
+  patron.setAbreviaturas(document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim());
+  ////patron.tags = document.querySelector('input[placeholder*="gorro"]').value.split(',').map(t => t.trim());
+  const tags = document.querySelector('input[placeholder*="gorro"]').value
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag !== '');
+  patron.setTags(tags);
+  1
   // Instrucciones
-  patron.instrucciones = recopilarInstrucciones();
+  ////patron.instrucciones = recopilarInstrucciones();
+  // Instrucciones — SERIALIZADAS como string JSON
+  const instruccionesArray = recopilarInstrucciones();
+  patron.instrucciones = JSON.stringify(instruccionesArray);
+
 
   // Opción: guardar en localStorage (o enviarlo al servidor con fetch/post)
   localStorage.setItem("patronSeleccionado", JSON.stringify(patron));

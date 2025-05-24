@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RepositorioPatron extends JpaRepository<Patron, Long> {
         List<Patron> findPatronByCreador(Usuario usuario);
@@ -14,4 +15,7 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
         @Query("SELECT p FROM Patron p WHERE p.creador.id = :id")
         List<Patron> findByCreadorId(@Param("id") Long id);
 
+        Object findPatronById(Long idPatron);
+
+        //Object insertPatron(Patron patron);
 }

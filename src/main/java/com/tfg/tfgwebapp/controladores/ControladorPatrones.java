@@ -16,18 +16,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/patrones")
+@RequestMapping("/api/patrones")
 public class ControladorPatrones {
     private static final Logger logger = LoggerFactory.getLogger(ControladorPatrones.class);
 
@@ -44,48 +46,6 @@ public class ControladorPatrones {
     }
 
     @GetMapping("/patrones-tienda")
-    //public ResponseEntity<List<Patron>> obtenerPatronesUsuario(HttpSession session) {
-    /*public ResponseEntity<List<Patron>> obtenerPatronesUsuario() throws IOException {
-        logger.info("En controlador obtenerPatronesUsuario");
-
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Usuario autenticado: " + usuarioAuth);
-
-        // Comprobar si hay usuario autenticado válido
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
-            // Devuelve 401 sin body o con lista vacía para no cambiar el tipo de retorno
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
-        }
-
-        Object principal = usuarioAuth.getPrincipal();
-
-        String email;
-
-        if (principal instanceof UserDetails) {
-            email = ((UserDetails) principal).getUsername();
-        } else if (principal instanceof String) {
-            email = (String) principal;
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
-        }
-
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(email);
-
-        if (usuarioOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.emptyList());
-        }
-
-        Usuario usuario = usuarioOpt.get();
-
-        // Aquí llamas a tu servicio para obtener patrones del usuario
-        List<Patron> patrones = servicioPatron.obtenerPatrones(usuario);
-
-        if (patrones == null) {
-            patrones = Collections.emptyList();
-        }
-
-        return ResponseEntity.ok(patrones);
-    }*/
     public ResponseEntity<List<Patron>> obtenerPatronesUsuario() {
         System.out.println("En controlador obtenerPatronesUsuario");
         Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
@@ -120,5 +80,94 @@ public class ControladorPatrones {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PostMapping("/nuevo")
+    public ResponseEntity<Patron> crearPatron(
+            @RequestParam Long idCreador
+    ) {
+        Patron patron = new Patron();
+        patron.setCreador(repositorioUsuario.findById(idCreador).get());
+        repositorioPatron.save(patron);
+        return ResponseEntity.status(HttpStatus.CREATED).body(patron);
+    }
+
+    @PostMapping("/guardar")
+    public ResponseEntity<?> guardarPatron(
+            @RequestParam Long idPatron,
+            @RequestParam String titulo,
+            @RequestParam double precio,
+            @RequestParam Patron.Dificultad dificultad,
+            @RequestParam String descripcion,
+            @RequestParam Patron.Idioma idioma,
+            @RequestParam Patron.Unidad unidad,
+            @RequestParam String lanas,
+            @RequestParam String agujaGanchillo,
+            @RequestParam String agujaLanera,
+            @RequestParam String otros,
+            @RequestParam String abreviaturas,
+            @RequestParam(required = false) List<MultipartFile> imagenes,
+            @RequestParam List<String> tags,
+            @RequestParam String instrucciones
+
+            ) throws IOException {
+        logger.info("Entrando en el método guardarPatron");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+
+        Patron patron = (Patron) repositorioPatron.findPatronById(idPatron);
+
+        // Define ruta y nombre para la carpeta de destino de las imagenes de los patrones
+        String carpetaDestino = "src/main/resources/static/imagenes/patrones/";
+        List<String> rutasRelativas = new ArrayList<>();
+        if (imagenes != null && !imagenes.isEmpty()) {
+            try {
+                for (MultipartFile imagen : imagenes) {
+                    if (!imagen.isEmpty()) {
+                        String nombreArchivo = System.currentTimeMillis() + "_" + imagen.getOriginalFilename();
+                        Path rutaArchivo = Paths.get(carpetaDestino, nombreArchivo);
+                        Files.write(rutaArchivo, imagen.getBytes());
+
+                        // Ruta relativa para guardar en el objeto Patron
+                        String rutaRelativa = "./imagenes/patrones/" + nombreArchivo;
+                        rutasRelativas.add(rutaRelativa);
+                    }
+                }
+                patron.setImagenes(rutasRelativas);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar las imágenes.");
+            }
+        }
+
+
+        patron.setTitulo(titulo);
+        patron.setPrecio(precio);
+        patron.setDificultad(dificultad);
+        patron.setDescripcion(descripcion);
+        patron.setIdioma(idioma);
+        patron.setUnidad(unidad);
+        patron.setLanas(lanas);
+        patron.setAgujaGanchillo(agujaGanchillo);
+        patron.setAgujadaLanera(agujaLanera);
+        patron.setOtros(otros);
+        patron.setAbreviaturas(abreviaturas);
+        patron.setTags(tags);
+        patron.setInstrucciones(instrucciones);
+
+        repositorioPatron.save(patron);
+
+        return ResponseEntity.ok(patron);
     }
 }

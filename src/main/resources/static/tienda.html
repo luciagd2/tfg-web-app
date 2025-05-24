@@ -67,7 +67,7 @@
                             Borradores
                         </label>
                     </div>
-                        <a class="btn btn-primary boton-check" href="edicionPatron.html" role="button">
+                        <a class="btn btn-primary boton-check" id="btn-crear" role="button">
                             <i class="bi bi-plus-circle"></i>
                             Crear
                         </a>
@@ -231,7 +231,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             const container = document.getElementById("contenedor-cards-tienda");
 
-            fetch("/patrones/patrones-tienda", {
+            fetch("/api/patrones/patrones-tienda", {
                 method: "GET",
                 credentials: "include"
             })
@@ -261,7 +261,7 @@
                                 ? `<i class="bi bi-star-fill"></i>`
                                 : patron.dificultad === "Intermedio"
                                     ? `<i class="bi bi-star-half"></i>`
-                                    : `<i class="bi bi-cart-fill"></i>`
+                                    : `<i class="bi bi-star"></i>`
                         }
                         <span class="card-title text-titulo fw-bold">${patron.titulo}</span>
                       </div>
@@ -314,6 +314,37 @@
                     console.error("Error cargando patrones:", error);
                     container.innerHTML = "<p>Error cargando los patrones.</p>";
                 });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-crear').addEventListener('click', async () => {
+                const formData = new FormData();
+                formData.append("idCreador", (JSON.parse(localStorage.getItem("usuario"))).id);
+
+                try {
+                    const response = await fetch('/api/patrones/nuevo', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: "include"
+                    });
+                    if (response.ok) {
+                        alert("Patron creado correctamente");
+                        const patron = await response.json();
+                        localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                        window.location.href="edicionPatron.html";
+                    } else {
+                        const errorText = await response.text(); // o .json() si sabes que es JSON
+                        console.error("Estado:", response.status);
+                        console.error("Respuesta:", errorText);
+                        alert(`Error al crear patron: ${response.status}`);
+                    }
+                }
+                catch (error) {
+                    console.error('Error al crear el patrón:', error);
+                    alert('No se pudo crear el patrón. Inténtalo de nuevo.');
+                }
+            });
         });
     </script>
 </body>

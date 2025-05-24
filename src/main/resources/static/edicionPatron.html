@@ -59,11 +59,12 @@
             ¿Quieres guardar tu progreso?
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Seguir trabajando</button>
-            <button type="button" class="btn btn-primary" onclick="guardarPatron()">
-                <a class="nav-link" href="tienda.html">Guardar cambios</a>
+            <button type="button" class="btn btn-primary" id="btn-seguir-trabajando" data-bs-dismiss="modal">Seguir trabajando</button>
+            <button type="button" class="btn btn-primary" id="btn-guardar-cambios">
+                <!--<a class="nav-link" href="tienda.html">Guardar cambios</a>-->
+                Guardar cambios
             </button>
-            <button type="button" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" id="btn-descartar">
                 <a class="nav-link" href="tienda.html">Descartar</a>
             </button>
             </div>
@@ -141,7 +142,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Precio del patrón</label>
                                     <div id="precio-patron" class="mb-3 input-group">
-                                        <input type="text" class="form-control" aria-label="Euro">
+                                        <input id="input-precio" type="text" class="form-control" aria-label="Euro">
                                         <span class="input-group-text">€</span>
                                     </div>
                                 </div>
@@ -241,6 +242,98 @@
             previewContainer.innerHTML = ''; // limpia las vistas previas
         };
     });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-guardar-cambios').addEventListener('click', async () => {
+                const tags = document.querySelector('input[placeholder*="gorro"]').value
+                    .split(',')
+                    .map(tag => tag.trim())
+                    .filter(tag => tag !== '');
+
+                const formData = new FormData();
+
+                formData.append("idPatron", (JSON.parse(localStorage.getItem("patronSeleccionado"))).id);
+                //formData.append("id", localStorage.getItem("patronSeleccionado").getItem("id"));
+                formData.append("titulo",document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value.trim());
+                formData.append("precio",parseFloat(document.querySelector('#input-precio').value));
+                formData.append("dificultad",document.querySelector('select#dificultad').value);
+                formData.append("descripcion",document.querySelector('textarea[placeholder*="Breve"]').value.trim());
+                formData.append("idioma",document.querySelector('select#idioma').value);
+                formData.append("unidad",document.querySelector('select#unidad').value);
+                formData.append("lanas",document.querySelector('input[placeholder*="Lana"]').value.trim());
+                formData.append("agujaGanchillo",document.querySelector('input[placeholder*="5 mm"]').value.trim());
+                formData.append("agujaLanera",document.querySelector('input[placeholder*="Sí / No"]').value.trim());
+                formData.append("otros",document.querySelector('input[placeholder*="Marcadores"]').value.trim());
+                formData.append("abreviaturas",document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim());
+                const archivos = document.getElementById("input-imagenes-muestra").files;
+                for (let i = 0; i < archivos.length; i++) {
+                    formData.append("imagenes", archivos[i]);
+                }
+                formData.append("tags",tags);
+                formData.append("instrucciones",JSON.stringify(recopilarInstrucciones()));
+
+                try {
+                    console.log("Justo antes del fetch a /api/patron/guardar")
+                    const response = await fetch("/api/patrones/guardar", {
+                        method: "POST",
+                        body: formData,
+                        credentials: "include"
+                    });
+                    if (response.ok) {
+                        alert("Patron guardado correctamente");
+                        const patron = await response.json();
+                        localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                        window.location.href = "tienda.html";
+                    } else {
+                        const errorText = await response.text(); // o .json() si sabes que es JSON
+                        console.error("Estado:", response.status);
+                        console.error("Respuesta:", errorText);
+                        alert(`Error al guardar patron: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error("Error al guardar el patrón:", error);
+                    alert("Hubo un error al guardar los cambios. Revisa la consola.");
+                }
+            });
+        });
+
+
+        function recopilarInstrucciones() {
+            const secciones = document.querySelectorAll('#secciones-patron .card-seccion');
+            const instrucciones = [];
+
+            secciones.forEach(seccion => {
+                const titulo = seccion.querySelector('.txt-titulo').value;
+                const contenido = [];
+
+                const elementos = seccion.querySelectorAll('[id$="-contenido"] > *');
+
+                elementos.forEach(el => {
+                    if (el.classList.contains('input-group')) {
+                        const span = el.querySelector('.input-group-text');
+                        const input = el.querySelector('input');
+                        if (span && input) {
+                            // Es una vuelta
+                            contenido.push({ tipo: 'vuelta', texto: input.value });
+                        }
+                    } else if (el.classList.contains('d-flex') && el.querySelector('.txt-subtitulo')) {
+                        contenido.push({ tipo: 'subtitulo', texto: el.querySelector('input').value });
+                    } else if (el.querySelector('textarea')) {
+                        contenido.push({ tipo: 'info', texto: el.querySelector('textarea').value });
+                    } else if (el.classList.contains('input-group-imagen')) {
+                        const previews = el.querySelectorAll('img.img-preview');
+                        previews.forEach(img => {
+                            contenido.push({ tipo: 'imagen', contenido: img.src }); // usar la URL directa, no base64
+                        });
+                    }
+                });
+
+                instrucciones.push({ titulo, contenido });
+            });
+
+            return instrucciones;
+        }
     </script>
 </body>
 </html>

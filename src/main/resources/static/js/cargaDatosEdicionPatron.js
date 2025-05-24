@@ -18,20 +18,20 @@ document.addEventListener("DOMContentLoaded", () => {
 function cargarEdicionPatron(patron) {
     // Información general
     document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value = patron.titulo || '';
-    document.querySelector('input[placeholder="Tu nombre o alias"]').value = patron.usuario.nombre || '';
-    document.querySelector('textarea[placeholder*="Breve"]').value = patron.informacion.descripcion || '';
-    document.querySelector('select.form-select#idioma').value = patron.informacion.idioma || '';
-    document.querySelector('select.form-select#unidad').value = patron.informacion.unidad || '';
-    document.querySelector('select.form-select#dificultad').value = patron.informacion.dificultad || '';
+    document.querySelector('input[placeholder="Tu nombre o alias"]').value = patron.creador.nombreUsuario || '';
+    document.querySelector('textarea[placeholder*="Breve"]').value = patron.descripcion || '';
+    document.querySelector('select.form-select#idioma').value = patron.idioma || '';
+    document.querySelector('select.form-select#unidad').value = patron.unidad || '';
+    document.querySelector('select.form-select#dificultad').value = patron.dificultad || '';
     document.querySelector('input[aria-label="Euro"]').value = patron.precio || '';
 
-    document.querySelector('input[placeholder*="Lana"]').value = patron.materiales.lanas || '';
-    document.querySelector('input[placeholder*="5 mm"]').value = patron.materiales.agujaGanchillo || '';
-    document.querySelector('input[placeholder*="Sí / No"]').value = patron.materiales.agujaLanera || '';
-    document.querySelector('input[placeholder*="Marcadores"]').value = patron.materiales.otros || '';
+    document.querySelector('input[placeholder*="Lana"]').value = patron.lanas || '';
+    document.querySelector('input[placeholder*="5 mm"]').value = patron.agujaGanchillo || '';
+    document.querySelector('input[placeholder*="Sí / No"]').value = patron.agujaLanera || '';
+    document.querySelector('input[placeholder*="Marcadores"]').value = patron.otros || '';
     
     document.querySelector('textarea[placeholder*="pb = punto bajo"]').value = patron.abreviaturas || '';
-    document.querySelector('input[placeholder*="gorro"]').value = (patron.tags || []).join(', ');
+    document.querySelector('input[placeholder*="gorro"]').value = (patron.tags.join(', ') || []);
 
     //Imagenes para la vista previa
     const previewContainer = document.getElementById('div-imagenes-muestra');
@@ -49,9 +49,18 @@ function cargarEdicionPatron(patron) {
     };
 
     // Instrucciones
-    
-    if (Array.isArray(patron.instrucciones)) {
-        patron.instrucciones.forEach(seccion => {
+    let instrucciones = [];
+    try {
+        if (typeof patron.instrucciones === 'string' && patron.instrucciones.trim().startsWith('[')) {
+            instrucciones = JSON.parse(patron.instrucciones);
+        } else {
+            console.warn("Formato de instrucciones inválido:", patron.instrucciones);
+        }
+    } catch (e) {
+        console.error("Error al parsear instrucciones:", e);
+    }
+    if (Array.isArray(instrucciones)) {
+        instrucciones.forEach(seccion => {
             addSeccion();
             const ultima = document.querySelectorAll('#secciones-patron > .card');
             const nuevaSeccion = ultima[ultima.length - 1];

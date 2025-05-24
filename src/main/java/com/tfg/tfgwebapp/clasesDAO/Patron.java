@@ -77,7 +77,9 @@ public class Patron {
 
     @OneToMany(mappedBy = "patron", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
+
     //Instrucciones
+    @Column(columnDefinition = "TEXT")
     private String instrucciones;
 
 

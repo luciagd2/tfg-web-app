@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const patronGuardado = localStorage.getItem("patronSeleccionado");
     if (patronGuardado) {
       const patron = JSON.parse(patronGuardado);
+      //const patronId = patron.id;
       cargarDatosInfoPatron(patron);
     } else {
       console.error("No se encontró ningún patrón.");
@@ -17,16 +18,16 @@ document.addEventListener("DOMContentLoaded", () => {
 function cargarDatosInfoPatron(patron) {
     // Título y usuario
     document.querySelector(".card-title").textContent = patron.titulo;
-    document.querySelector(".card-subtitle .img-usu").src = patron.usuario.imagen;
+    document.querySelector(".card-subtitle .img-usu").src = patron.creador.imagen;
     document.querySelector(".card-subtitle").innerHTML = `
-        <div class="d-flex gap-1 creador" id="creadorPatron" data-id-creador="${patron.usuario.idUsuario}" style="cursor:pointer;">
-            <img src="${patron.usuario.imagen}" alt="Perfil" class="rounded-circle img-usu">
-            ${patron.usuario.nombre}
+        <div class="d-flex gap-1 creador" id="creadorPatron" data-id-creador="${patron.creador.id}" style="cursor:pointer;">
+            <img src="${patron.creador.imagenPerfil}" alt="Perfil" class="rounded-circle img-usu">
+            ${patron.creador.nombreUsuario}
         </div>
     `;
   
     // Descripción
-    document.querySelector(".card-text").textContent = patron.descripcionCorta;
+    document.querySelector(".card-text").textContent = patron.descripcion;
 
     // Precio
     if (patron.precio > 0){
@@ -41,21 +42,19 @@ function cargarDatosInfoPatron(patron) {
     }
 
     // Información
-    const info = patron.informacion;
     document.querySelector("#panelInformacion .accordion-body").innerHTML = `
-        <div class="row"><div class="col titulo-info"><p>Dificultad:</p></div><div class="col col-9 txt-info"><p>${info.dificultad}</p></div></div>
-        <div class="row"><div class="col titulo-info"><p>Descripción:</p></div><div class="col col-9 txt-info"><p>${info.descripcion}</p></div></div>
-        <div class="row"><div class="col titulo-info"><p>Idioma:</p></div><div class="col col-9 txt-info"><p>${info.idioma}</p></div></div>
-        <div class="row"><div class="col titulo-info"><p>Unidad:</p></div><div class="col col-9 txt-info"><p>${info.unidad}</p></div></div>
+        <div class="row"><div class="col titulo-info"><p>Dificultad:</p></div><div class="col col-9 txt-info"><p>${patron.dificultad}</p></div></div>
+        <!--<div class="row"><div class="col titulo-info"><p>Descripción:</p></div><div class="col col-9 txt-info"><p>${patron.descripcion}</p></div></div>-->
+        <div class="row"><div class="col titulo-info"><p>Idioma:</p></div><div class="col col-9 txt-info"><p>${patron.idioma}</p></div></div>
+        <div class="row"><div class="col titulo-info"><p>Unidad:</p></div><div class="col col-9 txt-info"><p>${patron.unidad}</p></div></div>
     `;
   
     // Materiales
-    const mat = patron.materiales;
     document.querySelector("#panelMateriales .accordion-body").innerHTML = `
-        <div class="row"><div class="col titulo-info"><p>Lanas:</p></div><div class="col col-9 txt-info"><p>${mat.lanas}</p></div></div>
-        <div class="row"><div class="col titulo-info"><p>Aguja de ganchillo:</p></div><div class="col col-9 txt-info"><p>${mat.agujaGanchillo}</p></div></div>
-        <div class="row"><div class="col titulo-info"><p>Aguja lanera:</p></div><div class="col col-9 txt-info"><p>${mat.agujaLanera}</p></div></div>
-        <div class="row"><div class="col titulo-info"><p>Otros:</p></div><div class="col col-9 txt-info"><p>${mat.otros}</p></div></div>
+        <div class="row"><div class="col titulo-info"><p>Lanas:</p></div><div class="col col-9 txt-info"><p>${patron.lanas}</p></div></div>
+        <div class="row"><div class="col titulo-info"><p>Aguja de ganchillo:</p></div><div class="col col-9 txt-info"><p>${patron.agujaGanchillo}</p></div></div>
+        <div class="row"><div class="col titulo-info"><p>Aguja lanera:</p></div><div class="col col-9 txt-info"><p>${patron.agujaLanera}</p></div></div>
+        <div class="row"><div class="col titulo-info"><p>Otros:</p></div><div class="col col-9 txt-info"><p>${patron.otros}</p></div></div>
     `;
   
     // Abreviaturas
