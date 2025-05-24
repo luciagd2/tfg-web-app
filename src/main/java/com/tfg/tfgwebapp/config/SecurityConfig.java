@@ -42,11 +42,14 @@ public class SecurityConfig {
     @Bean
     public DefaultSecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                //.cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/usuarios/registro",
-                                         "/api/usuarios/login",
-                                         "api/usuarios/perfil",
+                        .requestMatchers("api/usuarios/**",
+                                //         "/api/usuarios/registro",
+                                    //     "/api/usuarios/login",
+                                    //     "/api/usuarios/perfil",
+                                   //      "/patrones/patrones-tienda",
                                          "/login",
                                          "/*.html",
                                          "/",

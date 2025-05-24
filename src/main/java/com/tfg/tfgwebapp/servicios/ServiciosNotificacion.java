@@ -1,5 +1,8 @@
+package com.tfg.tfgwebapp.servicios;
+
 public class ServiciosNotificacion {
 
+    /*
     private final NotificacionRepository notificacionRepository;
     private final ServicioPlantillaNotificacion templateService;
     private final RepositorioUsuario usuarioRepository;
@@ -20,4 +23,5 @@ public class ServiciosNotificacion {
 
         notificacionRepository.save(notificacion);
     }
+    */
 }

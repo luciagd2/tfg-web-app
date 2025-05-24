@@ -24,20 +24,21 @@ import javax.swing.*;
     private Long idPatronRelacionado;
     private Long idUsuarioRelacionado;
 
-    // getters y setters
-}
+    //Enumerates
+    public enum TipoNotificacion {
+        GUARDADO,
+        COMPRA_EXITOSA,
+        PATRON_GRATIS,
+        CAMBIO_PRECIO,
+        NUEVO_PATRON_CREADOR,
+        ACTUALIZADO_FAVORITO,
+        ACTUALIZADO_COMPRADO,
+        COMPRA_AL_CREADOR,
+        GUARDADO_AL_CREADOR,
+        GUSTADO_AL_CREADOR,
+        CALIFICACION,
+        TENDENCIA
+    }
 
-public enum TipoNotificacion {
-    GUARDADO,
-    COMPRA_EXITOSA, 
-    PATRON_GRATIS, 
-    CAMBIO_PRECIO, 
-    NUEVO_PATRON_CREADOR,
-    ACTUALIZADO_FAVORITO, 
-    ACTUALIZADO_COMPRADO, 
-    COMPRA_AL_CREADOR, 
-    GUARDADO_AL_CREADOR,
-    GUSTADO_AL_CREADOR, 
-    CALIFICACION, 
-    TENDENCIA
+    // getters y setters
 }

@@ -2,14 +2,12 @@ package com.tfg.tfgwebapp.clasesDAO;
 
 import jakarta.persistence.*;
 
-import javax.swing.*;
-
 @Entity
-public class Resena {
+public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idResena;
+    private Long idReview;
 
     @ManyToOne
     @JoinColumn(name = "idPatron") //clave foranea

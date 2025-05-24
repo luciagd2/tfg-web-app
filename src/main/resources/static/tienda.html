@@ -226,5 +226,95 @@
             modal.hide();
         });
     </script>
+    <script>
+        //CARDS DE LOS PATRONES - VISTA PREVIA TIENDA
+        document.addEventListener("DOMContentLoaded", () => {
+            const container = document.getElementById("contenedor-cards-tienda");
+
+            fetch("/patrones/patrones-tienda", {
+                method: "GET",
+                credentials: "include"
+            })
+                .then((response) => {
+                    console.log(response)
+                    if (!response.ok) {
+                        throw new Error("No se pudieron cargar los patrones");
+                    }
+                    return response.json();
+                })
+                .then((patrones) => {
+                    patrones.forEach((patron) => {
+                        const card = document.createElement("div");
+                        card.className = "card position-relative";
+                        card.style.width = "18rem";
+
+                        card.innerHTML = `
+                  <button class="btn btn-light boton-popover position-absolute top-0 end-0 m-1 p-1">
+                    <i class="bi bi-gear-fill"></i>
+                  </button>
+                  <a href="infoPatron.html" class="card-patron" data-id="${patron.id}">
+                    <img src="${patron.imagenes[0] || 'placeholder.jpg'}" class="card-img-top rounded-3" alt="${patron.titulo}">
+                    <div class="card-body">
+                      <div class="dificultad-titulo">
+                        ${
+                            patron.dificultad === "Avanzado"
+                                ? `<i class="bi bi-star-fill"></i>`
+                                : patron.dificultad === "Intermedio"
+                                    ? `<i class="bi bi-star-half"></i>`
+                                    : `<i class="bi bi-cart-fill"></i>`
+                        }
+                        <span class="card-title text-titulo fw-bold">${patron.titulo}</span>
+                      </div>
+                      <span class="text-creador">Yo</span>
+                      <div class="precio-fav-guardar">
+                        <span class="text-precio fw-bold">${patron.precio}</span>
+                      </div>
+                    </div>
+                  </a>
+                `;
+
+                        container.appendChild(card);
+
+                        // Popover
+                        const popoverBtn = card.querySelector(".boton-popover");
+
+                        const popoverContent = document.createElement("div");
+                        popoverContent.classList.add("text-center", "text-popover");
+
+                        const btnPrecio = document.createElement("button");
+                        btnPrecio.className = "btn btn-sm btn-outline-primary mb-1";
+                        btnPrecio.innerHTML = '<i class="bi bi-tag-fill"></i> Precio';
+
+                        const btnEditar = document.createElement("a");
+                        btnEditar.className = "btn btn-sm btn-outline-secondary mb-1 popover-editar";
+                        btnEditar.href = `edicionPatron.html?id=${patron.id}`;
+                        btnEditar.innerHTML = '<i class="bi bi-pencil-fill"></i> Editar';
+
+                        const btnEliminar = document.createElement("button");
+                        btnEliminar.className = "btn btn-sm btn-outline-danger";
+                        btnEliminar.innerHTML = '<i class="bi bi-trash3-fill"></i> Eliminar';
+
+                        popoverContent.appendChild(btnPrecio);
+                        popoverContent.appendChild(btnEditar);
+                        popoverContent.appendChild(btnEliminar);
+
+                        new bootstrap.Popover(popoverBtn, {
+                            content: popoverContent,
+                            html: true,
+                            placement: "bottom",
+                            trigger: "click"
+                        });
+
+                        btnEditar.addEventListener("click", () => {
+                            localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error cargando patrones:", error);
+                    container.innerHTML = "<p>Error cargando los patrones.</p>";
+                });
+        });
+    </script>
 </body>
 </html>
