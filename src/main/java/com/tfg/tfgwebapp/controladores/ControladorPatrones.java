@@ -6,6 +6,7 @@ import com.tfg.tfgwebapp.repositorios.RepositorioPatron;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
 import com.tfg.tfgwebapp.servicios.ServicioPatron;
 import jakarta.servlet.http.HttpSession;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,23 @@ public class ControladorPatrones {
         this.repositorioPatron = repositorioPatron;
     }
 
+    @GetMapping("/encontrar")
+    public ResponseEntity<List<Patron>> encontrarPatron(@RequestParam long id) {
+        try {
+            Patron patron = (Patron) repositorioPatron.findPatronById(id);
+
+            // FORZAR LA CARGA DEL CREADOR
+            Hibernate.initialize(patron.getCreador());
+            patron.getCreador().getNombreUsuario();
+
+            return ResponseEntity.ok(Collections.singletonList(patron));
+        } catch (Exception e) {
+            System.out.println("Error al encontar el patron");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/patrones-tienda-publicados")
     public ResponseEntity<List<Patron>> obtenerPatronesUsuarioPublicados() {
         System.out.println("En controlador obtenerPatronesUsuario");
@@ -73,7 +91,7 @@ public class ControladorPatrones {
             }
             return ResponseEntity.ok(patrones);
         } catch (Exception e) {
-            System.out.println("Pecepcion al conseguir los patrones");
+            System.out.println("Error al conseguir los patrones");
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

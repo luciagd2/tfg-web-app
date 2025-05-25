@@ -225,7 +225,7 @@
         });
     </script>
     <script>
-        //CARDS DE LOS PATRONES - VISTA PREVIA TIENDA
+        //CARGA DE PATRONES PROPIOS SEGÚN ESTADO - PUBLICADO O BORRADOR
         document.addEventListener("DOMContentLoaded", () => {
             const container = document.getElementById("contenedor-cards-tienda");
             const btnBorradores = document.getElementById("borradores");
@@ -247,6 +247,7 @@
                     .then((patrones) => {
                         patrones.forEach((patron) => {
                             const card = document.createElement("div");
+                            card.id = patron.id;
                             card.className = "card position-relative";
                             card.style.width = "18rem";
 
@@ -254,9 +255,9 @@
                           <button class="btn btn-light boton-popover position-absolute top-0 end-0 m-1 p-1">
                             <i class="bi bi-gear-fill"></i>
                           </button>
-                          <a href="infoPatron.html" class="card-patron" data-id="${patron.id}">
+                          <a href="infoPatron.html" class="card-patron" data-id="${patron.id}" id="card-patron-${patron.id}">
                             <img src="${patron.imagenes?.[0] || 'placeholder.jpg'}" class="card-img-top rounded-3" alt="${patron.titulo}">
-                            <div class="card-body">
+                            <div class="card-body" href="infoPatron.html">
                               <div class="dificultad-titulo">
                                 ${
                                 patron.dificultad === "Avanzado"
@@ -298,6 +299,7 @@
                             btnEditar.innerHTML = '<i class="bi bi-pencil-fill"></i> Editar';
 
                             const btnEliminar = document.createElement("button");
+                            btnEliminar.id = "btn-eliminar";
                             btnEliminar.className = "btn btn-sm btn-outline-danger";
                             btnEliminar.innerHTML = '<i class="bi bi-trash3-fill"></i> Eliminar';
 
@@ -312,8 +314,16 @@
                                 trigger: "focus"
                             });
 
-                            btnEditar.addEventListener("click", () => {
-                                localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                            popoverBtn.addEventListener("click", async () => {
+                                await guardarPatronSeleccionado(patron.id);
+                            });
+
+                            const cardLink = card.querySelector(`#card-patron-${patron.id}`);
+                            cardLink.addEventListener("click", async (e) => {
+                                e.preventDefault(); // Para controlar la navegación si querés manejarlo manualmente
+                                await guardarPatronSeleccionado(patron.id);
+                                // Luego podés redirigir, por ejemplo:
+                                window.location.href = "infoPatron.html";
                             });
                         });
                     })
@@ -321,6 +331,27 @@
                         console.error("Error cargando patrones:", error);
                         container.innerHTML = "<p>Error cargando los patrones.</p>";
                     });
+            };
+
+            const guardarPatronSeleccionado = async (patronId) => {
+                try {
+                    const response = await fetch(`/api/patrones/encontrar?id=${patronId}`, {
+                        method: "GET",
+                        credentials: "include"
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Estado:", response.status);
+                        console.error("Respuesta:", errorText);
+                        alert(`Error al encontrar patrón: ${response.status}`);
+                        return;
+                    }
+                    const patron = await response.json();
+                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron[0]));
+                } catch (error) {
+                    console.error("Error al encontrar el patrón:", error);
+                    alert("No se pudo encontrar el patrón. Inténtalo de nuevo.");
+                }
             };
 
             // Cargar publicados por defecto
@@ -341,6 +372,7 @@
         });
     </script>
     <script>
+        // EVENT LISTENER PARA CREAR PATRONES
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btn-crear').addEventListener('click', async () => {
                 const formData = new FormData();
@@ -348,6 +380,38 @@
 
                 try {
                     const response = await fetch('/api/patrones/nuevo', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: "include"
+                    });
+                    if (response.ok) {
+                        alert("Patron creado correctamente");
+                        const patron = await response.json();
+                        localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                        window.location.href="edicionPatron.html";
+                    } else {
+                        const errorText = await response.text(); // o .json() si sabes que es JSON
+                        console.error("Estado:", response.status);
+                        console.error("Respuesta:", errorText);
+                        alert(`Error al crear patron: ${response.status}`);
+                    }
+                }
+                catch (error) {
+                    console.error('Error al crear el patrón:', error);
+                    alert('No se pudo crear el patrón. Inténtalo de nuevo.');
+                }
+            });
+        });
+    </script>
+    <script>
+        // EVENT LISTENER PARA CAMBIAR ESTADO DE PUBLICACIÓN DE LOS PATRONES
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-publicar').addEventListener('click', async () => {
+                const formData = new FormData();
+                formData.append("idCreador", (JSON.parse(localStorage.getItem("usuario"))).id);
+
+                try {
+                    const response = await fetch('/api/patrones/estado-publicacion', {
                         method: 'POST',
                         body: formData,
                         credentials: "include"
