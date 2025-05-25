@@ -320,8 +320,14 @@
 
                             const cardLink = card.querySelector(`#card-patron-${patron.id}`);
                             cardLink.addEventListener("click", async (e) => {
-                                await guardarPatronSeleccionado(patron.id);
-                                window.location.href = "infoPatron.html";
+                                e.preventDefault(); // Evitamos que el navegador cambie de página automáticamente
+                                try {
+                                    await guardarPatronSeleccionado(patron.id);
+                                    window.location.href = "infoPatron.html";
+                                } catch (error) {
+                                    console.error("Error al guardar patron:", error);
+                                    alert("No se pudo cargar el patrón seleccionado.");
+                                }
                             });
 
                             // Evento para el estado de publicación
@@ -375,7 +381,6 @@
                         console.error("Estado:", response.status);
                         console.error("Respuesta:", errorText);
                         alert(`Error al eliminar el patrón: ${response.status}`);
-                        return;
                     }
                     const patron = await response.json();
                     localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
@@ -400,6 +405,7 @@
                     }
                     const patron = await response.json();
                     localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                    return;
                 } catch (error) {
                     console.error("Error al encontrar el patrón:", error);
                     alert("No se pudo encontrar el patrón. Inténtalo de nuevo.");

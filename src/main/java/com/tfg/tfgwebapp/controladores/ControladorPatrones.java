@@ -55,6 +55,7 @@ public class ControladorPatrones {
             Hibernate.initialize(patron.getCreador());
             patron.getCreador().getNombreUsuario();
 
+            System.out.println("En encontrar patron, response.ok");
             return ResponseEntity.ok(patron);
         } catch (Exception e) {
             System.out.println("Error al encontar el patron");
