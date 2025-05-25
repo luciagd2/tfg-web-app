@@ -320,10 +320,14 @@
 
                             const cardLink = card.querySelector(`#card-patron-${patron.id}`);
                             cardLink.addEventListener("click", async (e) => {
-                                e.preventDefault(); // Para controlar la navegación si querés manejarlo manualmente
                                 await guardarPatronSeleccionado(patron.id);
-                                // Luego podés redirigir, por ejemplo:
                                 window.location.href = "infoPatron.html";
+                            });
+
+                            // Evento para el estado de publicación
+                            btnPublicar.addEventListener("click", async (e) => {
+                                await actualizarEstadoPublicacion(patron.id);
+                                window.location.href = "tienda.html";
                             });
                         });
                     })
@@ -331,6 +335,27 @@
                         console.error("Error cargando patrones:", error);
                         container.innerHTML = "<p>Error cargando los patrones.</p>";
                     });
+            };
+
+            const actualizarEstadoPublicacion = async (patronId) => {
+                try {
+                    const response = await fetch(`/api/patrones/estado-publicacion?id=${patronId}`, {
+                        method: "POST",
+                        credentials: "include"
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Estado:", response.status);
+                        console.error("Respuesta:", errorText);
+                        alert(`Error al cambiar el estado del patrón: ${response.status}`);
+                        return;
+                    }
+                    const patron = await response.json();
+                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron[0]));
+                } catch (error) {
+                    console.error("Error al cambiar el estado el patrón:", error);
+                    alert("No se pudo cambiar el estado del patrón. Inténtalo de nuevo.");
+                }
             };
 
             const guardarPatronSeleccionado = async (patronId) => {
@@ -355,18 +380,18 @@
             };
 
             // Cargar publicados por defecto
-            cargarPatrones("/api/patrones/patrones-tienda-publicados", true);
+            cargarPatrones("/api/patrones/patrones-tienda-publicados", false);
 
             // Eventos para radio buttons
             btnBorradores.addEventListener("change", () => {
                 if (btnBorradores.checked) {
-                    cargarPatrones("/api/patrones/patrones-tienda-borradores", false);
+                    cargarPatrones("/api/patrones/patrones-tienda-borradores", true);
                 }
             });
 
             btnPublicados.addEventListener("change", () => {
                 if (btnPublicados.checked) {
-                    cargarPatrones("/api/patrones/patrones-tienda-publicados", true);
+                    cargarPatrones("/api/patrones/patrones-tienda-publicados", false);
                 }
             });
         });

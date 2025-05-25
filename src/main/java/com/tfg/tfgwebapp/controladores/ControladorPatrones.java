@@ -63,6 +63,27 @@ public class ControladorPatrones {
         }
     }
 
+    @PostMapping("/estado-publicacion")
+    public ResponseEntity<List<Patron>> cambiarEstadoPublicacion(@RequestParam long id) {
+        try {
+            Patron patron = (Patron) repositorioPatron.findPatronById(id);
+
+            boolean estadoActual = patron.isPublicado();
+            patron.setPublicado(!estadoActual);
+            repositorioPatron.save(patron);
+
+            // FORZAR LA CARGA DEL CREADOR
+            Hibernate.initialize(patron.getCreador());
+            patron.getCreador().getNombreUsuario();
+
+            return ResponseEntity.ok(Collections.singletonList(patron));
+        } catch (Exception e) {
+            System.out.println("Error al cambiar el estado del patron");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/patrones-tienda-publicados")
     public ResponseEntity<List<Patron>> obtenerPatronesUsuarioPublicados() {
         System.out.println("En controlador obtenerPatronesUsuario");
