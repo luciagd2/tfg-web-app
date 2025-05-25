@@ -45,8 +45,8 @@ public class ControladorPatrones {
         this.repositorioPatron = repositorioPatron;
     }
 
-    @GetMapping("/patrones-tienda")
-    public ResponseEntity<List<Patron>> obtenerPatronesUsuario() {
+    @GetMapping("/patrones-tienda-publicados")
+    public ResponseEntity<List<Patron>> obtenerPatronesUsuarioPublicados() {
         System.out.println("En controlador obtenerPatronesUsuario");
         Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -62,14 +62,45 @@ public class ControladorPatrones {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        System.out.println("Usuario encontrado\n");
         Usuario usuario = usuarioOpt.get();
 
-        //System.out.println("Patrones 1: "+servicioPatron.obtenerPatrones(usuario)+"\n");
-        //List<Patron> patrones = servicioPatron.obtenerPatrones(usuario);
         List<Patron> patrones = new ArrayList<>();
         try {
-            patrones = repositorioPatron.findPatronByCreador(usuario);
+            patrones = repositorioPatron.findPatronByCreadorAndPublicado(usuario, true);
+            System.out.println("Patrones en lista");
+            if (patrones == null || patrones.isEmpty()) {
+                patrones = Collections.emptyList();
+            }
+            return ResponseEntity.ok(patrones);
+        } catch (Exception e) {
+            System.out.println("Pecepcion al conseguir los patrones");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/patrones-tienda-borradores")
+    public ResponseEntity<List<Patron>> obtenerPatronesUsuarioBorradores() {
+        System.out.println("En controlador obtenerPatronesUsuario");
+        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            System.out.println("Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        List<Patron> patrones = new ArrayList<>();
+        try {
+            patrones = repositorioPatron.findPatronByCreadorAndPublicado(usuario, false);
             System.out.println("Patrones en lista");
             if (patrones == null || patrones.isEmpty()) {
                 patrones = Collections.emptyList();
