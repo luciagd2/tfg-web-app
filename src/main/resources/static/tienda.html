@@ -329,6 +329,12 @@
                                 await actualizarEstadoPublicacion(patron.id);
                                 window.location.href = "tienda.html";
                             });
+
+                            // Evento para eliminar el patron
+                            btnEliminar.addEventListener("click", async (e) => {
+                                await eliminarPatron(patron.id);
+                                window.location.href = "tienda.html";
+                            });
                         });
                     })
                     .catch((error) => {
@@ -351,10 +357,31 @@
                         return;
                     }
                     const patron = await response.json();
-                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron[0]));
+                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
                 } catch (error) {
                     console.error("Error al cambiar el estado el patrón:", error);
-                    alert("No se pudo cambiar el estado del patrón. Inténtalo de nuevo.");
+                    //alert("No se pudo cambiar el estado del patrón. Inténtalo de nuevo.");
+                }
+            };
+
+            const eliminarPatron = async (patronId) => {
+                try {
+                    const response = await fetch(`/api/patrones/eliminar?id=${patronId}`, {
+                        method: "POST",
+                        credentials: "include"
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Estado:", response.status);
+                        console.error("Respuesta:", errorText);
+                        alert(`Error al eliminar el patrón: ${response.status}`);
+                        return;
+                    }
+                    const patron = await response.json();
+                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                } catch (error) {
+                    console.error("Error al eliminar el patrón:", error);
+                    alert("No se pudo eliminar el patrón. Inténtalo de nuevo.");
                 }
             };
 
@@ -372,7 +399,7 @@
                         return;
                     }
                     const patron = await response.json();
-                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron[0]));
+                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
                 } catch (error) {
                     console.error("Error al encontrar el patrón:", error);
                     alert("No se pudo encontrar el patrón. Inténtalo de nuevo.");

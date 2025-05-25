@@ -47,7 +47,7 @@ public class ControladorPatrones {
     }
 
     @GetMapping("/encontrar")
-    public ResponseEntity<List<Patron>> encontrarPatron(@RequestParam long id) {
+    public ResponseEntity<Patron> encontrarPatron(@RequestParam long id) {
         try {
             Patron patron = (Patron) repositorioPatron.findPatronById(id);
 
@@ -55,7 +55,7 @@ public class ControladorPatrones {
             Hibernate.initialize(patron.getCreador());
             patron.getCreador().getNombreUsuario();
 
-            return ResponseEntity.ok(Collections.singletonList(patron));
+            return ResponseEntity.ok(patron);
         } catch (Exception e) {
             System.out.println("Error al encontar el patron");
             e.printStackTrace();
@@ -64,7 +64,7 @@ public class ControladorPatrones {
     }
 
     @PostMapping("/estado-publicacion")
-    public ResponseEntity<List<Patron>> cambiarEstadoPublicacion(@RequestParam long id) {
+    public ResponseEntity<Patron> cambiarEstadoPublicacion(@RequestParam long id) {
         try {
             Patron patron = (Patron) repositorioPatron.findPatronById(id);
 
@@ -76,9 +76,28 @@ public class ControladorPatrones {
             Hibernate.initialize(patron.getCreador());
             patron.getCreador().getNombreUsuario();
 
-            return ResponseEntity.ok(Collections.singletonList(patron));
+            return ResponseEntity.ok(patron);
         } catch (Exception e) {
             System.out.println("Error al cambiar el estado del patron");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/eliminar")
+    public ResponseEntity<Void> eliminarPatron(@RequestParam long id) {
+        try {
+            Patron patron = (Patron) repositorioPatron.findPatronById(id);
+
+            if (patron == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            repositorioPatron.delete(patron);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.out.println("Error al eliminar el patrón con ID: " + id);
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
