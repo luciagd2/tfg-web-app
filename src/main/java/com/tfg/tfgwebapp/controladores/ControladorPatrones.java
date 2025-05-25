@@ -10,6 +10,7 @@ import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -54,6 +55,10 @@ public class ControladorPatrones {
             // FORZAR LA CARGA DEL CREADOR
             Hibernate.initialize(patron.getCreador());
             patron.getCreador().getNombreUsuario();
+
+            // FORZAR LA CARGA DE LAS RESEÑAS
+            Hibernate.initialize(patron.getResenas());
+            patron.getResenas();
 
             System.out.println("En encontrar patron, response.ok");
             return ResponseEntity.ok(patron);
@@ -105,6 +110,7 @@ public class ControladorPatrones {
     }
 
     @GetMapping("/patrones-tienda-publicados")
+    @EntityGraph(attributePaths = {"reviews"})
     public ResponseEntity<List<Patron>> obtenerPatronesUsuarioPublicados() {
         System.out.println("En controlador obtenerPatronesUsuario");
         Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
@@ -139,6 +145,7 @@ public class ControladorPatrones {
     }
 
     @GetMapping("/patrones-tienda-borradores")
+    @EntityGraph(attributePaths = {"reviews"})
     public ResponseEntity<List<Patron>> obtenerPatronesUsuarioBorradores() {
         System.out.println("En controlador obtenerPatronesUsuario");
         Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();

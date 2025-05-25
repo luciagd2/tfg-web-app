@@ -176,9 +176,6 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
-                    <input type="text" class="form-control" id="nombreUsuarioModal" placeholder="Tu nombre" required>
-    
                     <label for="imagenPatron" class="form-label mt-3">Imagen del Patrón (opcional)</label>
                     <input type="file" class="form-control" id="imagenPatronModal">
     
@@ -205,12 +202,14 @@
     <script>
         document.getElementById("agregarReseñaModal").addEventListener("click", function() {
             // Recoger los valores del formulario
-            const nombreUsuario = document.getElementById("nombreUsuarioModal").value;
             const imagenPatron = document.getElementById("imagenPatronModal").files[0];
             const puntuacion = document.getElementById("puntuacionModal").value;
             const comentario = document.getElementById("comentarioModal").value;
+            const patron = JSON.parse(localStorage.getItem("patronSeleccionado"));
+            const usuario = JSON.parse(localStorage.getItem("usuario"));
 
             // Si el nombre de usuario y puntuación no están vacíos, agregar reseña
+            /*
             if (puntuacion) {
                 const contenedorReseñas = document.getElementById("contenedorReseñas");
 
@@ -298,6 +297,41 @@
                 document.getElementById("imagenPatron").value = '';
                 document.getElementById("puntuacion").value = '1';
                 document.getElementById("comentario").value = '';
+            }*/
+            if (!puntuacion) {
+                alert("Falta la puntiación. Por favor, indica un valor.");
+                return;
+            }
+
+            // FormData para enviar al backend
+            const formData = new FormData();
+            formData.append("patron", patron);
+            formData.append("usuario", usuario);
+            formData.append("puntuacion", puntuacion);
+            formData.append("mensaje", comentario);
+            formData.append("nombreUsuario", nombreUsuario);
+            formData.append("imagen", imagenPatron);
+
+            try {
+                const response = await fetch("/api/reviews/nuevaReview", {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Error al guardar la reseña:", errorText);
+                    alert("Hubo un error al guardar la reseña.");
+                    return;
+                }
+
+                const nuevaReview = await response.json(); // Esperamos recibir la reseña guardada con ruta de imagen
+                window.location.href("infoPatron.html");
+
+            } catch (error) {
+                console.error("Error de red o del servidor:", error);
+                alert("No se pudo guardar la reseña. Intenta de nuevo.");
             }
         });
     </script>

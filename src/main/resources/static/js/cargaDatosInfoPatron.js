@@ -5,17 +5,21 @@
 //RECUPERAR EL PATRON SELECCIONADO PARA MOSTRAR LOS DATOS DESPUES
 document.addEventListener("DOMContentLoaded", () => {
     const patronGuardado = localStorage.getItem("patronSeleccionado");
+    const reviewsGuardadas = localStorage.getItem("reviewsPatron");
     if (patronGuardado) {
-      const patron = JSON.parse(patronGuardado);
-      //const patronId = patron.id;
-      cargarDatosInfoPatron(patron);
+        if (reviewsGuardadas){
+            const patron = JSON.parse(patronGuardado);
+            const reviews = JSON.parse(reviewsGuardadas);
+            //const patronId = patron.id;
+            cargarDatosInfoPatron(patron, reviews);
+        }
     } else {
       console.error("No se encontró ningún patrón.");
     }
 });
 
 //CARGA DE DATOS PATRONES
-function cargarDatosInfoPatron(patron) {
+function cargarDatosInfoPatron(patron, reviews) {
     // Título y usuario
     document.querySelector(".card-title").textContent = patron.titulo;
     document.querySelector(".card-subtitle .img-usu").src = patron.creador.imagen;
@@ -98,22 +102,22 @@ function cargarDatosInfoPatron(patron) {
     // Reseñas
     const contenedorResenas = document.getElementById("contenedorReseñas");
     contenedorResenas.innerHTML = "";
-    patron.resenas.forEach(resena => {
+    reviews.forEach(resena => {
         const card = document.createElement("div");
         card.className = "card mb-3 card-resenia";
         card.innerHTML = `
             <div class="card-header d-flex align-items-center gap-1">
-                <img src="${resena.imagenUsuario}" alt="Usuario" class="rounded-circle img-usu-resenia">
-                <strong>${resena.nombre}</strong>
+                <img src="${resena.usuario.imagenPerfil}" alt="Usuario" class="rounded-circle img-usu-resenia">
+                <strong>${resena.usuario.nombreUsuario}</strong>
             </div>
             <div class="card-body card-body-resenia">
-                ${resena.imagenPatron ? `<img src="${resena.imagenPatron}" class="img-fluid rounded mb-3 img-resenia">` : ""}
+                ${resena.imagen ? `<img src="${resena.imagen}" class="img-fluid rounded mb-3 img-resenia">` : ""}
                 <div class="mb-2">
                     ${[...Array(5)].map((_, i) =>
                         `<i class="bi ${i < resena.puntuacion ? 'bi-star-fill text-warning' : 'bi-star text-muted'}"></i>`
                     ).join('')}
                 </div>
-                <p class="mb-0 comentario-resenia">${resena.comentario}</p>
+                <p class="mb-0 comentario-resenia">${resena.mensaje}</p>
             </div>
         `;
         contenedorResenas.appendChild(card);
@@ -127,13 +131,35 @@ function cargarDatosInfoPatron(patron) {
     });
     
 }
-  
-  document.addEventListener("DOMContentLoaded", () => {
+
+document.addEventListener("DOMContentLoaded", async () => {
     const patronGuardado = localStorage.getItem("patronSeleccionado");
     if (patronGuardado) {
       const patron = JSON.parse(patronGuardado);
-      cargarDatosInfoPatron(patron);
+      const reviews = await obtenerReviews(patron.id);
+      cargarDatosInfoPatron(patron, reviews);
     } else {
       console.error("No se encontró ningún patrón.");
     }
-  });
+});
+
+async function obtenerReviews(patronId){
+    try {
+        const response = await fetch(`/api/previews/getReviews?patronId=${patronId}`, {
+            method: "GET",
+            credentials: "include"
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Estado:", response.status);
+            console.error("Respuesta:", errorText);
+            alert(`Error al recuperar las reseñas del patrón: ${response.status}`);
+            return [];
+        }
+        const reviews = await response.json();
+        localStorage.setItem("reviewsPatron", JSON.stringify(reviews));
+        return reviews;
+    } catch (error) {
+        console.error("Error al recuperar las reseñas del patrón:", error);
+    }
+};

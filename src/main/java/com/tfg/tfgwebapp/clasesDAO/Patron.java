@@ -1,6 +1,7 @@
 package com.tfg.tfgwebapp.clasesDAO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -77,6 +78,7 @@ public class Patron {
     private List<String> imagenes = new ArrayList<>();
 
     @OneToMany(mappedBy = "patron", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Review> reviews = new ArrayList<>();
 
     //Instrucciones
