@@ -25,10 +25,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/patrones")
@@ -64,6 +62,104 @@ public class ControladorPatrones {
             return ResponseEntity.ok(patron);
         } catch (Exception e) {
             System.out.println("Error al encontar el patron");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/getAllPatronesPublicados")
+    @EntityGraph(attributePaths = {"reviews"})
+    public ResponseEntity<List<Patron>> getAllPatronesPublicados() {
+        System.out.println("En controlador getAllPatronesPublicados");
+        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            System.out.println("Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        List<Patron> patrones = new ArrayList<>();
+        try {
+            patrones = repositorioPatron.findAllByPublicado(true);
+            System.out.println("Patrones en lista");
+            if (patrones == null || patrones.isEmpty()) {
+                patrones = Collections.emptyList();
+            }
+            return ResponseEntity.ok(patrones);
+        } catch (Exception e) {
+            System.out.println("Error al conseguir los patrones");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/getAllFiltros")
+    @EntityGraph(attributePaths = {"reviews"})
+    public ResponseEntity<List<Patron>> getAllFiltros(
+            @RequestParam(required = false) List<String> dificultad,
+            @RequestParam(required = false) List<String> orden
+    ) {
+        System.out.println("En controlador getAllPatronesPublicados");
+        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            System.out.println("Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        List<Patron> patrones = new ArrayList<>();
+        try {
+            patrones = repositorioPatron.findAllByPublicado(true);
+
+            // Filtro por dificultad
+            if (dificultad != null && !dificultad.isEmpty()) {
+                patrones = patrones.stream()
+                        .filter(p -> dificultad.contains(p.getDificultad()))
+                        .collect(Collectors.toList());
+            }
+
+            // Filtro por orden
+            if (orden != null && !orden.isEmpty()) {
+                // Filtrado por "Gratis" y "Pago"
+                if (orden.contains("Gratis")) {
+                    patrones = patrones.stream()
+                            .filter(p -> "Gratis".equalsIgnoreCase(p.getPrecio()))
+                            .collect(Collectors.toList());
+                } else if (orden.contains("Pago")) {
+                    patrones = patrones.stream()
+                            .filter(p -> !"Gratis".equalsIgnoreCase(p.getPrecio()))
+                            .collect(Collectors.toList());
+                }
+
+                // Ordenamiento
+                if (orden.contains("Nuevo")) {
+                    patrones.sort(Comparator.comparing(Patron::getFechaCreacion).reversed());
+                } else if (orden.contains("Antiguo")) {
+                    patrones.sort(Comparator.comparing(Patron::getFechaCreacion));
+                }
+            }
+
+            return ResponseEntity.ok(patrones);
+        } catch (Exception e) {
+            System.out.println("Error al conseguir los patrones");
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

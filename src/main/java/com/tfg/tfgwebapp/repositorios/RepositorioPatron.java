@@ -16,4 +16,9 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
 
         List<Patron> findPatronByCreadorAndPublicado(Usuario usuario, boolean b);
 
+        List<Patron> findAllByPublicado(boolean b);
+
+        List<Patron> findAllByDificultad(String dificultad);
+
+        List<Patron> findPatronByPrecio(Double precio);
 }
