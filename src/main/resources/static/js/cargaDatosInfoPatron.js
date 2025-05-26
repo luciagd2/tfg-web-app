@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function obtenerReviews(patronId){
     try {
-        const response = await fetch(`/api/previews/getReviews?patronId=${patronId}`, {
+        const response = await fetch(`/api/reviews/getReviews?patronId=${patronId}`, {
             method: "GET",
             credentials: "include"
         });

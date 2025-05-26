@@ -176,10 +176,10 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <label for="imagenPatron" class="form-label mt-3">Imagen del Patrón (opcional)</label>
+                    <label for="imagenPatronModal" class="form-label mt-3">Imagen del Patrón (opcional)</label>
                     <input type="file" class="form-control" id="imagenPatronModal">
     
-                    <label for="puntuacion" class="form-label mt-3">Puntuación</label>
+                    <label for="puntuacionModal" class="form-label mt-3">Puntuación</label>
                     <select class="form-select" id="puntuacionModal">
                         <option value="1">1 Estrella</option>
                         <option value="2">2 Estrellas</option>
@@ -188,7 +188,7 @@
                         <option value="5">5 Estrellas</option>
                     </select>
     
-                    <label for="comentario" class="form-label mt-3">Comentario (opcional)</label>
+                    <label for="comentarioModal" class="form-label mt-3">Comentario (opcional)</label>
                     <textarea class="form-control" id="comentarioModal" rows="3" placeholder="Deja tu comentario aquí"></textarea>
                 </div>
                 <div class="modal-footer">
@@ -200,13 +200,13 @@
         </div>
     </div>  
     <script>
-        document.getElementById("agregarReseñaModal").addEventListener("click", function() {
+        document.getElementById("agregarReseñaModal").addEventListener("click", async function () {
             // Recoger los valores del formulario
             const imagenPatron = document.getElementById("imagenPatronModal").files[0];
             const puntuacion = document.getElementById("puntuacionModal").value;
             const comentario = document.getElementById("comentarioModal").value;
-            const patron = JSON.parse(localStorage.getItem("patronSeleccionado"));
-            const usuario = JSON.parse(localStorage.getItem("usuario"));
+            const patron = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
+            const usuario = JSON.parse(localStorage.getItem("usuario")).id;
 
             // Si el nombre de usuario y puntuación no están vacíos, agregar reseña
             /*
@@ -305,11 +305,10 @@
 
             // FormData para enviar al backend
             const formData = new FormData();
-            formData.append("patron", patron);
-            formData.append("usuario", usuario);
+            formData.append("idPatron", patron);
+            formData.append("idUsuario", usuario);
             formData.append("puntuacion", puntuacion);
             formData.append("mensaje", comentario);
-            formData.append("nombreUsuario", nombreUsuario);
             formData.append("imagen", imagenPatron);
 
             try {
@@ -327,7 +326,7 @@
                 }
 
                 const nuevaReview = await response.json(); // Esperamos recibir la reseña guardada con ruta de imagen
-                window.location.href("infoPatron.html");
+                window.location.href = "infoPatron.html";
 
             } catch (error) {
                 console.error("Error de red o del servidor:", error);

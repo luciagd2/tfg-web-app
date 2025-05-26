@@ -23,16 +23,20 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/previews")
+@RequestMapping("/api/reviews")
 public class ControladorReviews {
     private static final Logger logger = LoggerFactory.getLogger(ControladorPatrones.class);
 
     private final RepositorioReview repositorioReview;
+    private final RepositorioPatron repositorioPatron;
+    private final RepositorioUsuario repositorioUsuario;
 
     // Inyección mediante constructor (recomendado)
     @Autowired
-    public ControladorReviews(RepositorioReview repositorioReview) {
+    public ControladorReviews(RepositorioReview repositorioReview, RepositorioPatron repositorioPatron, RepositorioUsuario repositorioUsuario) {
         this.repositorioReview = repositorioReview;
+        this.repositorioPatron = repositorioPatron;
+        this.repositorioUsuario = repositorioUsuario;
     }
 
     @GetMapping("/getReviews")
@@ -49,17 +53,19 @@ public class ControladorReviews {
         }
     }
 
-    @PostMapping("/reviews/nuevaReview")
+    @PostMapping("/nuevaReview")
     public ResponseEntity<?> guardarNuevaReview(
-            @RequestParam Patron patron,
-            @RequestParam Usuario usuario,
+            @RequestParam long idPatron,
+            @RequestParam long idUsuario,
             @RequestParam int puntuacion,
             @RequestParam(required = false) String mensaje,
-            @RequestParam String nombreUsuario,
             @RequestParam(required = false) MultipartFile imagen
     ) throws IOException {
 
         Review nuevaReview = new Review();
+
+        Patron patron = repositorioPatron.findById(idPatron).get();
+        Usuario usuario = repositorioUsuario.findById(idUsuario).get();
 
         nuevaReview.setPatron(patron);
         nuevaReview.setPuntuacion(puntuacion);
