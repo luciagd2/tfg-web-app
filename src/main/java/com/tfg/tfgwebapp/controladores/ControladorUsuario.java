@@ -1,6 +1,6 @@
 package com.tfg.tfgwebapp.controladores;
 
-import com.tfg.tfgwebapp.clasesDAO.Usuario;
+import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
 import com.tfg.tfgwebapp.servicios.ServicioAutenticacion;
 import com.tfg.tfgwebapp.servicios.ServiciosUsuario;

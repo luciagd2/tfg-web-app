@@ -1,11 +1,10 @@
 package com.tfg.tfgwebapp.controladores;
 
-import com.tfg.tfgwebapp.clasesDAO.Patron;
-import com.tfg.tfgwebapp.clasesDAO.Usuario;
+import com.tfg.tfgwebapp.clasesModelo.Patron;
+import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioPatron;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
 import com.tfg.tfgwebapp.servicios.ServicioPatron;
-import jakarta.servlet.http.HttpSession;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/patrones")
@@ -34,14 +31,12 @@ public class ControladorPatrones {
     private static final Logger logger = LoggerFactory.getLogger(ControladorPatrones.class);
 
     private final RepositorioUsuario repositorioUsuario;
-    private final ServicioPatron servicioPatron;
     private final RepositorioPatron repositorioPatron;
 
     // Inyección mediante constructor (recomendado)
     @Autowired
-    public ControladorPatrones(RepositorioUsuario repositorioUsuario, ServicioPatron servicioPatron, RepositorioPatron repositorioPatron) {
+    public ControladorPatrones(RepositorioUsuario repositorioUsuario, RepositorioPatron repositorioPatron) {
         this.repositorioUsuario = repositorioUsuario;
-        this.servicioPatron = servicioPatron;
         this.repositorioPatron = repositorioPatron;
     }
 
@@ -55,8 +50,8 @@ public class ControladorPatrones {
             patron.getCreador().getNombreUsuario();
 
             // FORZAR LA CARGA DE LAS RESEÑAS
-            Hibernate.initialize(patron.getResenas());
-            patron.getResenas();
+            Hibernate.initialize(patron.getReviews());
+            patron.getReviews();
 
             System.out.println("En encontrar patron, response.ok");
             return ResponseEntity.ok(patron);
@@ -103,63 +98,79 @@ public class ControladorPatrones {
     }
 
     @GetMapping("/getAllFiltros")
-    @EntityGraph(attributePaths = {"reviews"})
+    @EntityGraph(attributePaths = {"reviews", "tags"})
     public ResponseEntity<List<Patron>> getAllFiltros(
-            @RequestParam(required = false) List<String> dificultad,
-            @RequestParam(required = false) List<String> orden
+            @RequestParam String filtros,
+            @RequestParam(required = false) String busqueda
     ) {
-        System.out.println("En controlador getAllPatronesPublicados");
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+        System.out.println("En controlador getAllFiltros");
+        System.out.println("Texto de búsqueda recibido: " + busqueda);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            System.out.println("Usuario no encontrado");
+        Usuario usuario = repositorioUsuario.findByEmail(((UserDetails) auth.getPrincipal()).getUsername())
+                .orElse(null);
+        if (usuario == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Usuario usuario = usuarioOpt.get();
+        String[] flags = filtros.split(",");
+        boolean principiante = Boolean.parseBoolean(flags[0]);
+        boolean intermedio   = Boolean.parseBoolean(flags[1]);
+        boolean avanzado     = Boolean.parseBoolean(flags[2]);
+        boolean puntuacion = Boolean.parseBoolean(flags[3]);
 
-        List<Patron> patrones = new ArrayList<>();
+        if (busqueda != null && busqueda.isBlank()) {
+            busqueda = null;
+        }
+
+        /*
         try {
-            patrones = repositorioPatron.findAllByPublicado(true);
+        String[] filtroStrings = filtros.split(",");
+        if (filtroStrings.length != 4) {
+            return ResponseEntity.badRequest().build();
+        }
 
-            // Filtro por dificultad
-            if (dificultad != null && !dificultad.isEmpty()) {
-                patrones = patrones.stream()
-                        .filter(p -> dificultad.contains(p.getDificultad()))
-                        .collect(Collectors.toList());
+        boolean[] filtroBools = new boolean[4];
+        for (int i = 0; i < 4; i++) {
+            filtroBools[i] = Boolean.parseBoolean(filtroStrings[i].trim());
+        }
+
+        List<Dificultad> dificultadesFiltradas = new ArrayList<>();
+        if (filtroBools[0]) dificultadesFiltradas.add(Dificultad.Principiante);
+        if (filtroBools[1]) dificultadesFiltradas.add(Dificultad.Intermedio);
+        if (filtroBools[2]) dificultadesFiltradas.add(Dificultad.Avanzado);
+
+        List<Patron> patrones;
+
+        if (!dificultadesFiltradas.isEmpty()) {
+            if (filtroBools[3]) {
+                patrones = repositorioPatron.findAllByDificultadInOrderByPuntuacionMediaDesc(dificultadesFiltradas);
+            } else {
+                patrones = repositorioPatron.findAllByDificultadIn(dificultadesFiltradas);
             }
-
-            // Filtro por orden
-            if (orden != null && !orden.isEmpty()) {
-                // Filtrado por "Gratis" y "Pago"
-                if (orden.contains("Gratis")) {
-                    patrones = patrones.stream()
-                            .filter(p -> "Gratis".equalsIgnoreCase(p.getPrecio()))
-                            .collect(Collectors.toList());
-                } else if (orden.contains("Pago")) {
-                    patrones = patrones.stream()
-                            .filter(p -> !"Gratis".equalsIgnoreCase(p.getPrecio()))
-                            .collect(Collectors.toList());
-                }
-
-                // Ordenamiento
-                if (orden.contains("Nuevo")) {
-                    patrones.sort(Comparator.comparing(Patron::getFechaCreacion).reversed());
-                } else if (orden.contains("Antiguo")) {
-                    patrones.sort(Comparator.comparing(Patron::getFechaCreacion));
-                }
+        } else {
+            if (filtroBools[3]) {
+                patrones = repositorioPatron.findAllOrderByPuntuacionMediaDesc();
+            } else {
+                patrones = repositorioPatron.findAll();
             }
+        }
 
+        return ResponseEntity.ok(patrones);
+        */
+        List<Patron> patrones;
+        try {
+            if (puntuacion) {
+                patrones = repositorioPatron.buscarConFiltrosYTextoOrdenadoPorPuntuacion(principiante, intermedio, avanzado, busqueda);
+            } else {
+                patrones = repositorioPatron.buscarConFiltrosYTexto(principiante, intermedio, avanzado, busqueda);
+            }
             return ResponseEntity.ok(patrones);
+
         } catch (Exception e) {
-            System.out.println("Error al conseguir los patrones");
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -353,7 +364,7 @@ public class ControladorPatrones {
         patron.setUnidad(unidad);
         patron.setLanas(lanas);
         patron.setAgujaGanchillo(agujaGanchillo);
-        patron.setAgujadaLanera(agujaLanera);
+        patron.setAgujaLanera(agujaLanera);
         patron.setOtros(otros);
         patron.setAbreviaturas(abreviaturas);
         patron.setTags(tags);

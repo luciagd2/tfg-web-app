@@ -1,8 +1,6 @@
-package com.tfg.tfgwebapp.clasesDAO;
+package com.tfg.tfgwebapp.clasesModelo;
 
 import jakarta.persistence.*;
-
-import javax.swing.*;
 
 @Entity
   public class Notificacion {

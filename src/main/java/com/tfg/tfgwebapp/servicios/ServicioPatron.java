@@ -1,16 +1,13 @@
 package com.tfg.tfgwebapp.servicios;
 
-import com.tfg.tfgwebapp.clasesDAO.Patron;
-import com.tfg.tfgwebapp.clasesDAO.Usuario;
+import com.tfg.tfgwebapp.clasesModelo.Patron;
+import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioPatron;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service

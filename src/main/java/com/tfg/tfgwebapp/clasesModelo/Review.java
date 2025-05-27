@@ -1,4 +1,4 @@
-package com.tfg.tfgwebapp.clasesDAO;
+package com.tfg.tfgwebapp.clasesModelo;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;

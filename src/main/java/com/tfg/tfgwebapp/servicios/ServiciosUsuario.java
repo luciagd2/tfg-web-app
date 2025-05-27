@@ -1,6 +1,6 @@
 package com.tfg.tfgwebapp.servicios;
 
-import com.tfg.tfgwebapp.clasesDAO.Usuario;
+import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

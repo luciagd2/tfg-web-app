@@ -1,9 +1,6 @@
 package com.tfg.tfgwebapp.servicios;
 
-import com.tfg.tfgwebapp.clasesDAO.Notificacion;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 public class ServicioPlantillaNotificacion {

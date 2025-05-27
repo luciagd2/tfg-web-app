@@ -1,13 +1,11 @@
 package com.tfg.tfgwebapp.controladores;
 
-import com.tfg.tfgwebapp.clasesDAO.Patron;
-import com.tfg.tfgwebapp.clasesDAO.Review;
-import com.tfg.tfgwebapp.clasesDAO.Usuario;
+import com.tfg.tfgwebapp.clasesModelo.Patron;
+import com.tfg.tfgwebapp.clasesModelo.Review;
+import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioPatron;
 import com.tfg.tfgwebapp.repositorios.RepositorioReview;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
-import com.tfg.tfgwebapp.servicios.ServicioPatron;
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

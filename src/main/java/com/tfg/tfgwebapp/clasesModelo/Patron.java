@@ -1,6 +1,5 @@
-package com.tfg.tfgwebapp.clasesDAO;
+package com.tfg.tfgwebapp.clasesModelo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -20,9 +19,11 @@ public class Patron {
     @Setter
     @Getter
     private String titulo;
+
     @Setter
     @Getter
     private double precio;
+
     @Setter
     @Getter
     private boolean publicado;
@@ -57,31 +58,47 @@ public class Patron {
     @Setter
     @Getter
     private String lanas;
+
     @Setter
     @Getter
     private String agujaGanchillo;
+
+    @Setter
     @Getter
     private String agujaLanera;
+
+    @Setter
+    @Getter
     private String otros;
 
     //Otros
+    @Setter
+    @Getter
     private String abreviaturas;
 
+    @Setter
+    @Getter
     @ElementCollection
     @CollectionTable(name = "patron_tags", joinColumns = @JoinColumn(name = "patron_id"))
     @Column(name = "tag")
     private List<String> tags = new ArrayList<>();
 
+    @Setter
+    @Getter
     @ElementCollection
     @CollectionTable(name = "patron_imagenes", joinColumns = @JoinColumn(name = "patron_id"))
     @Column(name = "imagen")
     private List<String> imagenes = new ArrayList<>();
 
+    @Setter
+    @Getter
     @OneToMany(mappedBy = "patron", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Review> reviews = new ArrayList<>();
 
     //Instrucciones
+    @Setter
+    @Getter
     @Column(columnDefinition = "TEXT")
     private String instrucciones;
 
@@ -103,58 +120,6 @@ public class Patron {
     public enum Unidad {
         Centímetros,
         Pulgadas
-    }
-
-    public void setAgujadaLanera(String agujaLanera) {
-        this.agujaLanera = agujaLanera;
-    }
-
-    public String getOtros() {
-        return otros;
-    }
-
-    public void setOtros(String otros) {
-        this.otros = otros;
-    }
-
-    public String getAbreviaturas() {
-        return abreviaturas;
-    }
-
-    public void setAbreviaturas(String abreviaturas) {
-        this.abreviaturas = abreviaturas;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
-    public List<String> getImagenes() {
-        return imagenes;
-    }
-
-    public void setImagenes(List<String> imagenes) {
-        this.imagenes = imagenes;
-    }
-
-    public List<Review> getResenas() {
-        return reviews;
-    }
-
-    public void setResenas(List<Review> reviews) {
-        this.reviews = reviews;
-    }
-
-    public String getInstrucciones() {
-        return instrucciones;
-    }
-
-    public void setInstrucciones(String instrucciones) {
-        this.instrucciones = instrucciones;
     }
 }
 

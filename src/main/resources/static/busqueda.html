@@ -34,16 +34,11 @@
         <nav class="navbar bg-body-tertiary barra-busqueda">
           <div class="container-fluid">
             <form class="d-flex" role="search">
-              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-success" type="submit">Buscar</button>
+              <input class="form-control me-2" type="search" placeholder="Buscar patrones..." aria-label="Search">
+              <button class="btn btn-outline-success" type="submit" id="btnBuscar">Buscar</button>
               <button class="btn btn-outline-success icon-btn" type="button" data-bs-toggle="modal" data-bs-target="#modalFiltros">
                 <i class="bi bi-funnel-fill"></i>
               </button>
-              <!--
-              <button class="btn btn-outline-success icon-btn" type="button" data-bs-toggle="modal" data-bs-target="#modalOrden">
-                <i class="bi bi-sort-down"></i>
-              </button>
-              -->
             </form>
           </div>
         </nav>
@@ -61,69 +56,27 @@
               </div>
               <!-- CUERPO DEL MODAL -->
               <div class="modal-body">
-                <!--
-                <h5 class="titulo-categoria">Categoría</h5>
-                <div class="seccion-categoria">
-                  <p class="d-inline-flex fila-categorias">
-                    <button type="button" class="btn toggle-btn  btn-categoria" data-bs-toggle="button">
-                      Ropa
-                    </button>
-                    <button type="button" class="btn toggle-btn btn-categoria" data-bs-toggle="button">Accesorios</button>
-                  </p>
-                  <p class="d-inline-flex fila-categorias ">
-                    <button type="button" class="btn toggle-btn btn-categoria" data-bs-toggle="button">
-                      Muñecos
-                    </button>
-                    <button type="button" class="btn toggle-btn  btn-categoria" data-bs-toggle="button">
-                      <i class="bi bi-three-dots"></i>
-                      Otros
-                    </button>
-                  </p>
-                </div>
-              -->
-                <h5 class="titulo-categoria">Dificultad</h5>
                 <div class="seccion-dificultad">
-                  <p class="d-inline-flex fila-dificultad">
+                  <p class="d-inline-flex col-filtros gap-3"> <!--fila-dificultad-->
                     <button type="button" class="btn toggle-btn" data-bs-toggle="button">
                       <i class="bi bi-star"></i>
-                      Principiante
+                      Dificultad Principiante
                     </button>
                     <button type="button" class="btn toggle-btn" data-bs-toggle="button">
                       <i class="bi bi-star-half"></i>
-                      Intermedio
+                      Dificultad Intermedio
                     </button>
                     <button type="button" class="btn toggle-btn" data-bs-toggle="button">
                       <i class="bi bi-star-fill"></i>
-                      Avanzado
+                      Dificultad Avanzado
+                    </button>
+                    <button type="button" class="btn toggle-btn" data-bs-toggle="button">
+                      <i class="bi bi-bookmark-heart"></i>
+                      Mejor puntuación
                     </button>
                   </p>
                 </div>
 
-                <h5 class="titulo-categoria">Orden</h5>
-                <div class="modal-body col-filtros">
-                  <div class="btn-group-vertical " role="group" aria-label="Orden por antigüedad">
-                    <input type="radio" class="btn-check" name="antig" id="antig-1" autocomplete="off">
-                    <label class="btn btn-filtro mb-3" for="antig-1">
-                      <i class="bi bi-calendar-plus-fill"></i> Más nuevo a más antiguo
-                    </label>
-                    <input type="radio" class="btn-check" name="antig" id="antig-2" autocomplete="off">
-                    <label class="btn btn-filtro mb-3" for="antig-2">
-                      <i class="bi bi-calendar-minus-fill"></i> Más antiguo a más nuevo
-                    </label>
-                  </div>
-                  <div class="btn-group-vertical w-100 mb-3" role="group" aria-label="Orden por antigüedad">
-                    <input type="radio" class="btn-check" name="precio" id="precio-1" autocomplete="off">
-                    <label class="btn btn-filtro" for="precio-1">
-                      <i class="bi bi-cash-coin"></i>
-                      Precio ascendente
-                    </label>
-                    <input type="radio" class="btn-check" name="precio" id="precio-2" autocomplete="off">
-                    <label class="btn btn-filtro" for="precio-2">
-                      <i class="bi bi-piggy-bank-fill"></i>
-                      Gratis
-                    </label>
-                  </div>
-                </div>
                 <!-- FOOTER DEL MODAL -->
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -134,51 +87,7 @@
             </div>
           </div>
         </div>
-        <!-- MODAL FILTROS (trigger: btn orden) -->
-        <div class="modal fade" id="modalOrden" tabindex="-1" aria-labelledby="modalOrdenLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="modalOrdenLabel">Orden de búsqueda</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <!-- CUERPO DEL MODAL -->
-              <!--
-              <div class="modal-body col-filtros">
-                <div class="btn-group-vertical " role="group" aria-label="Orden por antigüedad">
-                  <input type="radio" class="btn-check" name="antig" id="antig-1" autocomplete="off">
-                  <label class="btn btn-filtro mb-3" for="antig-1">
-                    <i class="bi bi-calendar-plus-fill"></i> Más nuevo a más antiguo
-                  </label>
-                  <input type="radio" class="btn-check" name="antig" id="antig-2" autocomplete="off">
-                  <label class="btn btn-filtro mb-3" for="antig-2">
-                    <i class="bi bi-calendar-minus-fill"></i> Más antiguo a más nuevo
-                  </label>
-                </div>
-                <div class="btn-group-vertical w-100 mb-3" role="group" aria-label="Orden por antigüedad">
-                  <input type="radio" class="btn-check" name="precio" id="precio-1" autocomplete="off">
-                  <label class="btn btn-filtro" for="precio-1">
-                    <i class="bi bi-cash-coin"></i>
-                    Precio ascendente
-                  </label>
-                  <input type="radio" class="btn-check" name="precio" id="precio-2" autocomplete="off">
-                  <label class="btn btn-filtro" for="precio-2">
-                    <i class="bi bi-piggy-bank-fill"></i>
-                    Gratis
-                  </label>
-                </div>
-              </div>
-              -->
-              <!-- FOOTER DEL MODAL -->
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Aplicar</button>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        
       </div>
     </div>
 
@@ -291,64 +200,67 @@
         // Cargar publicados por defecto
         cargarPatrones("/api/patrones/getAllPatronesPublicados");
 
-        // Eventos para radio buttons
-        /*
-        btnBorradores.addEventListener("change", () => {
-          if (btnBorradores.checked) {
-            cargarPatrones("/api/patrones/patrones-tienda-borradores", true);
-          }
-        });
+          // BOTÓN DE BÚSQUEDA
+          const btnBuscar = document.getElementById('btnBuscar');
+          if (btnBuscar) {
+              btnBuscar.addEventListener('click', () => {
+                  const textoBusqueda = document.getElementById('barraBusqueda').value.trim();
+                  const filtrosGuardados = JSON.parse(localStorage.getItem("filtrosBusqueda")) || [false, false, false, false];
+                  const filtroString = filtrosGuardados.join(',');
 
-        btnPublicados.addEventListener("change", () => {
-          if (btnPublicados.checked) {
-            cargarPatrones("/api/patrones/patrones-tienda-publicados", false);
+                  const url = `/api/patrones/getAllFiltros?filtros=${encodeURIComponent(filtroString)}&busqueda=${encodeURIComponent(textoBusqueda)}`;
+                  cargarPatrones(url);
+              });
           }
-        });
-        */
+
+          // BOTÓN DE APLICAR FILTROS
+          const aplicarBtn = document.getElementById('aplicarFiltros');
+          if (aplicarBtn) {
+              aplicarBtn.addEventListener('click', () => {
+                  const filtroBtns = document.querySelectorAll('.seccion-dificultad .toggle-btn');
+                  const filtros = [
+                      filtroBtns[0].classList.contains('active'), // Principiante
+                      filtroBtns[1].classList.contains('active'), // Intermedio
+                      filtroBtns[2].classList.contains('active'), // Avanzado
+                      filtroBtns[3].classList.contains('active')  // Mejor puntuación
+                  ];
+
+                  localStorage.setItem("filtrosBusqueda", JSON.stringify(filtros));
+
+                  const modal = bootstrap.Modal.getInstance(document.getElementById('modalFiltros'));
+                  modal.hide();
+
+                  const filtroString = filtros.join(',');
+                  const textoBusqueda = document.getElementById('barraBusqueda').value.trim(); // también considera búsqueda activa
+                  const url = `/api/patrones/getAllFiltros?filtros=${encodeURIComponent(filtroString)}&busqueda=${encodeURIComponent(textoBusqueda)}`;
+                  cargarPatrones(url);
+              });
+          }
 
         // EVENT LISTENER PARA EL BOTON DE APLICAR FILTROS/ORDEN
-        const aplicarBtn = document.querySelector('#modalFiltros .btn.btn-primary');
-
+ /*
         document.getElementById('aplicarFiltros').addEventListener('click', () => {
-          // Dificultades seleccionadas
-          const dificultadBtns = document.querySelectorAll('.seccion-dificultad .toggle-btn.active');
-          const dificultades = Array.from(dificultadBtns).map(btn => btn.textContent.trim());
+          // Dificultades
+          const filtroBtns = document.querySelectorAll('.seccion-dificultad .toggle-btn');
+          const filtros = [
+            filtroBtns[0].classList.contains('active'), // Principiante
+            filtroBtns[1].classList.contains('active'), // Intermedio
+            filtroBtns[2].classList.contains('active'), // Avanzado
+            filtroBtns[3].classList.contains('active')  // Mejor puntuación
+          ];
 
-          //if (dificultades.length > 0) {
-            localStorage.setItem('filtrosBusqueda', JSON.stringify(dificultades));
-          //} else {
-          //  localStorage.removeItem('filtrosBusqueda');
-          //}
-
-          // Orden seleccionado
-          const ordenSeleccionado = [];
-          if (document.getElementById("antig-1").checked) ordenSeleccionado.push("Nuevo");
-          if (document.getElementById("antig-2").checked) ordenSeleccionado.push("Antiguo");
-          if (document.getElementById("precio-1").checked) ordenSeleccionado.push("Pago");
-          if (document.getElementById("precio-2").checked) ordenSeleccionado.push("Gratis");
-
-          localStorage.setItem("ordenBusqueda", JSON.stringify(ordenSeleccionado));
+          localStorage.setItem("filtrosBusqueda", JSON.stringify(filtros));
 
           // Cerrar modal
           const modal = bootstrap.Modal.getInstance(document.getElementById('modalFiltros'));
           modal.hide();
 
-          const filtros = JSON.parse(localStorage.getItem("filtrosBusqueda")) || [];
-          const orden = JSON.parse(localStorage.getItem("ordenBusqueda")) || [];
-          // Si no hay filtros ni orden
-          if (filtros.length === 0 && orden.length === 0) {
-            cargarPatrones("/api/patrones/getAllPatronesPublicados");
-            return;
-          }
-          // Si hay filtros u orden, cargar con filtros
-          const params = new URLSearchParams();
-          filtros.forEach(f => params.append("dificultad", f));
-          orden.forEach(o => params.append("orden", o));
-
-          const endpoint = `/api/patrones/getAllFiltros?${params.toString()}`;
-          cargarPatrones(endpoint);
+          // Llamada a la API con los filtros
+          const filtroString = filtros.join(',');
+          const url = `/api/patrones/getAllFiltros?filtros=${encodeURIComponent(filtroString)}`;
+          cargarPatrones(url);
         });
-
+*/
         document.getElementById('eliminarFiltros').addEventListener('click', () => {
           localStorage.removeItem('filtrosBusqueda');
           localStorage.removeItem('ordenBusqueda');
@@ -364,6 +276,7 @@
           // Carga todos los patrones por defecto
           cargarPatrones("/api/patrones/getAllPatronesPublicados");
         });
+
       });
     </script>
 
