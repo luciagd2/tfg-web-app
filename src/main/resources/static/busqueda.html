@@ -173,25 +173,25 @@
         };
 
         const guardarPatronSeleccionado = async (patronId) => {
-          try {
-            const response = await fetch(`/api/patrones/encontrar?otroUsuario=${patronId}`, {
-              method: "GET",
-              credentials: "include"
-            });
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error("Estado:", response.status);
-              console.error("Respuesta:", errorText);
-              alert(`Error al encontrar patrón: ${response.status}`);
-              return;
+            try {
+                const response = await fetch(`/api/patrones/encontrar?id=${patronId}`, {
+                    method: "GET",
+                    credentials: "include"
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Estado:", response.status);
+                    console.error("Respuesta:", errorText);
+                    alert(`Error al encontrar patrón: ${response.status}`);
+                    return;
+                }
+                const patron = await response.json();
+                localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                return;
+            } catch (error) {
+                console.error("Error al encontrar el patrón:", error);
+                alert("No se pudo encontrar el patrón. Inténtalo de nuevo.");
             }
-            const patron = await response.json();
-            localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
-            return;
-          } catch (error) {
-            console.error("Error al encontrar el patrón:", error);
-            alert("No se pudo encontrar el patrón. Inténtalo de nuevo.");
-          }
         };
 
         // Cargar publicados por defecto

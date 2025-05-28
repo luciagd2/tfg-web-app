@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.Map;
 import java.util.Optional;
 
@@ -252,6 +253,58 @@ public class ControladorUsuario {
         return ResponseEntity.ok(usuario);
     }
 
+    @PostMapping("/seguir")
+    public ResponseEntity<Void> seguirUsuario(@RequestParam Long id, Principal principal) {
+        Optional<Usuario> usuarioActualOpt = repositorioUsuario.findByEmail(principal.getName());
+        Optional<Usuario> creadorOpt = repositorioUsuario.findById(id);
+
+        if (usuarioActualOpt.isEmpty() || creadorOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Usuario usuarioActual = usuarioActualOpt.get();
+        Usuario creador = creadorOpt.get();
+
+        if (!creador.getSeguidores().contains(usuarioActual)) {
+            creador.getSeguidores().add(usuarioActual);
+            repositorioUsuario.save(creador);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/dejarDeSeguir")
+    public ResponseEntity<Void> dejarDeSeguirUsuario(@RequestParam Long id, Principal principal) {
+        Optional<Usuario> usuarioActualOpt = repositorioUsuario.findByEmail(principal.getName());
+        Optional<Usuario> creadorOpt = repositorioUsuario.findById(id);
+
+        if (usuarioActualOpt.isEmpty() || creadorOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Usuario usuarioActual = usuarioActualOpt.get();
+        Usuario creador = creadorOpt.get();
+
+        if (creador.getSeguidores().contains(usuarioActual)) {
+            creador.getSeguidores().remove(usuarioActual);
+            repositorioUsuario.save(creador);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/sigueA")
+    public ResponseEntity<Boolean> sigueA(@RequestParam Long id, Principal principal) {
+        Optional<Usuario> usuarioActualOpt = repositorioUsuario.findByEmail(principal.getName());
+        Optional<Usuario> creadorOpt = repositorioUsuario.findById(id);
+
+        if (usuarioActualOpt.isEmpty() || creadorOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        boolean sigue = creadorOpt.get().getSeguidores().contains(usuarioActualOpt.get());
+        return ResponseEntity.ok(sigue);
+    }
 
 }
 

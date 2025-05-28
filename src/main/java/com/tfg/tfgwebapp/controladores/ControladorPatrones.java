@@ -368,7 +368,7 @@ public class ControladorPatrones {
     @GetMapping("/patrones-tienda-otro")
     @EntityGraph(attributePaths = {"reviews"})
     public ResponseEntity<List<Patron>> obtenerPatronesOtrosPublicados(
-            @RequestParam Usuario otroUsuario
+            @RequestParam Long otroUsuario
     ) {
         System.out.println("En controlador obtenerPatronesUsuario");
         Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
@@ -388,8 +388,9 @@ public class ControladorPatrones {
         Usuario usuario = usuarioOpt.get();
 
         List<Patron> patrones = new ArrayList<>();
+        Usuario creador = repositorioUsuario.findById(otroUsuario).get();
         try {
-            patrones = repositorioPatron.findPatronByCreadorAndPublicado(otroUsuario, true);
+            patrones = repositorioPatron.findPatronByCreadorAndPublicado(creador, true);
             System.out.println("Patrones en lista");
             if (patrones == null || patrones.isEmpty()) {
                 patrones = Collections.emptyList();

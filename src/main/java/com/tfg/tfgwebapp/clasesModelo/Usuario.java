@@ -1,7 +1,14 @@
 package com.tfg.tfgwebapp.clasesModelo;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -18,6 +25,50 @@ public class Usuario {
     private boolean esCreador;
     @Column(length = 500)
     private String imagenPerfil;
+
+    // Usuarios a los que este usuario sigue
+    @JsonManagedReference
+    @ManyToMany
+    @JoinTable(
+            name = "usuario_seguidos",
+            joinColumns = @JoinColumn(name = "seguidor_id"),
+            inverseJoinColumns = @JoinColumn(name = "seguido_id")
+    )
+    private List<Usuario> seguidos = new ArrayList<>();
+
+    // Usuarios que siguen a este usuario (mapeado inversamente)
+    @Getter
+    @Setter
+    @JsonBackReference
+    @ManyToMany(mappedBy = "seguidos")
+    private List<Usuario> seguidores = new ArrayList<>();
+
+    // Patrones empezados
+    @ManyToMany
+    @JoinTable(
+            name = "usuario_patrones_empezados",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "patron_id")
+    )
+    private List<Patron> patronesEmpezados = new ArrayList<>();
+
+    // Patrones guardados
+    @ManyToMany
+    @JoinTable(
+            name = "usuario_patrones_guardados",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "patron_id")
+    )
+    private List<Patron> patronesGuardados = new ArrayList<>();
+
+    // Patrones comprados
+    @ManyToMany
+    @JoinTable(
+            name = "usuario_patrones_comprados",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "patron_id")
+    )
+    private List<Patron> patronesComprados = new ArrayList<>();
 
     // Getters y Setters
 

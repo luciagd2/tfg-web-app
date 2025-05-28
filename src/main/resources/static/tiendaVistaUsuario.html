@@ -34,14 +34,14 @@
             <!-- INFORMACION PERFIL -->
             <div class="text-center info-perfil">
                 <div class="d-flex align-items-center justify-content-center mb-2">
-                    <img src="imagenes/osito.jpg" alt="Perfil" class="rounded-circle" style="width: 60px; height: 60px;">
-                    <h2 class="ms-3 mb-0 nombre-usu">Nombre del Usuario</h2>
+                    <img src="imagenes/osito.jpg" alt="Perfil" class="rounded-circle" id="img-usuario" style="width: 60px; height: 60px;">
+                    <h2 class="ms-3 mb-0 nombre-usu" id="nombre-usuario">Nombre del Usuario</h2>
                 </div>
-                <p class="text-muted">Esta es la descripción del perfil. Algo breve que quieras poner debajo.</p>
+                <p class="text-muted" id="descripcion-usuario">Esta es la descripción del perfil. Algo breve que quieras poner debajo.</p>
             
                 <!-- Botón de seguidores -->
                 <button class="btn btn-outline-primary mt-2">
-                    <i class="bi bi-people-fill"></i>Seguir</span>
+                    <i class="bi bi-people-fill" id="btnSeguir"></i>Seguir</span>
                 </button>
 
             </div>
@@ -68,19 +68,88 @@
     <script src="js/estructuras.js"></script>
     <script src="js/datosPatron.js"></script>
     <script>
-        const usuarioTienda = JSON.parse(sessionStorage.getItem("creadorSeleccionado"));
-        // INFORMACION DE PERFIL
-        document.getElementById('img-usuario').src = JSON.parse(sessionStorage.getItem("creadorSeleccionado")).imagenPerfil;
-        document.getElementById('nombre-usuario').innerText = JSON.parse(sessionStorage.getItem("creadorSeleccionado")).nombreUsuario;
-        document.getElementById('description-usuario').innerText = JSON.parse(sessionStorage.getItem("creadorSeleccionado")).descripcionUsuario;
+        document.addEventListener("DOMContentLoaded", async () => {
+            console.log("Script cargado");
 
-        // PATRONES PUBLICADOS
-        //CARGA DE PATRONES PROPIOS SEGÚN ESTADO - PUBLICADO O BORRADOR
-        document.addEventListener("DOMContentLoaded", () => {
+            // INFORMACION DE PERFIL
+            const creador = JSON.parse(localStorage.getItem("creadorSeleccionado"));
+            const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+
+            if (!creador) {
+                console.error("No hay creadorSeleccionado en localStorage");
+                return;
+            }
+
+            document.getElementById('img-usuario').src = creador.imagenPerfil;
+            document.getElementById('nombre-usuario').innerText = creador.nombreUsuario;
+            document.getElementById('descripcion-usuario').innerText = creador.descripcionUsuario;
+
+            // BOTÓN SEGUIR
+            const btnSeguir = document.querySelector(".btn.btn-outline-primary, .btn.btn-primary");
+            console.log("Botón seguir:", btnSeguir);
+
+            if (!usuario || !creador) {
+                console.error("Faltan datos de usuario o creador");
+                return;
+            }
+
+            const creadorId = creador.id;
+
+            try {
+                const response = await fetch(`/api/usuarios/sigueA?id=${creadorId}`, {
+                    method: "GET",
+                    credentials: "include"
+                });
+                console.log("Respuesta sigueA:", response.status);
+
+                if (response.ok) {
+                    const sigue = await response.json();
+                    if (sigue) {
+                        btnSeguir.innerHTML = '<i class="bi bi-people-fill"></i> Siguiendo';
+                        btnSeguir.classList.remove("btn-outline-primary");
+                        btnSeguir.classList.add("btn-primary");
+                    }
+                }
+            } catch (error) {
+                console.error("Error al comprobar si sigue:", error);
+            }
+
+            btnSeguir.addEventListener("click", async () => {
+                const siguiendo = btnSeguir.textContent.trim() === "Siguiendo";
+                const url = siguiendo
+                    ? `/api/usuarios/dejarDeSeguir?id=${creadorId}`
+                    : `/api/usuarios/seguir?id=${creadorId}`;
+
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        credentials: "include"
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Error:", response.status, errorText);
+                        alert(`Error al ${siguiendo ? "dejar de seguir" : "seguir"} al creador`);
+                        return;
+                    }
+
+                    if (siguiendo) {
+                        btnSeguir.innerHTML = '<i class="bi bi-people-fill"></i> Seguir';
+                        btnSeguir.classList.remove("btn-primary");
+                        btnSeguir.classList.add("btn-outline-primary");
+                    } else {
+                        btnSeguir.innerHTML = '<i class="bi bi-people-fill"></i> Siguiendo';
+                        btnSeguir.classList.remove("btn-outline-primary");
+                        btnSeguir.classList.add("btn-primary");
+                    }
+                } catch (error) {
+                    console.error("Error al seguir/dejar de seguir:", error);
+                    alert("Ha ocurrido un error, inténtalo de nuevo.");
+                }
+            });
+
+            // CARGA DE PATRONES PUBLICADOS
             const container = document.getElementById("contenedor-cards-tienda");
-            const btnBorradores = document.getElementById("borradores");
-            const btnPublicados = document.getElementById("publicados");
-
             const cargarPatrones = (endpoint) => {
                 container.innerHTML = "";
 
@@ -178,25 +247,8 @@
             };
 
             // Cargar publicados por defecto
-            cargarPatrones(`/api/patrones/patrones-tienda-publicados?otroUsuario=${usuarioTienda}`);
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const btnSeguir = document.querySelector(".btn-outline-primary");
-
-            btnSeguir.addEventListener("click", function () {
-                // Alternar entre seguir/siguiendo (por si quieres permitir des-seguir)
-                if (btnSeguir.textContent.trim() === "Seguir") {
-                    btnSeguir.innerHTML = '<i class="bi bi-people-fill"></i> Siguiendo';
-                    btnSeguir.classList.remove("btn-outline-primary");
-                    btnSeguir.classList.add("btn-primary");
-                } else {
-                    btnSeguir.innerHTML = '<i class="bi bi-people-fill"></i> Seguir';
-                    btnSeguir.classList.remove("btn-primary");
-                    btnSeguir.classList.add("btn-outline-primary");
-                }
-            });
+            const usuarioTienda = JSON.parse(localStorage.getItem("creadorSeleccionado"));
+            cargarPatrones(`/api/patrones/patrones-tienda-publicados?otroUsuario=${usuarioTienda.id}`);
         });
     </script>
 
