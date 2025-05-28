@@ -34,8 +34,8 @@
         <nav class="navbar bg-body-tertiary barra-busqueda">
           <div class="container-fluid">
             <form class="d-flex" role="search">
-              <input class="form-control me-2" type="search" placeholder="Buscar patrones..." aria-label="Search">
-              <button class="btn btn-outline-success" type="submit" id="btnBuscar">Buscar</button>
+              <input class="form-control me-2" type="search" id="inputBusqueda" placeholder="Buscar patrones..." aria-label="Search">
+              <button class="btn btn-outline-success" type="button" id="btnBuscar">Buscar</button> <!--type="submit"-->
               <button class="btn btn-outline-success icon-btn" type="button" data-bs-toggle="modal" data-bs-target="#modalFiltros">
                 <i class="bi bi-funnel-fill"></i>
               </button>
@@ -119,9 +119,6 @@
                       card.style.width = "18rem";
 
                       card.innerHTML = `
-                          <button class="btn btn-light boton-popover position-absolute top-0 end-0 m-1 p-1">
-                            <i class="bi bi-gear-fill"></i>
-                          </button>
                           <a href="infoPatron.html" class="card-patron" data-id="${patron.id}" id="card-patron-${patron.id}">
                             <img src="${patron.imagenes?.[0] || 'placeholder.jpg'}" class="card-img-top rounded-3" alt="${patron.titulo}">
                             <div class="card-body" href="infoPatron.html">
@@ -199,46 +196,53 @@
 
         // Cargar publicados por defecto
         cargarPatrones("/api/patrones/getAllPatronesPublicados");
+/*
+        // EVENT LISTENER PARA EL BOTON DE BUSQUEDA
+        const btnBuscar = document.getElementById('btnBuscar');
+        btnBuscar.addEventListener('click', () => {
+            const inputBusqueda = document.getElementById('inputBusqueda').value.trim();
 
-          // BOTÓN DE BÚSQUEDA
-          const btnBuscar = document.getElementById('btnBuscar');
-          if (btnBuscar) {
-              btnBuscar.addEventListener('click', () => {
-                  const textoBusqueda = document.getElementById('barraBusqueda').value.trim();
-                  const filtrosGuardados = JSON.parse(localStorage.getItem("filtrosBusqueda")) || [false, false, false, false];
-                  const filtroString = filtrosGuardados.join(',');
+            if (inputBusqueda.length === 0) {
+                alert("Por favor ingresa una palabra clave para buscar.");
+                return;
+            }
 
-                  const url = `/api/patrones/getAllFiltros?filtros=${encodeURIComponent(filtroString)}&busqueda=${encodeURIComponent(textoBusqueda)}`;
-                  cargarPatrones(url);
-              });
-          }
+            const url = `/api/patrones/getAllBusqueda?query=${encodeURIComponent(inputBusqueda)}`;
+            cargarPatrones(url); // Asegúrate de que esta función maneje el renderizado de resultados
+        });
+*/
+        const btnBuscar = document.getElementById('btnBuscar');
+        btnBuscar.addEventListener('click', () => {
+            const inputBusqueda = document.getElementById('inputBusqueda').value.trim();
 
-          // BOTÓN DE APLICAR FILTROS
-          const aplicarBtn = document.getElementById('aplicarFiltros');
-          if (aplicarBtn) {
-              aplicarBtn.addEventListener('click', () => {
-                  const filtroBtns = document.querySelectorAll('.seccion-dificultad .toggle-btn');
-                  const filtros = [
-                      filtroBtns[0].classList.contains('active'), // Principiante
-                      filtroBtns[1].classList.contains('active'), // Intermedio
-                      filtroBtns[2].classList.contains('active'), // Avanzado
-                      filtroBtns[3].classList.contains('active')  // Mejor puntuación
-                  ];
+            if (inputBusqueda.length === 0) {
+                alert("Por favor ingresa una palabra clave para buscar.");
+                return;
+            }
 
-                  localStorage.setItem("filtrosBusqueda", JSON.stringify(filtros));
+            // Recuperamos los filtros
+            const filtros = localStorage.getItem("filtrosBusqueda");
+            console.log('Estado de filtrosBusqueda: ', filtros);
+            if (filtros !== null) {
+                try {
+                    const filtrosJSON = JSON.parse(filtros);
+                    const filtroString = filtrosJSON.join(',');
+                    url = `/api/patrones/getAllBusquedaFiltros?query=${encodeURIComponent(inputBusqueda)}&filtros=${encodeURIComponent(filtroString)}`;
+                    cargarPatrones(url);
+                } catch (e) {
+                    console.error("Error parseando filtros del localStorage", e);
+                    url = `/api/patrones/getAllBusqueda?query=${encodeURIComponent(inputBusqueda)}`;
+                    cargarPatrones(url);
+                }
+            } else {
+                // No hay filtros, usar endpoint básico
+                url = `/api/patrones/getAllBusqueda?query=${encodeURIComponent(inputBusqueda)}`;
+                cargarPatrones(url);
+            }
 
-                  const modal = bootstrap.Modal.getInstance(document.getElementById('modalFiltros'));
-                  modal.hide();
-
-                  const filtroString = filtros.join(',');
-                  const textoBusqueda = document.getElementById('barraBusqueda').value.trim(); // también considera búsqueda activa
-                  const url = `/api/patrones/getAllFiltros?filtros=${encodeURIComponent(filtroString)}&busqueda=${encodeURIComponent(textoBusqueda)}`;
-                  cargarPatrones(url);
-              });
-          }
+        });
 
         // EVENT LISTENER PARA EL BOTON DE APLICAR FILTROS/ORDEN
- /*
         document.getElementById('aplicarFiltros').addEventListener('click', () => {
           // Dificultades
           const filtroBtns = document.querySelectorAll('.seccion-dificultad .toggle-btn');
@@ -260,7 +264,8 @@
           const url = `/api/patrones/getAllFiltros?filtros=${encodeURIComponent(filtroString)}`;
           cargarPatrones(url);
         });
-*/
+
+        // EVENT LISTENER PARA EL BOTON DE ELIMINAR FILTROS/ORDEN
         document.getElementById('eliminarFiltros').addEventListener('click', () => {
           localStorage.removeItem('filtrosBusqueda');
           localStorage.removeItem('ordenBusqueda');

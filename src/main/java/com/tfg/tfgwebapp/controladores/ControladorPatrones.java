@@ -100,11 +100,9 @@ public class ControladorPatrones {
     @GetMapping("/getAllFiltros")
     @EntityGraph(attributePaths = {"reviews", "tags"})
     public ResponseEntity<List<Patron>> getAllFiltros(
-            @RequestParam String filtros,
-            @RequestParam(required = false) String busqueda
+            @RequestParam String filtros
     ) {
         System.out.println("En controlador getAllFiltros");
-        System.out.println("Texto de búsqueda recibido: " + busqueda);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -122,11 +120,6 @@ public class ControladorPatrones {
         boolean avanzado     = Boolean.parseBoolean(flags[2]);
         boolean puntuacion = Boolean.parseBoolean(flags[3]);
 
-        if (busqueda != null && busqueda.isBlank()) {
-            busqueda = null;
-        }
-
-        /*
         try {
         String[] filtroStrings = filtros.split(",");
         if (filtroStrings.length != 4) {
@@ -138,10 +131,10 @@ public class ControladorPatrones {
             filtroBools[i] = Boolean.parseBoolean(filtroStrings[i].trim());
         }
 
-        List<Dificultad> dificultadesFiltradas = new ArrayList<>();
-        if (filtroBools[0]) dificultadesFiltradas.add(Dificultad.Principiante);
-        if (filtroBools[1]) dificultadesFiltradas.add(Dificultad.Intermedio);
-        if (filtroBools[2]) dificultadesFiltradas.add(Dificultad.Avanzado);
+        List<Patron.Dificultad> dificultadesFiltradas = new ArrayList<>();
+        if (filtroBools[0]) dificultadesFiltradas.add(Patron.Dificultad.Principiante);
+        if (filtroBools[1]) dificultadesFiltradas.add(Patron.Dificultad.Intermedio);
+        if (filtroBools[2]) dificultadesFiltradas.add(Patron.Dificultad.Avanzado);
 
         List<Patron> patrones;
 
@@ -160,14 +153,99 @@ public class ControladorPatrones {
         }
 
         return ResponseEntity.ok(patrones);
-        */
-        List<Patron> patrones;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/getAllBusqueda")
+    @EntityGraph(attributePaths = {"reviews", "tags"})
+    public ResponseEntity<List<Patron>> getAllBusqueda(
+            @RequestParam String query
+    ) {
+        System.out.println("En controlador getAllBusqueda");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuario usuario = repositorioUsuario.findByEmail(((UserDetails) auth.getPrincipal()).getUsername())
+                .orElse(null);
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         try {
-            if (puntuacion) {
-                patrones = repositorioPatron.buscarConFiltrosYTextoOrdenadoPorPuntuacion(principiante, intermedio, avanzado, busqueda);
-            } else {
-                patrones = repositorioPatron.buscarConFiltrosYTexto(principiante, intermedio, avanzado, busqueda);
+            if (query == null || query.trim().isEmpty()) {
+                return ResponseEntity.badRequest().build();
             }
+
+            List<Patron> patrones = repositorioPatron.searchByTituloAutorOTags(query.trim());
+            System.out.println("Patrones en lista: " + patrones);
+            return ResponseEntity.ok(patrones);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/getAllBusquedaFiltros")
+    @EntityGraph(attributePaths = {"reviews", "tags"})
+    public ResponseEntity<List<Patron>> buscarConFiltros(
+            @RequestParam String query,
+            @RequestParam String filtros
+    ) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuario usuario = repositorioUsuario.findByEmail(((UserDetails) auth.getPrincipal()).getUsername())
+                .orElse(null);
+        if (usuario == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            if (query == null || query.trim().isEmpty() || filtros == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            String[] filtroStrings = filtros.split(",");
+            if (filtroStrings.length != 4) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            boolean[] filtroBools = new boolean[4];
+            for (int i = 0; i < 4; i++) {
+                filtroBools[i] = Boolean.parseBoolean(filtroStrings[i].trim());
+            }
+
+            List<Patron.Dificultad> dificultadesFiltradas = new ArrayList<>();
+            if (filtroBools[0]) dificultadesFiltradas.add(Patron.Dificultad.Principiante);
+            if (filtroBools[1]) dificultadesFiltradas.add(Patron.Dificultad.Intermedio);
+            if (filtroBools[2]) dificultadesFiltradas.add(Patron.Dificultad.Avanzado);
+
+            List<Patron> patrones;
+
+            if (!dificultadesFiltradas.isEmpty()) {
+                if (filtroBools[3]) {
+                    patrones = repositorioPatron.buscarPorTextoYFiltrosOrdenado(query, dificultadesFiltradas);
+                } else {
+                    patrones = repositorioPatron.buscarPorTextoYFiltros(query, dificultadesFiltradas);
+                }
+            } else {
+                // Sin filtros de dificultad, usar búsqueda general
+                patrones = repositorioPatron.buscarPorTexto(query);
+            }
+
             return ResponseEntity.ok(patrones);
 
         } catch (Exception e) {

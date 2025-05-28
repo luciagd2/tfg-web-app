@@ -17,6 +17,7 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
 
         List<Patron> findAllByPublicado(boolean b);
 
+        //Query por filtros
         @Query("select p from Patron p where p.publicado = true and p.dificultad in ?1")
         List<Patron> findAllByDificultadIn(List<Patron.Dificultad> dificultades);
 
@@ -26,52 +27,34 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
         @Query("SELECT p FROM Patron p LEFT JOIN p.reviews r WHERE p.publicado = true AND p.dificultad IN :dificultades GROUP BY p ORDER BY AVG(r.puntuacion) DESC")
         List<Patron> findAllByDificultadInOrderByPuntuacionMediaDesc(@Param("dificultades") List<Patron.Dificultad> dificultades);
 
-        @Query("""
-        SELECT DISTINCT p FROM Patron p
-        LEFT JOIN p.reviews r
-        LEFT JOIN p.tags tag
-        WHERE (:busqueda IS NULL\s
-               OR LOWER(p.titulo) LIKE CONCAT('%', LOWER(:busqueda), '%')\s
-               OR LOWER(p.creador.nombreUsuario) LIKE CONCAT('%', LOWER(:busqueda), '%')\s
-               OR LOWER(tag) LIKE CONCAT('%', LOWER(:busqueda), '%'))
-        AND (
-             (:principiante = true AND p.dificultad = 'Principiante') OR
-             (:intermedio = true AND p.dificultad = 'Intermedio') OR
-             (:avanzado = true AND p.dificultad = 'Avanzado')
-        )
-        AND p.publicado = true
-        GROUP BY p
-        ORDER BY AVG(r.puntuacion) DESC
-        """)
-        List<Patron> buscarConFiltrosYTexto(
-                @Param("principiante") boolean principiante,
-                @Param("intermedio") boolean intermedio,
-                @Param("avanzado") boolean avanzado,
-                @Param("titulo") String textoBusqueda
-        );
+        //Query por busqueda
+        @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.tags t " +
+                "WHERE p.publicado = true AND (" +
+                "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+                "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+                "LOWER(t) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
+        List<Patron> searchByTituloAutorOTags(@Param("searchTerm") String searchTerm);
 
-        @Query("""
-        SELECT p FROM Patron p
-        LEFT JOIN p.reviews r
-        LEFT JOIN p.tags tag
-        WHERE (:busqueda IS NULL\s
-              OR LOWER(p.titulo) LIKE CONCAT('%', LOWER(:busqueda), '%')\s
-              OR LOWER(p.creador.nombreUsuario) LIKE CONCAT('%', LOWER(:busqueda), '%')\s
-              OR LOWER(tag) LIKE CONCAT('%', LOWER(:busqueda), '%'))
-        AND (
-            (:principiante = true AND p.dificultad = 'Principiante') OR
-            (:intermedio = true AND p.dificultad = 'Intermedio') OR
-            (:avanzado = true AND p.dificultad = 'Avanzado')
-        )
-        AND p.publicado = true
-        GROUP BY p
-        ORDER BY AVG(r.puntuacion) DESC
-        """)
-        List<Patron> buscarConFiltrosYTextoOrdenadoPorPuntuacion(
-                @Param("principiante") boolean principiante,
-                @Param("intermedio") boolean intermedio,
-                @Param("avanzado") boolean avanzado,
-                @Param("busqueda") String busqueda
-        );
+        //Query por busqueda y filtros
+        @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.tags t " +
+                "WHERE p.publicado = true AND (" +
+                "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+                "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+                "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))")
+        List<Patron> buscarPorTexto(@Param("query") String query);
 
+        @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.reviews r LEFT JOIN p.tags t " +
+                "WHERE p.publicado = true AND p.dificultad IN :dificultades AND (" +
+                "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+                "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+                "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))" +
+                "GROUP BY p ORDER BY AVG(r.puntuacion) DESC")
+        List<Patron> buscarPorTextoYFiltrosOrdenado(@Param("query") String query, @Param("dificultades") List<Patron.Dificultad> dificultades);
+
+        @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.tags t " +
+                "WHERE p.publicado = true AND p.dificultad IN :dificultades AND (" +
+                "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+                "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+                "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))")
+        List<Patron> buscarPorTextoYFiltros(@Param("query") String query, @Param("dificultades") List<Patron.Dificultad> dificultades);
 }
