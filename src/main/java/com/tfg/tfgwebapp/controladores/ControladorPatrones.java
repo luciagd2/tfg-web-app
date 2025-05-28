@@ -364,6 +364,43 @@ public class ControladorPatrones {
         }
     }
 
+
+    @GetMapping("/patrones-tienda-otro")
+    @EntityGraph(attributePaths = {"reviews"})
+    public ResponseEntity<List<Patron>> obtenerPatronesOtrosPublicados(
+            @RequestParam Usuario otroUsuario
+    ) {
+        System.out.println("En controlador obtenerPatronesUsuario");
+        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            System.out.println("Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        List<Patron> patrones = new ArrayList<>();
+        try {
+            patrones = repositorioPatron.findPatronByCreadorAndPublicado(otroUsuario, true);
+            System.out.println("Patrones en lista");
+            if (patrones == null || patrones.isEmpty()) {
+                patrones = Collections.emptyList();
+            }
+            return ResponseEntity.ok(patrones);
+        } catch (Exception e) {
+            System.out.println("Error al conseguir los patrones");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
     @PostMapping("/nuevo")
     public ResponseEntity<Patron> crearPatron(
             @RequestParam Long idCreador

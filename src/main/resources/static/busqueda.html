@@ -174,7 +174,7 @@
 
         const guardarPatronSeleccionado = async (patronId) => {
           try {
-            const response = await fetch(`/api/patrones/encontrar?id=${patronId}`, {
+            const response = await fetch(`/api/patrones/encontrar?otroUsuario=${patronId}`, {
               method: "GET",
               credentials: "include"
             });
@@ -196,21 +196,7 @@
 
         // Cargar publicados por defecto
         cargarPatrones("/api/patrones/getAllPatronesPublicados");
-/*
-        // EVENT LISTENER PARA EL BOTON DE BUSQUEDA
-        const btnBuscar = document.getElementById('btnBuscar');
-        btnBuscar.addEventListener('click', () => {
-            const inputBusqueda = document.getElementById('inputBusqueda').value.trim();
 
-            if (inputBusqueda.length === 0) {
-                alert("Por favor ingresa una palabra clave para buscar.");
-                return;
-            }
-
-            const url = `/api/patrones/getAllBusqueda?query=${encodeURIComponent(inputBusqueda)}`;
-            cargarPatrones(url); // Asegúrate de que esta función maneje el renderizado de resultados
-        });
-*/
         const btnBuscar = document.getElementById('btnBuscar');
         btnBuscar.addEventListener('click', () => {
             const inputBusqueda = document.getElementById('inputBusqueda').value.trim();

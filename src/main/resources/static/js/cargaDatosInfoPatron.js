@@ -126,7 +126,8 @@ function cargarDatosInfoPatron(patron, reviews) {
     //Event si se pulse en el creador: redirige al usuario a su tienda
     document.getElementById("creadorPatron").addEventListener("click", function () {
         const idCreador = this.getAttribute("data-id-creador");
-        localStorage.setItem("idCreadorSeleccionado", idCreador);
+        const creador = obtenerUsuarioCreador(idCreador);
+        localStorage.setItem("creadorSeleccionado", creador);
         window.location.href = "tiendaVistaUsuario.html";
     });
     
@@ -142,6 +143,27 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("No se encontró ningún patrón.");
     }
 });
+
+async function obtenerUsuarioCreador(creadorId){
+    try {
+        const response = await fetch(`/api/usuarios/perfil/encontrar?idUsuario=${patronId}`, {
+            method: "GET",
+            credentials: "include"
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Estado:", response.status);
+            console.error("Respuesta:", errorText);
+            alert(`Error al recuperar el usuario: ${response.status}`);
+            return;
+        }
+        const usuario = await response.json();
+        localStorage.setItem("reviewsPatron", JSON.stringify(usuario));
+        return usuario;
+    } catch (error) {
+        console.error("Error al recuperar las reseñas del patrón:", error);
+    }
+}
 
 async function obtenerReviews(patronId){
     try {
@@ -162,4 +184,4 @@ async function obtenerReviews(patronId){
     } catch (error) {
         console.error("Error al recuperar las reseñas del patrón:", error);
     }
-};
+}

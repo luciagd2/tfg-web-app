@@ -231,5 +231,27 @@ public class ControladorUsuario {
         return ResponseEntity.ok(usuario);
     }
 
+    @GetMapping("/perfil/encontrar")
+    public ResponseEntity<?> encontrarUsuario(@RequestParam Long idUsuario
+    ) throws IOException {
+        logger.info("Entrando en el método encontrarUsuario");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuario = repositorioUsuario.findById(idUsuario).get();
+        return ResponseEntity.ok(usuario);
+    }
+
+
 }
 
