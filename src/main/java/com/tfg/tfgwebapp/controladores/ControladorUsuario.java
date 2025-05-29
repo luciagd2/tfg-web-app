@@ -253,40 +253,36 @@ public class ControladorUsuario {
         return ResponseEntity.ok(usuario);
     }
 
-    @PostMapping("/seguir")
-    public ResponseEntity<Void> seguirUsuario(@RequestParam Long id, Principal principal) {
-        Optional<Usuario> usuarioActualOpt = repositorioUsuario.findByEmail(principal.getName());
-        Optional<Usuario> creadorOpt = repositorioUsuario.findById(id);
+    @PostMapping("/seguimiento")
+    public ResponseEntity<?> seguimientoUsuario(@RequestParam Long idCreador) {
+        logger.info("Entrando en el método seguimientoUsuario");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioActualOpt.isEmpty() || creadorOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
         }
 
-        Usuario usuarioActual = usuarioActualOpt.get();
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        Optional<Usuario> creadorOpt = repositorioUsuario.findById(idCreador);
+
+        if (creadorOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         Usuario creador = creadorOpt.get();
 
-        if (!creador.getSeguidores().contains(usuarioActual)) {
-            creador.getSeguidores().add(usuarioActual);
+        if (!creador.getIdsSeguidores().contains(usuario.getId())) {
+            creador.getIdsSeguidores().add(usuario.getId());
             repositorioUsuario.save(creador);
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/dejarDeSeguir")
-    public ResponseEntity<Void> dejarDeSeguirUsuario(@RequestParam Long id, Principal principal) {
-        Optional<Usuario> usuarioActualOpt = repositorioUsuario.findByEmail(principal.getName());
-        Optional<Usuario> creadorOpt = repositorioUsuario.findById(id);
-
-        if (usuarioActualOpt.isEmpty() || creadorOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Usuario usuarioActual = usuarioActualOpt.get();
-        Usuario creador = creadorOpt.get();
-
-        if (creador.getSeguidores().contains(usuarioActual)) {
-            creador.getSeguidores().remove(usuarioActual);
+        }else{
+            creador.getIdsSeguidores().remove(usuario.getId());
             repositorioUsuario.save(creador);
         }
 
@@ -294,17 +290,43 @@ public class ControladorUsuario {
     }
 
     @GetMapping("/sigueA")
-    public ResponseEntity<Boolean> sigueA(@RequestParam Long id, Principal principal) {
-        Optional<Usuario> usuarioActualOpt = repositorioUsuario.findByEmail(principal.getName());
-        Optional<Usuario> creadorOpt = repositorioUsuario.findById(id);
+    public ResponseEntity<?> sigueA(@RequestParam Long idCreador) {
+        logger.info("Entrando en el método sigueA");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioActualOpt.isEmpty() || creadorOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
         }
 
-        boolean sigue = creadorOpt.get().getSeguidores().contains(usuarioActualOpt.get());
-        return ResponseEntity.ok(sigue);
-    }
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
 
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        Optional<Usuario> creadorOpt = repositorioUsuario.findById(idCreador);
+
+        if (creadorOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Usuario creador = creadorOpt.get();
+
+        if (!creador.getIdsSeguidores().contains(usuario.getId())) {
+            creador.getIdsSeguidores().add(usuario.getId());
+            repositorioUsuario.save(creador);
+        } else {
+            creador.getIdsSeguidores().remove(usuario.getId());
+            repositorioUsuario.save(creador);
+        }
+
+        if (creador.getIdsSeguidores().contains(usuario.getId())) {
+            return ResponseEntity.ok(true);
+        } else{
+            return ResponseEntity.ok(false);
+        }
+    }
 }
 

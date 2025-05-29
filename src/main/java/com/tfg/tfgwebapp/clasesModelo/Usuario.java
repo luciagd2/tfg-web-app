@@ -27,6 +27,18 @@ public class Usuario {
     private String imagenPerfil;
 
     // Usuarios a los que este usuario sigue
+    @Getter
+    @Setter
+    @ElementCollection
+    @CollectionTable(
+            name = "usuario_seguidores",
+            joinColumns = @JoinColumn(name = "usaurio_id")
+    )
+    @Column(name = "seguidor")
+    private List<Long> idsSeguidores = new ArrayList<>();
+
+    /*
+    // Usuarios a los que este usuario sigue
     @JsonManagedReference
     @ManyToMany
     @JoinTable(
@@ -42,6 +54,7 @@ public class Usuario {
     @JsonBackReference
     @ManyToMany(mappedBy = "seguidos")
     private List<Usuario> seguidores = new ArrayList<>();
+*/
 
     // Patrones empezados
     @ManyToMany

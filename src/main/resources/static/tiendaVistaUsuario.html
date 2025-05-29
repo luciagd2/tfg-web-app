@@ -96,14 +96,14 @@
             const creadorId = creador.id;
 
             try {
-                const response = await fetch(`/api/usuarios/sigueA?id=${creadorId}`, {
+                const response = await fetch(`/api/usuarios/sigueA?idCreador=${creadorId}`, {
                     method: "GET",
                     credentials: "include"
                 });
-                console.log("Respuesta sigueA:", response.status);
 
                 if (response.ok) {
                     const sigue = await response.json();
+                    console.log('Siguiendo?: ', sigue)
                     if (sigue) {
                         btnSeguir.innerHTML = '<i class="bi bi-people-fill"></i> Siguiendo';
                         btnSeguir.classList.remove("btn-outline-primary");
@@ -116,12 +116,9 @@
 
             btnSeguir.addEventListener("click", async () => {
                 const siguiendo = btnSeguir.textContent.trim() === "Siguiendo";
-                const url = siguiendo
-                    ? `/api/usuarios/dejarDeSeguir?id=${creadorId}`
-                    : `/api/usuarios/seguir?id=${creadorId}`;
 
                 try {
-                    const response = await fetch(url, {
+                    const response = await fetch(`/api/usuarios/seguimiento?idCreador=${creadorId}`, {
                         method: "POST",
                         credentials: "include"
                     });
@@ -150,6 +147,7 @@
 
             // CARGA DE PATRONES PUBLICADOS
             const container = document.getElementById("contenedor-cards-tienda");
+
             const cargarPatrones = (endpoint) => {
                 container.innerHTML = "";
 
