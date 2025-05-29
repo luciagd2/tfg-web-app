@@ -1,6 +1,7 @@
 package com.tfg.tfgwebapp.clasesModelo;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -40,6 +41,7 @@ public class Usuario {
     // Patrones empezados
     @Getter
     @Setter
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "usuario_patrones_empezados",
@@ -51,6 +53,7 @@ public class Usuario {
     // Patrones guardados
     @Getter
     @Setter
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "usuario_patrones_guardados",
@@ -62,6 +65,7 @@ public class Usuario {
     // Patrones comprados
     @Getter
     @Setter
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "usuario_patrones_comprados",

@@ -54,8 +54,10 @@ async function cargarDatosInfoPatron(patron, reviews) {
         });
 
         if (response.ok) {
-            const sigue = await response.json();
-            if (sigue) {
+            const estaGuardado = await response.json();
+            if (estaGuardado) {
+                btnGuardar.textContent = 'Guardado';
+            } else {
                 btnGuardar.textContent = 'Guardar';
             }
         }

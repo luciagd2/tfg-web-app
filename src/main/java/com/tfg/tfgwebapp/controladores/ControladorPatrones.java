@@ -358,12 +358,11 @@ public class ControladorPatrones {
             }
             return ResponseEntity.ok(patrones);
         } catch (Exception e) {
-            System.out.println("Pecepcion al conseguir los patrones");
+            System.out.println("Error al conseguir los patrones");
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
     @GetMapping("/patrones-tienda-otro")
     @EntityGraph(attributePaths = {"reviews"})
@@ -516,7 +515,7 @@ public class ControladorPatrones {
         }
         Patron patron = patronOpt.get();
 
-        if (!usuario.getPatronesGuardados().contains(patron)) {
+        if (usuario.getPatronesGuardados().contains(patron)) {
             return ResponseEntity.ok(true);
         } else{
             return ResponseEntity.ok(false);
@@ -560,5 +559,39 @@ public class ControladorPatrones {
 
         repositorioUsuario.save(usuario);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/patrones-biblioteca-guardados")
+    @EntityGraph(attributePaths = {"reviews"})
+    public ResponseEntity<List<Patron>> obtenerPatronesBibliotecaGuardados() {
+        System.out.println("En controlador obtenerPatronesBibliotecaGuardados");
+        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            System.out.println("Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        try {
+            List<Patron> patrones = usuario.getPatronesGuardados();
+            System.out.println("Patrones en lista");
+            if (patrones == null || patrones.isEmpty()) {
+                patrones = Collections.emptyList();
+            }
+            return ResponseEntity.ok(patrones);
+        } catch (Exception e) {
+            System.out.println("Error al conseguir los patrones guardados");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

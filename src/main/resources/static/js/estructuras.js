@@ -35,9 +35,11 @@ function cargarMenu() {
 
     document.getElementById("container-menu").innerHTML = menuHTML;
 }
+
+
 document.addEventListener("DOMContentLoaded", cargarMenu);
 
-
+/*
 //CARDS DE LOS PATRONES - VISTA PREVIA
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("contenedor-cards");
@@ -170,3 +172,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+*/

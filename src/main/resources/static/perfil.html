@@ -58,13 +58,13 @@
                         Comprados
                     </label>
             
-                    <input type="radio" class="btn-check" name="optiones" id="favoritos" autocomplete="off">
-                    <label class="btn boton-check" for="favoritos">
+                    <input type="radio" class="btn-check" name="optiones" id="empezados" autocomplete="off">
+                    <label class="btn boton-check" for="empezados">
                         <i class="bi bi-heart-fill"></i>
-                        Favoritos
+                        Empezados
                     </label>
                 </div>
-                <div class="contenedor-cards gap-4">
+                <div class="contenedor-cards gap-4" id="contenedor-cards-biblioteca">
                     <!-- CARDS PARA LOS PATRONES -->
                     <div class="card" style="width: 18rem;">
                         <a href="infoPatron.html" class="card-patron">
@@ -124,6 +124,7 @@
     </div>
 
     <script src="js/estructuras.js"></script>
+    <script src="js/cargarPatronesBiblioteca.js"></script>
     <script>
         // INFORMACION DE PERFIL
         document.getElementById('img-perfil').src = JSON.parse(sessionStorage.getItem("usuario")).imagenPerfil;
@@ -175,6 +176,36 @@
             // Cierra el modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('editarPerfilModal'));
             modal.hide();
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const btnGuardados = document.getElementById("guardados");
+            const btnComprados = document.getElementById("comprados");
+            const btnEmpezados = document.getElementById("empezados");
+            const container = document.getElementById("contenedor-cards-biblioteca");
+
+            // Cargar guardados por defecto
+            cargarPatrones("/api/patrones/patrones-biblioteca-guardados", container);
+
+            // Eventos para radio buttons
+            btnGuardados.addEventListener("change", () => {
+                if (btnBorradores.checked) {
+                    cargarPatrones("/api/patrones/patrones-biblioteca-guardados", container);
+                }
+            });
+
+            btnComprados.addEventListener("change", () => {
+                if (btnPublicados.checked) {
+                    cargarPatrones("/api/patrones/patrones-biblioteca-comprados", container);
+                }
+            });
+
+            btnEmpezados.addEventListener("change", () => {
+                if (btnPublicados.checked) {
+                    cargarPatrones("/api/patrones/patrones-biblioteca-empezados", container);
+                }
+            });
         });
     </script>
 
