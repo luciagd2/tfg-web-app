@@ -44,7 +44,8 @@
                         <p class="card-text">Descripcion</p>
                         <div>
                             <p class="card-precio">Precio</p>
-                            <a href="#" class="btn card-link">Enlace para empezar/comprar</a>
+                            <a class="btn card-link" id="btnGuardar">Guardar</a>
+                            <a href="#" class="btn card-link" id="btnComprarEmpezar">Comprar</a>
                         </div>
                     </div>
                 </div>
@@ -208,96 +209,6 @@
             const patron = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
             const usuario = JSON.parse(localStorage.getItem("usuario")).id;
 
-            // Si el nombre de usuario y puntuación no están vacíos, agregar reseña
-            /*
-            if (puntuacion) {
-                const contenedorReseñas = document.getElementById("contenedorReseñas");
-
-                // Crear una card para la reseña
-                const card = document.createElement("div");
-                card.classList.add("card", "mb-3", "card-resenia");
-
-                // Crear la cabecera con el nombre de usuario
-                const cardHeader = document.createElement("div");
-                cardHeader.classList.add("card-header", "d-flex", "align-items-center", "gap-1");
-                cardHeader.innerHTML = `
-                    <img src="https://via.placeholder.com/40" alt="Usuario" class="rounded-circle img-usu-resenia">
-                    <strong>${nombreUsuario}</strong>
-                `;
-                card.appendChild(cardHeader);
-
-                // Crear el cuerpo de la card
-                const cardBody = document.createElement("div");
-                cardBody.classList.add("card-body", "card-body-resenia");
-
-                // Si hay imagen del patrón
-                if (imagenPatron) {
-                    const image = document.createElement("img");
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        image.src = e.target.result;
-                        image.classList.add("img-fluid", "rounded", "mb-3", "img-resenia");
-                        cardBody.appendChild(image);
-                        // Crear las estrellas
-                        const estrellas = document.createElement("div");
-                        estrellas.classList.add("mb-2");
-                        for (let i = 1; i <= 5; i++) {
-                            const estrella = document.createElement("i");
-                            // Si la estrella está dentro de la puntuación, llenarla
-                            if (i <= puntuacion) {
-                                estrella.classList.add("bi", "bi-star-fill", "text-warning");
-                            } else {
-                                estrella.classList.add("bi", "bi-star", "text-muted");
-                            }
-                            estrellas.appendChild(estrella);
-                        }
-                        cardBody.appendChild(estrellas);
-                        // Crear el comentario
-                        if (comentario) {
-                            const textoComentario = document.createElement("p");
-                            textoComentario.classList.add("mb-0", "comentario-resenia");
-                            textoComentario.textContent = comentario;
-                            cardBody.appendChild(textoComentario);
-                        }
-                        card.appendChild(cardBody);
-                    };
-                    reader.readAsDataURL(imagenPatron);
-                }
-
-                else{
-                    // Crear las estrellas
-                    const estrellas = document.createElement("div");
-                    estrellas.classList.add("mb-2");
-                    for (let i = 1; i <= 5; i++) {
-                        const estrella = document.createElement("i");
-                        // Si la estrella está dentro de la puntuación, llenarla
-                        if (i <= puntuacion) {
-                            estrella.classList.add("bi", "bi-star-fill", "text-warning");
-                        } else {
-                            estrella.classList.add("bi", "bi-star", "text-muted");
-                        }
-                        estrellas.appendChild(estrella);
-                    }
-                    cardBody.appendChild(estrellas);
-                    // Crear el comentario
-                    if (comentario) {
-                        const textoComentario = document.createElement("p");
-                        textoComentario.classList.add("mb-0", "comentario-resenia");
-                        textoComentario.textContent = comentario;
-                        cardBody.appendChild(textoComentario);
-                    }
-                    card.appendChild(cardBody);
-                    }
-
-                // Agregar la card al contenedor de reseñas
-                contenedorReseñas.appendChild(card);
-
-                // Limpiar el formulario
-                document.getElementById("nombreUsuario").value = '';
-                document.getElementById("imagenPatron").value = '';
-                document.getElementById("puntuacion").value = '1';
-                document.getElementById("comentario").value = '';
-            }*/
             if (!puntuacion) {
                 alert("Falta la puntiación. Por favor, indica un valor.");
                 return;

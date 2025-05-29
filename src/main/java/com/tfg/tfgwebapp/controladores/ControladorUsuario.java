@@ -280,12 +280,11 @@ public class ControladorUsuario {
 
         if (!creador.getIdsSeguidores().contains(usuario.getId())) {
             creador.getIdsSeguidores().add(usuario.getId());
-            repositorioUsuario.save(creador);
         }else{
             creador.getIdsSeguidores().remove(usuario.getId());
-            repositorioUsuario.save(creador);
         }
 
+        repositorioUsuario.save(creador);
         return ResponseEntity.ok().build();
     }
 
@@ -313,7 +312,7 @@ public class ControladorUsuario {
             return ResponseEntity.notFound().build();
         }
         Usuario creador = creadorOpt.get();
-
+/*
         if (!creador.getIdsSeguidores().contains(usuario.getId())) {
             creador.getIdsSeguidores().add(usuario.getId());
             repositorioUsuario.save(creador);
@@ -321,7 +320,7 @@ public class ControladorUsuario {
             creador.getIdsSeguidores().remove(usuario.getId());
             repositorioUsuario.save(creador);
         }
-
+*/
         if (creador.getIdsSeguidores().contains(usuario.getId())) {
             return ResponseEntity.ok(true);
         } else{

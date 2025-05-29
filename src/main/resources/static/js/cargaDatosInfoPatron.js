@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 //CARGA DE DATOS PATRONES
-function cargarDatosInfoPatron(patron, reviews) {
+async function cargarDatosInfoPatron(patron, reviews) {
     // Título y usuario
     document.querySelector(".card-title").textContent = patron.titulo;
     document.querySelector(".card-subtitle .img-usu").src = patron.creador.imagen;
@@ -29,21 +29,66 @@ function cargarDatosInfoPatron(patron, reviews) {
             ${patron.creador.nombreUsuario}
         </div>
     `;
-  
+
     // Descripción
     document.querySelector(".card-text").textContent = patron.descripcion;
 
     // Precio
-    if (patron.precio > 0){
+    if (patron.precio > 0) {
         document.querySelector(".card-precio").textContent = patron.precio;
-        document.querySelector(".card-link").textContent = "Comprar";
-        document.querySelector(".card-link").href = "pasarelaPago.html";
-    }
-    else{
+        document.getElementById("btnComprarEmpezar").textContent = "Comprar"
+        document.getElementById("btnComprarEmpezar").href = "pasarelaPago.html";
+    } else {
         document.querySelector(".card-precio").textContent = "Gratis";
-        document.querySelector(".card-link").textContent = "Guardar";
-        //TODO: guardar el patron en la biblioteca
+        document.getElementById("btnComprarEmpezar").textContent = "Empezar"
+        //document.getElementById("btnComprarEmpezar").href = "";
+        //TODO: vista de patron con instrucciones
     }
+
+    const btnGuardar = document.getElementById("btnGuardar");
+    const idPatron = patron.id;
+    try {
+        const response = await fetch(`/api/patrones/estaGuardo?idPatron=${idPatron}`, {
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (response.ok) {
+            const sigue = await response.json();
+            if (sigue) {
+                btnGuardar.textContent = 'Guardar';
+            }
+        }
+    } catch (error) {
+        console.error("Error al comprobar si sigue:", error);
+    }
+/*
+    btnGuardar.addEventListener("click", async () => {
+        const guardado = btnGuardar.textContent === "Guardado";
+
+        try {
+            const response = await fetch(`/api/patrones/guardar?idPatron=${idPatron}`, {
+                method: "POST",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Error:", response.status, errorText);
+                alert(`Error al ${guardado ? "quitar de guardados" : "guardar"} el patrón`);
+                return;
+            }
+
+            if (guardado) {
+                btnGuardar.textContent = 'Guardar';
+            } else {
+                btnGuardar.textContent = 'Guardado';
+            }
+        } catch (error) {
+            console.error("Error al guardar/dejar de guardar el patrón:", error);
+            alert("Ha ocurrido un error, inténtalo de nuevo.");
+        }
+    });*/
 
     // Información
     document.querySelector("#panelInformacion .accordion-body").innerHTML = `
@@ -52,7 +97,7 @@ function cargarDatosInfoPatron(patron, reviews) {
         <div class="row"><div class="col titulo-info"><p>Idioma:</p></div><div class="col col-9 txt-info"><p>${patron.idioma}</p></div></div>
         <div class="row"><div class="col titulo-info"><p>Unidad:</p></div><div class="col col-9 txt-info"><p>${patron.unidad}</p></div></div>
     `;
-  
+
     // Materiales
     document.querySelector("#panelMateriales .accordion-body").innerHTML = `
         <div class="row"><div class="col titulo-info"><p>Lanas:</p></div><div class="col col-9 txt-info"><p>${patron.lanas}</p></div></div>
@@ -60,12 +105,12 @@ function cargarDatosInfoPatron(patron, reviews) {
         <div class="row"><div class="col titulo-info"><p>Aguja lanera:</p></div><div class="col col-9 txt-info"><p>${patron.agujaLanera}</p></div></div>
         <div class="row"><div class="col titulo-info"><p>Otros:</p></div><div class="col col-9 txt-info"><p>${patron.otros}</p></div></div>
     `;
-  
+
     // Abreviaturas
     document.querySelector("#panelAbreviaturas .accordion-body").innerHTML = `
         <div class="row"><div class="col titulo-info"><p>${patron.abreviaturas}</p></div></div>
     `;
-  
+
     // Tags
     const tagContainer = document.querySelector("#panelTags .accordion-body .div-tags");
     tagContainer.innerHTML = "";
@@ -75,7 +120,7 @@ function cargarDatosInfoPatron(patron, reviews) {
         p.textContent = tag;
         tagContainer.appendChild(p);
     });
-  
+
     // Carrusel de imágenes
     const carouselInner = document.querySelector("#carouselFotos .carousel-inner");
     const carouselIndicators = document.querySelector(".carousel-indicators");
@@ -86,7 +131,7 @@ function cargarDatosInfoPatron(patron, reviews) {
         div.className = `carousel-item ${index === 0 ? 'active' : ''}`;
         div.innerHTML = `<img src="${img}" class="d-block w-100 rounded-3" alt="...">`;
         carouselInner.appendChild(div);
-  
+
         const button = document.createElement("button");
         button.type = "button";
         button.setAttribute("data-bs-target", "#carouselFotos");
@@ -98,7 +143,7 @@ function cargarDatosInfoPatron(patron, reviews) {
         }
         carouselIndicators.appendChild(button);
     });
-  
+
     // Reseñas
     const contenedorResenas = document.getElementById("contenedorReseñas");
     contenedorResenas.innerHTML = "";
@@ -114,8 +159,8 @@ function cargarDatosInfoPatron(patron, reviews) {
                 ${resena.imagen ? `<img src="${resena.imagen}" class="img-fluid rounded mb-3 img-resenia">` : ""}
                 <div class="mb-2">
                     ${[...Array(5)].map((_, i) =>
-                        `<i class="bi ${i < resena.puntuacion ? 'bi-star-fill text-warning' : 'bi-star text-muted'}"></i>`
-                    ).join('')}
+            `<i class="bi ${i < resena.puntuacion ? 'bi-star-fill text-warning' : 'bi-star text-muted'}"></i>`
+        ).join('')}
                 </div>
                 <p class="mb-0 comentario-resenia">${resena.mensaje}</p>
             </div>
@@ -147,7 +192,7 @@ function cargarDatosInfoPatron(patron, reviews) {
         }
 
     });
-    
+
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -181,3 +226,32 @@ async function obtenerReviews(patronId){
         console.error("Error al recuperar las reseñas del patrón:", error);
     }
 }
+
+const btnGuardar = document.getElementById("btnGuardar");
+btnGuardar.addEventListener("click", async () => {
+    const idPatron = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
+    const guardado = btnGuardar.textContent === "Guardado";
+
+    try {
+        const response = await fetch(`/api/patrones/guardarBiblioteca?idPatron=${idPatron}`, {
+            method: "POST",
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Error:", response.status, errorText);
+            alert(`Error al ${guardado ? "quitar de guardados" : "guardar"} el patrón`);
+            return;
+        }
+
+        if (guardado) {
+            btnGuardar.textContent = 'Guardar';
+        } else {
+            btnGuardar.textContent = 'Guardado';
+        }
+    } catch (error) {
+        console.error("Error al guardar/dejar de guardar el patrón:", error);
+        alert("Ha ocurrido un error, inténtalo de nuevo.");
+    }
+});

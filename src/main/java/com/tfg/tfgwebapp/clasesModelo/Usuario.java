@@ -37,26 +37,9 @@ public class Usuario {
     @Column(name = "seguidor")
     private List<Long> idsSeguidores = new ArrayList<>();
 
-    /*
-    // Usuarios a los que este usuario sigue
-    @JsonManagedReference
-    @ManyToMany
-    @JoinTable(
-            name = "usuario_seguidos",
-            joinColumns = @JoinColumn(name = "seguidor_id"),
-            inverseJoinColumns = @JoinColumn(name = "seguido_id")
-    )
-    private List<Usuario> seguidos = new ArrayList<>();
-
-    // Usuarios que siguen a este usuario (mapeado inversamente)
+    // Patrones empezados
     @Getter
     @Setter
-    @JsonBackReference
-    @ManyToMany(mappedBy = "seguidos")
-    private List<Usuario> seguidores = new ArrayList<>();
-*/
-
-    // Patrones empezados
     @ManyToMany
     @JoinTable(
             name = "usuario_patrones_empezados",
@@ -66,6 +49,8 @@ public class Usuario {
     private List<Patron> patronesEmpezados = new ArrayList<>();
 
     // Patrones guardados
+    @Getter
+    @Setter
     @ManyToMany
     @JoinTable(
             name = "usuario_patrones_guardados",
@@ -75,6 +60,8 @@ public class Usuario {
     private List<Patron> patronesGuardados = new ArrayList<>();
 
     // Patrones comprados
+    @Getter
+    @Setter
     @ManyToMany
     @JoinTable(
             name = "usuario_patrones_comprados",

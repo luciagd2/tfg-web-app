@@ -133,19 +133,9 @@
                               </div>
                               <span class="text-creador">${patron.creador.nombreUsuario}</span>
                               <div class="precio-fav-guardar">
-                                <span class="text-precio fw-bold">${patron.precio}</span>
-                                <div class="fav-guardar">
-                                  <button type="button" class="btn toggle-btn-fav" data-bs-toggle="button">
-                                    <i class="bi bi-heart-fill"></i>
-                                  </button>
-                                  ${patron.precio === "Gratis" ?
-                                  `<button type="button" class="btn toggle-btn-guardar" data-bs-toggle="button">
-                                      <i class="bi bi-bookmark-fill"></i>
-                                  </button>`
-                                  : `<button type="button" class="btn toggle-btn-comprar" data-bs-toggle="button">
-                                   <i class="bi bi-cart-fill"></i>
-                                   </button>`}
-                                </div>
+                                ${patron.precio === 0 ?
+                                `<span class="text-precio fw-bold">Gratis</span>`
+                                : `<span class="text-precio fw-bold">${patron.precio}</span>`}
                               </div>
                             </div>
                           </a>
