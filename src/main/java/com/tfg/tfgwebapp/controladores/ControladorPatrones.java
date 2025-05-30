@@ -32,12 +32,14 @@ public class ControladorPatrones {
 
     private final RepositorioUsuario repositorioUsuario;
     private final RepositorioPatron repositorioPatron;
+    private final ServicioPatron servicioPatron;
 
     // Inyección mediante constructor (recomendado)
     @Autowired
-    public ControladorPatrones(RepositorioUsuario repositorioUsuario, RepositorioPatron repositorioPatron) {
+    public ControladorPatrones(RepositorioUsuario repositorioUsuario, RepositorioPatron repositorioPatron, ServicioPatron servicioPatron) {
         this.repositorioUsuario = repositorioUsuario;
         this.repositorioPatron = repositorioPatron;
+        this.servicioPatron = servicioPatron;
     }
 
     @GetMapping("/encontrar")
@@ -84,7 +86,7 @@ public class ControladorPatrones {
 
         List<Patron> patrones = new ArrayList<>();
         try {
-            patrones = repositorioPatron.findAllByPublicado(true);
+            patrones = repositorioPatron.findAllByEstado(Patron.Estado.Publicado);
             System.out.println("Patrones en lista");
             if (patrones == null || patrones.isEmpty()) {
                 patrones = Collections.emptyList();
@@ -255,19 +257,35 @@ public class ControladorPatrones {
     }
 
     @PostMapping("/estado-publicacion")
-    public ResponseEntity<Patron> cambiarEstadoPublicacion(@RequestParam long id) {
+    public ResponseEntity<?> cambiarEstadoPublicacion(
+            @RequestParam long id
+            //@RequestParam Patron.Estado nuevoEstado
+    ) {
         try {
             Patron patron = (Patron) repositorioPatron.findPatronById(id);
+            boolean enUso = servicioPatron.patronTieneUsuarios(id);
+            System.out.println("En uso?: " + enUso);
+            Patron.Estado estadoActual = patron.getEstado();
 
-            boolean estadoActual = patron.isPublicado();
-            patron.setPublicado(!estadoActual);
-            repositorioPatron.save(patron);
+            if (enUso && estadoActual.equals(Patron.Estado.Publicado)){
+                System.out.println("Patron publicado - conflicto");
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("El patrón tiene usuarios que lo han comprado o empezado");
+            } if (!enUso && estadoActual.equals(Patron.Estado.Publicado)){
+                System.out.println("Patron publicado - sin comflicto");
+                servicioPatron.cambiarEstadoPatron(id, Patron.Estado.Borrador);
+            } else { //Estado = Borrador
+                System.out.println("Patron borrador");
+                servicioPatron.cambiarEstadoPatron(id, Patron.Estado.Publicado);
+            }
 
             // FORZAR LA CARGA DEL CREADOR
             Hibernate.initialize(patron.getCreador());
             patron.getCreador().getNombreUsuario();
 
             return ResponseEntity.ok(patron);
+
+            //return ResponseEntity.ok(patron);
         } catch (Exception e) {
             System.out.println("Error al cambiar el estado del patron");
             e.printStackTrace();
@@ -275,18 +293,31 @@ public class ControladorPatrones {
         }
     }
 
+    @PostMapping("/estado-inactivo")
+    public ResponseEntity<?> cambiarEstadoInactivo(@RequestParam Long id) {
+        servicioPatron.cambiarEstadoPatron(id, Patron.Estado.Inactivo);
+        return ResponseEntity.ok("Estado cambiado a inactivo");
+    }
+
     @PostMapping("/eliminar")
-    public ResponseEntity<Void> eliminarPatron(@RequestParam long id) {
+    public ResponseEntity<?> eliminarPatron(@RequestParam long id) {
         try {
             Patron patron = (Patron) repositorioPatron.findPatronById(id);
+            boolean enUso = servicioPatron.patronTieneUsuarios(id);
 
             if (patron == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
-            repositorioPatron.delete(patron);
+            if (enUso) {
+                // Devolver código y mensaje especial para alertar en frontend
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("El patrón tiene usuarios que lo han comprado o empezado");
+            } else {
+                servicioPatron.eliminarPatron(id);
+                return ResponseEntity.ok("Patrón eliminado");
+            }
 
-            return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.out.println("Error al eliminar el patrón con ID: " + id);
             e.printStackTrace();
@@ -316,7 +347,7 @@ public class ControladorPatrones {
 
         List<Patron> patrones = new ArrayList<>();
         try {
-            patrones = repositorioPatron.findPatronByCreadorAndPublicado(usuario, true);
+            patrones = repositorioPatron.findPatronByCreadorAndEstado(usuario, Patron.Estado.Publicado);
             System.out.println("Patrones en lista");
             if (patrones == null || patrones.isEmpty()) {
                 patrones = Collections.emptyList();
@@ -351,7 +382,42 @@ public class ControladorPatrones {
 
         List<Patron> patrones = new ArrayList<>();
         try {
-            patrones = repositorioPatron.findPatronByCreadorAndPublicado(usuario, false);
+            patrones = repositorioPatron.findPatronByCreadorAndEstado(usuario, Patron.Estado.Borrador);
+            System.out.println("Patrones en lista");
+            if (patrones == null || patrones.isEmpty()) {
+                patrones = Collections.emptyList();
+            }
+            return ResponseEntity.ok(patrones);
+        } catch (Exception e) {
+            System.out.println("Error al conseguir los patrones");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/patrones-tienda-inactivos")
+    @EntityGraph(attributePaths = {"reviews"})
+    public ResponseEntity<List<Patron>> obtenerPatronesUsuarioInactivos() {
+        System.out.println("En controlador obtenerPatronesUsuario");
+        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            System.out.println("Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        List<Patron> patrones = new ArrayList<>();
+        try {
+            patrones = repositorioPatron.findPatronByCreadorAndEstado(usuario, Patron.Estado.Inactivo);
             System.out.println("Patrones en lista");
             if (patrones == null || patrones.isEmpty()) {
                 patrones = Collections.emptyList();
@@ -389,7 +455,7 @@ public class ControladorPatrones {
         List<Patron> patrones = new ArrayList<>();
         Usuario creador = repositorioUsuario.findById(otroUsuario).get();
         try {
-            patrones = repositorioPatron.findPatronByCreadorAndPublicado(creador, true);
+            patrones = repositorioPatron.findPatronByCreadorAndEstado(creador, Patron.Estado.Publicado);
             System.out.println("Patrones en lista");
             if (patrones == null || patrones.isEmpty()) {
                 patrones = Collections.emptyList();
@@ -401,6 +467,7 @@ public class ControladorPatrones {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PostMapping("/nuevo")
     public ResponseEntity<Patron> crearPatron(
             @RequestParam Long idCreador

@@ -26,7 +26,8 @@ public class Patron {
 
     @Setter
     @Getter
-    private boolean publicado;
+    @Enumerated(EnumType.STRING)
+    private Estado estado;
 
     @Setter
     @Getter
@@ -120,6 +121,12 @@ public class Patron {
     public enum Unidad {
         Centímetros,
         Pulgadas
+    }
+
+    public enum Estado {
+        Publicado,
+        Borrador,
+        Inactivo //los usuarios que lo hayan empezado o comprado seguirán teniendo acceso
     }
 }
 

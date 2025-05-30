@@ -13,23 +13,23 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
 
         Object findPatronById(Long idPatron);
 
-        List<Patron> findPatronByCreadorAndPublicado(Usuario usuario, boolean b);
+        List<Patron> findPatronByCreadorAndEstado(Usuario creador, Patron.Estado estado);
 
-        List<Patron> findAllByPublicado(boolean b);
+        List<Patron> findAllByEstado(Patron.Estado estado);
 
         //Query por filtros
-        @Query("select p from Patron p where p.publicado = true and p.dificultad in ?1")
+        @Query("select p from Patron p where p.estado = 'Publicado' and p.dificultad in ?1")
         List<Patron> findAllByDificultadIn(List<Patron.Dificultad> dificultades);
 
-        @Query("SELECT p FROM Patron p LEFT JOIN p.reviews r WHERE p.publicado = true GROUP BY p ORDER BY AVG(r.puntuacion) DESC")
+        @Query("SELECT p FROM Patron p LEFT JOIN p.reviews r WHERE p.estado = 'Publicado' GROUP BY p ORDER BY AVG(r.puntuacion) DESC")
         List<Patron> findAllOrderByPuntuacionMediaDesc();
 
-        @Query("SELECT p FROM Patron p LEFT JOIN p.reviews r WHERE p.publicado = true AND p.dificultad IN :dificultades GROUP BY p ORDER BY AVG(r.puntuacion) DESC")
+        @Query("SELECT p FROM Patron p LEFT JOIN p.reviews r WHERE p.estado = 'Publicado' AND p.dificultad IN :dificultades GROUP BY p ORDER BY AVG(r.puntuacion) DESC")
         List<Patron> findAllByDificultadInOrderByPuntuacionMediaDesc(@Param("dificultades") List<Patron.Dificultad> dificultades);
 
         //Query por busqueda
         @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.tags t " +
-                "WHERE p.publicado = true AND (" +
+                "WHERE p.estado = 'Publicado' AND (" +
                 "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
                 "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
                 "LOWER(t) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
@@ -37,14 +37,14 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
 
         //Query por busqueda y filtros
         @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.tags t " +
-                "WHERE p.publicado = true AND (" +
+                "WHERE p.estado = 'Publicado' AND (" +
                 "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
                 "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
                 "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))")
         List<Patron> buscarPorTexto(@Param("query") String query);
 
         @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.reviews r LEFT JOIN p.tags t " +
-                "WHERE p.publicado = true AND p.dificultad IN :dificultades AND (" +
+                "WHERE p.estado = 'Publicado' AND p.dificultad IN :dificultades AND (" +
                 "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
                 "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
                 "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))" +
@@ -52,11 +52,10 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
         List<Patron> buscarPorTextoYFiltrosOrdenado(@Param("query") String query, @Param("dificultades") List<Patron.Dificultad> dificultades);
 
         @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.tags t " +
-                "WHERE p.publicado = true AND p.dificultad IN :dificultades AND (" +
+                "WHERE p.estado = 'Publicado' AND p.dificultad IN :dificultades AND (" +
                 "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
                 "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
                 "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))")
         List<Patron> buscarPorTextoYFiltros(@Param("query") String query, @Param("dificultades") List<Patron.Dificultad> dificultades);
 
-    Long id(Long id);
 }

@@ -75,9 +75,9 @@ async function cargarDatosInfoPatron(patron, reviews) {
         if (response.ok) {
             const estaGuardado = await response.json();
             if (estaGuardado) {
-                btnGuardar.textContent = 'Empezar';
+                btnComprarEmpezar.textContent = 'Empezar';
             } else {
-                btnGuardar.textContent = 'Comprar';
+                btnComprarEmpezar.textContent = 'Comprar';
             }
         }
     } catch (error) {

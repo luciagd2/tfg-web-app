@@ -63,8 +63,14 @@
                 
                         <input type="radio" class="btn-check" name="tienda" id="borradores" autocomplete="off">
                         <label class="btn boton-check" for="borradores">
-                            <i class="bi bi-cart-check-fill"></i>
+                            <i class="bi bi-eraser-fill"></i>
                             Borradores
+                        </label>
+
+                        <input type="radio" class="btn-check" name="tienda" id="inactivos" autocomplete="off">
+                        <label class="btn boton-check" for="inactivos">
+                            <i class="bi bi-slash-circle-fill"></i>
+                            Inactivos
                         </label>
                     </div>
                         <a class="btn btn-primary boton-check" id="btn-crear" role="button">
@@ -230,6 +236,7 @@
             const container = document.getElementById("contenedor-cards-tienda");
             const btnBorradores = document.getElementById("borradores");
             const btnPublicados = document.getElementById("publicados");
+            const btnInactivos = document.getElementById("inactivos");
 
             const cargarPatrones = (endpoint, estado) => {
                 container.innerHTML = "";
@@ -355,15 +362,36 @@
                         method: "POST",
                         credentials: "include"
                     });
+                    if (response.status === 409) {
+                        const mensaje = await response.text();
+                        if (confirm(mensaje + "\n¿Quieres pasarlo a INACTIVO en lugar de borrador?")) {
+                            // Cambiar a inactivo
+                            const respInactivo = await fetch(`/api/patrones/estado-inactivo?id=${patronId}`, {
+                                method: "POST",
+                                credentials: "include"
+                            });
+                            if (respInactivo.ok) {
+                                alert("Patrón cambiado a inactivo.");
+                                window.location.reload();
+                            } else {
+                                alert("Error al cambiar a inactivo.");
+                            }
+                        }
+
+                        const patron = await response.json();
+                        localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+
+                        return;
+                    }
                     if (!response.ok) {
                         const errorText = await response.text();
                         console.error("Estado:", response.status);
                         console.error("Respuesta:", errorText);
                         alert(`Error al cambiar el estado del patrón: ${response.status}`);
-                        return;
                     }
-                    const patron = await response.json();
-                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+
+                    window.location.reload();
+
                 } catch (error) {
                     console.error("Error al cambiar el estado el patrón:", error);
                     //alert("No se pudo cambiar el estado del patrón. Inténtalo de nuevo.");
@@ -376,14 +404,32 @@
                         method: "POST",
                         credentials: "include"
                     });
+                    if (response.status === 409) {
+                        const mensaje = await response.text();
+                        if (confirm(mensaje + "\n¿Quieres pasarlo a INACTIVO en lugar de eliminar?")) {
+                            const respInactivo = await fetch(`/api/patrones/estado-inactivo?id=${patronId}`, {
+                                method: "POST",
+                                credentials: "include"
+                            });
+                            if (respInactivo.ok) {
+                                alert("Patrón cambiado a inactivo.");
+                                window.location.reload();
+                            } else {
+                                alert("Error al cambiar a inactivo.");
+                            }
+                        }
+
+                        const patron = await response.json();
+                        localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+
+                        return;
+                    }
                     if (!response.ok) {
                         const errorText = await response.text();
                         console.error("Estado:", response.status);
                         console.error("Respuesta:", errorText);
                         alert(`Error al eliminar el patrón: ${response.status}`);
                     }
-                    const patron = await response.json();
-                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
                 } catch (error) {
                     console.error("Error al eliminar el patrón:", error);
                     alert("No se pudo eliminar el patrón. Inténtalo de nuevo.");
@@ -425,6 +471,12 @@
             btnPublicados.addEventListener("change", () => {
                 if (btnPublicados.checked) {
                     cargarPatrones("/api/patrones/patrones-tienda-publicados", false);
+                }
+            });
+
+            btnInactivos.addEventListener("change", () => {
+                if (btnInactivos.checked) {
+                    cargarPatrones("/api/patrones/patrones-tienda-inactivos", true);
                 }
             });
         });
