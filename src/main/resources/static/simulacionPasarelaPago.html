@@ -1,17 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Ficheros css de Bootstrap -->
+    <link rel="stylesheet" href="css-bootstrap/bootstrap.min.css">
+
+    <!-- Ficheros css propios -->
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/registro-login.css">
+
     <title>Simulacion de Pasarela de Pago</title>
 </head>
 <body>
-<h1>Simulador de pago</h1>
-<p id="info-patron"></p>
 
-<form id="formPago">
-    <input type="hidden" id="patronId" name="patronId" />
-    <button type="submit" name="result" value="success">Pago exitoso</button>
-    <button type="submit" name="result" value="failure">Pago fallido</button>
-</form>
+<div style="display: flex; flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; margin-top: 22%">
+    <h1>Simulador de pago</h1>
+    <p id="info-patron"></p>
+    <form id="formPago">
+        <input type="hidden" id="patronId" name="patronId" />
+        <button type="submit" name="result" value="success" class="btn">Pago exitoso</button>
+        <button type="submit" name="result" value="failure" class="btn">Pago fallido</button>
+    </form>
+</div>
+
 
 <script>
     // Obtener el ID del patrón desde sessionStorage
