@@ -37,7 +37,7 @@ async function cargarDatosInfoPatron(patron, reviews) {
     if (patron.precio > 0) {
         document.querySelector(".card-precio").textContent = patron.precio;
         document.getElementById("btnComprarEmpezar").textContent = "Comprar"
-        document.getElementById("btnComprarEmpezar").href = "pasarelaPago.html";
+        document.getElementById("btnComprarEmpezar").href = "simulacionPasarelaPago.html";
     } else {
         document.querySelector(".card-precio").textContent = "Gratis";
         document.getElementById("btnComprarEmpezar").textContent = "Empezar"
@@ -64,33 +64,25 @@ async function cargarDatosInfoPatron(patron, reviews) {
     } catch (error) {
         console.error("Error al comprobar si sigue:", error);
     }
-/*
-    btnGuardar.addEventListener("click", async () => {
-        const guardado = btnGuardar.textContent === "Guardado";
 
-        try {
-            const response = await fetch(`/api/patrones/guardar?idPatron=${idPatron}`, {
-                method: "POST",
-                credentials: "include"
-            });
+    const btnComprarEmpezar = document.getElementById("btnComprarEmpezar");
+    try {
+        const response = await fetch(`/api/patrones/estaComprado?idPatron=${idPatron}`, {
+            method: "GET",
+            credentials: "include"
+        });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error("Error:", response.status, errorText);
-                alert(`Error al ${guardado ? "quitar de guardados" : "guardar"} el patrón`);
-                return;
-            }
-
-            if (guardado) {
-                btnGuardar.textContent = 'Guardar';
+        if (response.ok) {
+            const estaGuardado = await response.json();
+            if (estaGuardado) {
+                btnGuardar.textContent = 'Empezar';
             } else {
-                btnGuardar.textContent = 'Guardado';
+                btnGuardar.textContent = 'Comprar';
             }
-        } catch (error) {
-            console.error("Error al guardar/dejar de guardar el patrón:", error);
-            alert("Ha ocurrido un error, inténtalo de nuevo.");
         }
-    });*/
+    } catch (error) {
+        console.error("Error al comprobar si sigue:", error);
+    }
 
     // Información
     document.querySelector("#panelInformacion .accordion-body").innerHTML = `
@@ -256,4 +248,23 @@ btnGuardar.addEventListener("click", async () => {
         console.error("Error al guardar/dejar de guardar el patrón:", error);
         alert("Ha ocurrido un error, inténtalo de nuevo.");
     }
+});
+
+const btnComprarEmpezar = document.getElementById("btnComprarEmpezar");
+btnComprarEmpezar.addEventListener("click", async () => {
+    // Comprobamos si va a comprar/empezar/continuar
+    if (btnComprarEmpezar.textContent === "Comprar"){
+        const patronId = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
+        sessionStorage.setItem("patronCompra", localStorage.getItem("patronSeleccionado"));
+        // Redirigimos al simulador de pago
+        window.location.href = `/api/pasarelaPago/pedido?patronId=${patronId}`;
+
+    }
+    /*
+    else if (btnComprarEmpezar.textContent === "Empezar"){
+
+    } else {
+
+    }
+     */
 });

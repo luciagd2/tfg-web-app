@@ -190,19 +190,19 @@
 
             // Eventos para radio buttons
             btnGuardados.addEventListener("change", () => {
-                if (btnBorradores.checked) {
+                if (btnGuardados.checked) {
                     cargarPatrones("/api/patrones/patrones-biblioteca-guardados", container);
                 }
             });
 
             btnComprados.addEventListener("change", () => {
-                if (btnPublicados.checked) {
+                if (btnComprados.checked) {
                     cargarPatrones("/api/patrones/patrones-biblioteca-comprados", container);
                 }
             });
 
             btnEmpezados.addEventListener("change", () => {
-                if (btnPublicados.checked) {
+                if (btnEmpezados.checked) {
                     cargarPatrones("/api/patrones/patrones-biblioteca-empezados", container);
                 }
             });

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Simulacion de Pasarela de Pago</title>
+</head>
+<body>
+<h1>Simulador de pago</h1>
+<p id="info-patron"></p>
+
+<form id="formPago">
+    <input type="hidden" id="patronId" name="patronId" />
+    <button type="submit" name="result" value="success">Pago exitoso</button>
+    <button type="submit" name="result" value="failure">Pago fallido</button>
+</form>
+
+<script>
+    // Obtener el ID del patrón desde sessionStorage
+    const patronId = JSON.parse(sessionStorage.getItem("patronCompra")).id;
+    const patronTitulo = JSON.parse(sessionStorage.getItem("patronCompra")).titulo;
+    document.getElementById("patronId").value = patronId;
+    document.getElementById("info-patron").textContent = "Comprando patron '" + patronTitulo + "'";
+
+    // Interceptamos el envío del formulario
+    document.getElementById("formPago").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const result = e.submitter.value; // success o failure
+
+        // Enviamos por fetch
+        const response = await fetch(`/api/pasarelaPago/procesar?patronId=${patronId}&result=${result}`, {
+            method: "POST",
+            credentials: "include"
+        });
+
+        // Redirigimos a la URL que devuelve el servidor
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            alert("Error al procesar el pago");
+        }
+    });
+</script>
+</body>
+</html>

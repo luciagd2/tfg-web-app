@@ -45,7 +45,7 @@
                         <div>
                             <p class="card-precio">Precio</p>
                             <a class="btn card-link" id="btnGuardar">Guardar</a>
-                            <a href="#" class="btn card-link" id="btnComprarEmpezar">Comprar</a>
+                            <a class="btn card-link" id="btnComprarEmpezar">Comprar</a>
                         </div>
                     </div>
                 </div>
@@ -250,6 +250,35 @@
     <script src="js/estructuras.js">/*Para el menu y para guardar el patron seleccionado*/</script>
     <script src="js/datosPatron.js">/*Para los datos de prueba*/</script>
     <script src="js/cargaDatosInfoPatron.js">//Para cargar de datos del patron</script>
+    <script>
+        window.onload = async () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("status") === "success") {
+                try {
+                    const idPatronCompra = JSON.parse(sessionStorage.getItem("patronCompra")).id;
+                    const response = await fetch(`/api/patrones/guardarComprado?idPatron=${idPatronCompra}`, {
+                        method: "POST",
+                        credentials: "include"
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Error:", response.status, errorText);
+                        alert(`Error al guardar en la lista de comprados el patrón`);
+                        return;
+                    }
+                    btnComprarEmpezar.innerText = "Empezar";
+                    alert("¡Pago realizado con éxito!");
+                } catch (error) {
+                    console.error("Error al guardar/dejar de guardar el patrón:", error);
+                    alert("Ha ocurrido un error, inténtalo de nuevo.");
+                }
+
+            } else if (params.get("status") === "failure") {
+                alert("El pago ha fallado.");
+            }
+        }
+    </script>
+
 
 </body>
 </html>
