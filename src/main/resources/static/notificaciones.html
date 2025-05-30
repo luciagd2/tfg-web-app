@@ -34,27 +34,19 @@
     <script src="js/estructuras.js"></script>
     <script>
         const plantillasNotificaciones = {
-            guardado: "Has guardado el patrón <strong>{patron}</strong> correctamente.",
-            compraExitosa: "Tu compra del patrón <strong>{patron}</strong> fue exitosa.",
-            patronGratis: "El patrón <strong>{patron}</strong> que tenías en favoritos ahora es gratis.",
-            cambioPrecio: "El patrón <strong>{patron}</strong> que tenías en favoritos ha cambiado de precio.",
-            nuevoPatronCreador: "<strong>{creador}</strong> ha publicado un nuevo patrón.",
-            actualizadoFavorito: "El patrón <strong>{patron}</strong> que tienes guardado ha sido actualizado por el creador.",
-            actualizadoComprado: "El patrón <strong>{patron}</strong> que tienes comprado ha sido actualizado por el creador.",
-            compraAlCreador: "<strong>{usuario}</strong> ha comprado tu patrón <strong>{patron}</strong>.",
-            guardadoAlCreador: "<strong>{usuario}</strong> ha guardado tu patrón <strong>{patron}</strong>.",
-            gustadoAlCreador: "A <strong>{usuario}</strong> le ha gustado tu patrón <strong>{patron}</strong>.",
-            calificacion: "Tu patrón <strong>{patron}</strong> ha sido calificado con <strong>{estrellas} estrellas</strong> por <strong>{usuario}</strong>.",
-            tendencia: "Tu patrón <strong>{patron}</strong> es tendencia."
+            GUARDADO: notif => `Has guardado el patrón <strong>${notif.nombrePatron}</strong> correctamente.`,
+            COMPRA_EXITOSA: notif => `Tu compra del patrón <strong>${notif.nombrePatron}</strong> fue exitosa.`,
+            PATRON_GRATOS: notif => `El patrón <strong>${notif.nombrePatron}</strong> que tenías en guardado ahora es gratis.`,
+            CAMBIO_PRECIO: notif => `El patrón <strong>${notif.nombrePatron}</strong> que tenías en guardado ha cambiado de precio.`,
+            NUEVO_PATRON_CREADOR: notif => `<strong>${notif.nombreUsuario}</strong> ha publicado un nuevo patrón.`,
+            ACTUALIZADO_GUARDADO: notif => `El patrón <strong>{notif.nombrePatron}</strong> que tienes guardado ha sido actualizado por el creador.`,
+            ACTUALIZADO_COMPRADO: notif => `El patrón <strong>{notif.nombrePatron}</strong> que tienes comprado ha sido actualizado por el creador.`,
+            ELIMINAR_GUARDADO: notif => `El patrón <strong>{notif.nombrePatron}</strong> que tienes guardado ha sido eliminado por el creador.`,
+            COMPRA_AL_CREADOR: notif => `<strong>{notif.nombreUsuario}</strong> ha comprado tu patrón <strong>{patron}</strong>`,
+            GUARDADO_AL_CREADOR: notif => `<strong>{notif.nombreUsuario}</strong> ha guardado tu patrón <strong>{patron}</strong>`,
+            CALIFICACION: notif => `Tu patrón <strong>${notif.nombrePatron}</strong> ha sido calificado con <strong>${notif.estrellas} estrellas</strong> por <strong>${datos.usuario}</strong>.`,
+            NUEVO_SEGUIDOR: notif => `<strong>{notif.nombreUsuario}</strong> ha comenzado a seguirte.`,
         };
-
-        const notificaciones = [
-            { id: "guardado", datos: { patron: "Osito Dormilón" } },
-            { id: "compraExitosa", datos: { patron: "Gorro de Invierno" } },
-            { id: "nuevoPatronCreador", datos: { creador: "AnaCrochet" } },
-            { id: "calificacion", datos: { patron: "Chaleco Vintage", usuario: "ArtistaCrochet", estrellas: 5 } },
-        ];
-
 
         function renderNotificacionesDesdeId(lista, contenedorId) {
             const contenedor = document.getElementById(contenedorId);
@@ -77,6 +69,52 @@
         }
 
         renderNotificacionesDesdeId(notificaciones, 'listaNotificaciones');
+
+
+        async function getNombrePatron(id) {
+            if (!id) return null;
+            const res = await fetch(`/api/patrones/${id}`);
+            const data = await res.json();
+            return data.nombre;
+        }
+
+        async function getNombreUsuario(id) {
+            if (!id) return null;
+            const res = await fetch(`/api/usuarios/${id}`);
+            const data = await res.json();
+            return data.nombreUsuario;
+        }
+
+        async function enriquecerNotificacion(notif) {
+            if (notif.idPatronRelacionado) {
+                notif.nombrePatron = await getNombrePatron(notif.idPatronRelacionado);
+            }
+            if (notif.idUsuarioRelacionado) {
+                notif.nombreUsuario = await getNombreUsuario(notif.idUsuarioRelacionado);
+            }
+            return notif;
+        }
+
+        async function cargarNotificaciones(userId) {
+            const res = await fetch(`/api/notificaciones/${userId}`);
+            const notificaciones = await res.json();
+
+            const contenedor = document.getElementById("listaNotificaciones");
+            contenedor.innerHTML = "";
+
+            for (const notif of notificaciones) {
+                await enriquecerNotificacion(notif);
+
+                const plantilla = plantillasNotificaciones[notif.tipo];
+                if (!plantilla) continue;
+
+                const li = document.createElement("li");
+                li.className = "list-group-item mb-2";
+                li.innerHTML = plantilla(notif);
+                contenedor.appendChild(li);
+            }
+        }
+        cargarNotificaciones(JSON.parse(sessionStorage.getItem("usuario")).id);
 
       </script>
       

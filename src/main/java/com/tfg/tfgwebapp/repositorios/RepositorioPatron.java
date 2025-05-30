@@ -57,5 +57,4 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
                 "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
                 "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))")
         List<Patron> buscarPorTextoYFiltros(@Param("query") String query, @Param("dificultades") List<Patron.Dificultad> dificultades);
-
 }

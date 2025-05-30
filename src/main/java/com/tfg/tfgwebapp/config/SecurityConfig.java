@@ -49,6 +49,7 @@ public class SecurityConfig {
                                          "/api/patrones/**",
                                          "/api/reviews/**",
                                          "/api/pasaleraPago/**",
+                                         "api/notificaciones/**",
                                          "/login",
                                          "/*.html",
                                          "/",

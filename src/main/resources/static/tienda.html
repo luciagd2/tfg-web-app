@@ -390,11 +390,34 @@
                         alert(`Error al cambiar el estado del patrón: ${response.status}`);
                     }
 
+                    if(JSON.parse(localStorage.getItem("patronSeleccionado")).estado === "Publicado"){
+                        // Añadir a notificaciones
+                        try {
+                            const response = await fetch(`/api/notificaciones/nuevoPatron?idPatron=${JSON.parse(localStorage.getItem("patronSeleccionado")).id}`, {
+                                method: 'POST',
+                                credentials: "include"
+                            });
+                            if (response.ok) {
+                                const patron = await response.json();
+                                localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                                window.location.href="edicionPatron.html";
+                            } else {
+                                const errorText = await response.text();
+                                console.error("Estado:", response.status);
+                                console.error("Respuesta:", errorText);
+                                alert(`Error al crear patron: ${response.status}`);
+                            }
+                        }
+                        catch (error) {
+                            console.error('Error al añadir notificación (nuevo patrón):', error);
+                            alert('No se pudo enviar la notificación.');
+                        }
+                    }
+
                     window.location.reload();
 
                 } catch (error) {
                     console.error("Error al cambiar el estado el patrón:", error);
-                    //alert("No se pudo cambiar el estado del patrón. Inténtalo de nuevo.");
                 }
             };
 
@@ -485,6 +508,7 @@
         // EVENT LISTENER PARA CREAR PATRONES
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btn-crear').addEventListener('click', async () => {
+                //Añador nuevo patron a la base de datos
                 const formData = new FormData();
                 formData.append("idCreador", (JSON.parse(localStorage.getItem("usuario"))).id);
 
@@ -500,7 +524,7 @@
                         localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
                         window.location.href="edicionPatron.html";
                     } else {
-                        const errorText = await response.text(); // o .json() si sabes que es JSON
+                        const errorText = await response.text();
                         console.error("Estado:", response.status);
                         console.error("Respuesta:", errorText);
                         alert(`Error al crear patron: ${response.status}`);
@@ -510,12 +534,14 @@
                     console.error('Error al crear el patrón:', error);
                     alert('No se pudo crear el patrón. Inténtalo de nuevo.');
                 }
+
             });
         });
     </script>
     <script>
         // EVENT LISTENER PARA CAMBIAR ESTADO DE PUBLICACIÓN DE LOS PATRONES
         document.addEventListener('DOMContentLoaded', () => {
+            console.log("Estado: ", JSON.parse(localStorage.getItem("patronSeleccionado")).estado);
             document.getElementById('btn-publicar').addEventListener('click', async () => {
                 const formData = new FormData();
                 formData.append("idCreador", (JSON.parse(localStorage.getItem("usuario"))).id);
@@ -530,6 +556,33 @@
                         alert("Patron creado correctamente");
                         const patron = await response.json();
                         localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+
+                        if(JSON.parse(localStorage.getItem("patronSeleccionado")).estado === "Publicado"){
+                            // Añadir a notificaciones
+                            const formDataNotif = new FormData();
+                            try {
+                                const response = await fetch(`/api/notificaciones/nuevoPatron?idPatron=${JSON.parse(localStorage.getItem("patronSeleccionado")).id}`, {
+                                    method: 'POST',
+                                    credentials: "include"
+                                });
+                                if (response.ok) {
+                                    alert("Patron creado correctamente");
+                                    const patron = await response.json();
+                                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+                                    window.location.href="edicionPatron.html";
+                                } else {
+                                    const errorText = await response.text();
+                                    console.error("Estado:", response.status);
+                                    console.error("Respuesta:", errorText);
+                                    alert(`Error al crear patron: ${response.status}`);
+                                }
+                            }
+                            catch (error) {
+                                console.error('Error al añadir notificación (nuevo patrón):', error);
+                                alert('No se pudo enviar la notificación.');
+                            }
+                        }
+
                         window.location.href="edicionPatron.html";
                     } else {
                         const errorText = await response.text(); // o .json() si sabes que es JSON
@@ -539,9 +592,11 @@
                     }
                 }
                 catch (error) {
-                    console.error('Error al crear el patrón:', error);
-                    alert('No se pudo crear el patrón. Inténtalo de nuevo.');
+                    console.error('Error al cambiar el estado del patrón:', error);
+                    alert('No se pudo cambiar el estado del patrón. Inténtalo de nuevo.');
                 }
+
+
             });
         });
     </script>
