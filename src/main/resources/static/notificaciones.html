@@ -126,25 +126,29 @@
         }
 
         document.addEventListener("DOMContentLoaded", async () => {
-            fetch(`/api/notificaciones/obtener-no-leidas`, {
-                method: "GET",
-                credentials: "include"
-            })
-            .then((response) => {
+            try {
+                const response = await fetch(`/api/notificaciones/obtener-no-leidas`, {
+                    method: "GET",
+                    credentials: "include"
+                });
+
                 if (!response.ok) {
                     throw new Error(`Error al recuperar las notificaciones: ${response.status}`);
                 }
-                return response.json()
-            })
-            .then((notificaciones) => {
+
+                const notificaciones = await response.json();
+
+                // Invertir el orden (últimas notificaciones primero)
+                notificaciones.reverse();
+
                 notificaciones.forEach((notif) => {
                     crearToast(notif);
-                })
-            })
+                });
 
-            const notificaciones = await response.json();
-            return notificaciones;
-        })
+            } catch (error) {
+                console.error("Error cargando notificaciones:", error);
+            }
+        });
     </script>
 </body>
 </html>
