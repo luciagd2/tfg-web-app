@@ -2,6 +2,7 @@ package com.tfg.tfgwebapp.repositorios;
 
 import com.tfg.tfgwebapp.clasesModelo.Patron;
 import com.tfg.tfgwebapp.clasesModelo.Usuario;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -57,4 +58,7 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
                 "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
                 "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))")
         List<Patron> buscarPorTextoYFiltros(@Param("query") String query, @Param("dificultades") List<Patron.Dificultad> dificultades);
+
+        @Query("SELECT p FROM Patron p WHERE p.estado = 'Publicado' ORDER BY p.id DESC")
+        List<Patron> findTop20ByEstadoPublicadoOrderByIdDesc(Pageable pageable);
 }

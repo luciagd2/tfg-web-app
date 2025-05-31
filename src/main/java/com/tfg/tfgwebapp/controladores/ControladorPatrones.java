@@ -9,6 +9,8 @@ import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -100,6 +102,55 @@ public class ControladorPatrones {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/getMejorValorados")
+    @EntityGraph(attributePaths = {"reviews"})
+    public ResponseEntity<List<Patron>> getTop10PatronesMejorValorados() {
+        System.out.println("En controlador getMejorValorados");
+
+        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
+        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            List<Patron> mejoresPatrones = repositorioPatron.findAllOrderByPuntuacionMediaDesc();
+
+            // Limitar a los 10 primeros si hay más
+            if (mejoresPatrones.size() > 10) {
+                mejoresPatrones = mejoresPatrones.subList(0, 10);
+            }
+
+            return ResponseEntity.ok(mejoresPatrones);
+
+        } catch (Exception e) {
+            System.out.println("Error al obtener los patrones mejor valorados");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/getUltimosPatrones")
+    @EntityGraph(attributePaths = {"reviews"})
+    public ResponseEntity<List<Patron>> getUltimos20Patrones() {
+        System.out.println("En controlador getUltimosPatrones");
+
+        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
+        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            Pageable top20 = PageRequest.of(0, 20);
+            List<Patron> ultimosPatrones = repositorioPatron.findTop20ByEstadoPublicadoOrderByIdDesc(top20);
+            return ResponseEntity.ok(ultimosPatrones);
+        } catch (Exception e) {
+            System.out.println("Error al obtener los últimos patrones publicados");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     @GetMapping("/getAllFiltros")
     @EntityGraph(attributePaths = {"reviews", "tags"})
