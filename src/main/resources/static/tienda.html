@@ -44,7 +44,7 @@
             
                 <!-- Botón de seguidores -->
                 <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalSeguidores">
-                    <i class="bi bi-people-fill"></i> Seguidores <span class="badge ms-1">123</span>
+                    <i class="bi bi-people-fill me-2"></i> Seguidores <span id="numSeguidores" class="badge">#</span>
                 </button>
 
             </div>
@@ -229,6 +229,62 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('editarPerfilModal'));
             modal.hide();
         });
+    </script>
+    <script>
+        // FUNCIONES PARA CARGA DE DATOS RELACIONADA CON LOS SEGUIDORES DEL CREADOR
+        async function obtenerSeguidores() {
+            const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+            const idUsuario = usuario.id;
+
+            try {
+                const response = await fetch(`/api/usuarios/seguidores`, {
+                    method: "GET",
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error al obtener los seguidores");
+                }
+
+                const seguidores = await response.json();
+                return seguidores;
+
+            } catch (error) {
+                console.error("Error al obtener seguidores:", error);
+                return [];
+            }
+        }
+
+        async function actualizarContadorSeguidores() {
+            const seguidores = await obtenerSeguidores();
+            document.getElementById("numSeguidores").textContent = seguidores.length;
+        }
+
+        async function cargarListaSeguidores() {
+            const seguidores = await obtenerSeguidores();
+            const lista = document.querySelector('#modalSeguidores .list-group');
+            lista.innerHTML = "";
+
+            seguidores.forEach(seguidor => {
+                const li = document.createElement("li");
+                li.className = "item-list-seguidores list-group-item d-flex align-items-center mb-2";
+                li.style = "bac"
+                li.innerHTML = `
+            <img src="${seguidor.imagenPerfil || 'imagenes/logo-usuario.png'}" alt="${seguidor.nombreUsuario}" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+            <span>${seguidor.nombreUsuario}</span>
+        `;
+                lista.appendChild(li);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Actualizar contador de seguidores al cargar
+            await actualizarContadorSeguidores();
+        });
+
+        // Al abrir el modal, cargar la lista de seguidores
+        document.getElementById('modalSeguidores').addEventListener('show.bs.modal', cargarListaSeguidores);
+
     </script>
     <script>
         //CARGA DE PATRONES PROPIOS SEGÚN ESTADO - PUBLICADO O BORRADOR

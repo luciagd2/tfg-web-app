@@ -46,6 +46,11 @@
   color: #709279;
 }
 
+.item-list-seguidores{
+  background-color: #709279;
+  color: #d8e4d0;
+}
+
 .contenedor-cards {
   justify-content: left;
   padding: 1rem;

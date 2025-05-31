@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -312,20 +313,34 @@ public class ControladorUsuario {
             return ResponseEntity.notFound().build();
         }
         Usuario creador = creadorOpt.get();
-/*
-        if (!creador.getIdsSeguidores().contains(usuario.getId())) {
-            creador.getIdsSeguidores().add(usuario.getId());
-            repositorioUsuario.save(creador);
-        } else {
-            creador.getIdsSeguidores().remove(usuario.getId());
-            repositorioUsuario.save(creador);
-        }
-*/
         if (creador.getIdsSeguidores().contains(usuario.getId())) {
             return ResponseEntity.ok(true);
         } else{
             return ResponseEntity.ok(false);
         }
+    }
+
+    @GetMapping("/seguidores")
+    public ResponseEntity<?> getSeguidores() {
+        logger.info("Entrando en el método getSeguidores");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario creador = usuarioOpt.get();
+
+        List<Long> idsSeguidores = creador.getIdsSeguidores();
+
+        return ResponseEntity.ok(repositorioUsuario.findAllById(idsSeguidores));
     }
 }
 
