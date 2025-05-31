@@ -157,7 +157,6 @@ public class ControladorNotificaciones {
 
         repositorioNotificacion.save(notificacion);
 
-        System.out.println("Notificacion guardada - guardarNotificacionNuevaReview");
         return ResponseEntity.ok().build();
     }
 
@@ -190,9 +189,233 @@ public class ControladorNotificaciones {
 
         repositorioNotificacion.save(notificacion);
 
-        System.out.println("Notificacion guardada - guardarNotificacionNuevaReview");
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/patronCompraCreador")
+    public ResponseEntity<?> guardarNotificacionPatronCompraCreador(@RequestParam long idPatron) {
+        logger.info("Entrando en el método guardarNotificacionPatronCompraCreador");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuarioQueGuarda = usuarioOpt.get();
+        Patron patron = repositorioPatron.findById(idPatron).get();
+        Usuario creador = patron.getCreador();
+
+        Notificacion notificacion = new Notificacion();
+
+        notificacion.setUsuario(creador);
+        notificacion.setTipo(Notificacion.TipoNotificacion.COMPRA_AL_CREADOR);
+        notificacion.setUsuarioRelacionado(usuarioQueGuarda);
+        notificacion.setPatronRelacionado(patron);
+
+        repositorioNotificacion.save(notificacion);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/patronCompraUsuario")
+    public ResponseEntity<?> guardarNotificacionPatronCompraUsuario(@RequestParam long idPatron) {
+        logger.info("Entrando en el método guardarNotificacionPatronCompraUsuario");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        Patron patron = repositorioPatron.findById(idPatron).get();
+        Usuario creador = patron.getCreador();
+
+        Notificacion notificacion = new Notificacion();
+
+        notificacion.setUsuario(usuario);
+        notificacion.setTipo(Notificacion.TipoNotificacion.COMPRA_EXITOSA);
+        notificacion.setUsuarioRelacionado(creador);
+        notificacion.setPatronRelacionado(patron);
+
+        repositorioNotificacion.save(notificacion);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/actualizadoComprados")
+    public ResponseEntity<?> guardarNotificacionPatronActualizadoComprados(@RequestParam long idPatron) {
+        logger.info("Entrando en el método guardarNotificacionPatronActualizadoComprados");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario creador = usuarioOpt.get();
+        List<Usuario> idsUsuariosComprado = repositorioUsuario.findByPatronesComprados_Id(idPatron);
+
+        for (Usuario usuario : idsUsuariosComprado) {
+            Notificacion notificacion = new Notificacion();
+
+            notificacion.setUsuario(usuario);
+            notificacion.setTipo(Notificacion.TipoNotificacion.ACTUALIZADO_COMPRADO);
+            notificacion.setUsuarioRelacionado(creador);
+            notificacion.setPatronRelacionado(repositorioPatron.findById(idPatron).get());
+
+            repositorioNotificacion.save(notificacion);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/actualizadoGuardados")
+    public ResponseEntity<?> guardarNotificacionPatronActualizadoGuardados(@RequestParam long idPatron) {
+        logger.info("Entrando en el método guardarNotificacionPatronActualizadoGuardados");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario creador = usuarioOpt.get();
+        List<Usuario> idsUsuariosComprado = repositorioUsuario.findByPatronesGuardados_Id(idPatron);
+
+        for (Usuario usuario : idsUsuariosComprado) {
+            Notificacion notificacion = new Notificacion();
+
+            notificacion.setUsuario(usuario);
+            notificacion.setTipo(Notificacion.TipoNotificacion.ACTUALIZADO_GUARDADO);
+            notificacion.setUsuarioRelacionado(creador);
+            notificacion.setPatronRelacionado(repositorioPatron.findById(idPatron).get());
+
+            repositorioNotificacion.save(notificacion);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/actualizadoPrecio")
+    public ResponseEntity<?> guardarNotificacionPatronActualizadoPrecio(@RequestParam long idPatron) {
+        logger.info("Entrando en el método guardarNotificacionPatronActualizadoPrecio");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario creador = usuarioOpt.get();
+        List<Usuario> idsUsuariosComprado = repositorioUsuario.findByPatronesGuardados_Id(idPatron);
+
+        for (Usuario usuario : idsUsuariosComprado) {
+            Notificacion notificacion = new Notificacion();
+
+            notificacion.setUsuario(usuario);
+            notificacion.setTipo(Notificacion.TipoNotificacion.CAMBIO_PRECIO);
+            notificacion.setUsuarioRelacionado(creador);
+            notificacion.setPatronRelacionado(repositorioPatron.findById(idPatron).get());
+
+            repositorioNotificacion.save(notificacion);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/actualizadoGratis")
+    public ResponseEntity<?> guardarNotificacionPatronActualizadoGratis(@RequestParam long idPatron) {
+        logger.info("Entrando en el método guardarNotificacionPatronActualizadoGratis");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario creador = usuarioOpt.get();
+        List<Usuario> idsUsuariosComprado = repositorioUsuario.findByPatronesGuardados_Id(idPatron);
+
+        for (Usuario usuario : idsUsuariosComprado) {
+            Notificacion notificacion = new Notificacion();
+
+            notificacion.setUsuario(usuario);
+            notificacion.setTipo(Notificacion.TipoNotificacion.CAMBIO_PRECIO);
+            notificacion.setUsuarioRelacionado(creador);
+            notificacion.setPatronRelacionado(repositorioPatron.findById(idPatron).get());
+
+            repositorioNotificacion.save(notificacion);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/seguir")
+    public ResponseEntity<?> guardarNotificacionSeguir(@RequestParam long idCreador) {
+        logger.info("Entrando en el método guardarNotificacionPatronGuardadoCreador");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuarioQueSigueA = usuarioOpt.get();
+        Usuario creador = repositorioUsuario.getUsuarioById(idCreador);
+
+        Notificacion notificacion = new Notificacion();
+
+        notificacion.setUsuario(creador);
+        notificacion.setTipo(Notificacion.TipoNotificacion.PATRON_GRATIS);
+        notificacion.setUsuarioRelacionado(usuarioQueSigueA);
+
+        repositorioNotificacion.save(notificacion);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+
 
     @PostMapping("/marcar-leido")
     public ResponseEntity<?> marcarLeido(@RequestParam long idNotificacion) {

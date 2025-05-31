@@ -48,6 +48,37 @@
 
         // Redirigimos a la URL que devuelve el servidor
         if (response.redirected) {
+            try {
+                const idPatron = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
+                const response = await fetch(`/api/notificaciones/patronCompraCreador?idPatron=${idPatron}`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Error al enviar la notificacion:", errorText);
+                    return;
+                }
+            } catch (error) {
+                console.error("Error al enviar notificacion:", error);
+            }
+
+            try {
+                const idPatron = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
+                const response = await fetch(`/api/notificaciones/patronCompraUsuario?idPatron=${idPatron}`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Error al enviar la notificacion:", errorText);
+                    return;
+                }
+            } catch (error) {
+                console.error("Error al enviar notificacion:", error);
+            }
             window.location.href = response.url;
         } else {
             alert("Error al procesar el pago");

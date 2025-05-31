@@ -253,7 +253,9 @@
 
                 const formData = new FormData();
 
-                formData.append("idPatron", (JSON.parse(localStorage.getItem("patronSeleccionado"))).id);
+                const patron = JSON.parse(localStorage.getItem("patronSeleccionado"))
+                const idPatron = patron.id;
+                formData.append("idPatron", idPatron;
                 //formData.append("id", localStorage.getItem("patronSeleccionado").getItem("id"));
                 formData.append("titulo",document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value.trim());
                 formData.append("precio",parseFloat(document.querySelector('#input-precio').value));
@@ -284,6 +286,51 @@
                         alert("Patron guardado correctamente");
                         const patron = await response.json();
                         localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+
+                        // Notificaciones de patron actualizado para comprados y guardados
+                        try {
+                            const response = await fetch(`/api/notificaciones/actualizadoComprados?idPatron=${idPatron}`, {
+                                method: "POST",
+                                credentials: "include"
+                            });
+
+                            if (!response.ok) {
+                                const errorText = await response.text();
+                                console.error("Error al enviar la notificacion:", errorText);
+                                return;
+                            }
+                        } catch (error) {
+                            console.error("Error al enviar notificacion:", error);
+                        }
+
+                        try {
+                            const response = await fetch(`/api/notificaciones/actualizadoGuardados?idPatron=${idPatron}`, {
+                                method: "POST",
+                                credentials: "include"
+                            });
+
+                            if (!response.ok) {
+                                const errorText = await response.text();
+                                console.error("Error al enviar la notificacion:", errorText);
+                                return;
+                            }
+                        } catch (error) {
+                            console.error("Error al enviar notificacion:", error);
+                        }
+
+                        // Si cambia el precio
+                        if (patron.precio !== parseFloat(document.querySelector('#input-precio').value)){
+                            // Si ahora es gratis: notificacion de precio gratis
+                            if (parseFloat(document.querySelector('#input-precio').value) === 0){
+
+                            }
+                            // notificacion de cambio de precio
+                            else {
+
+                            }
+                        }
+
+
                         window.location.href = "tienda.html";
                     } else {
                         const errorText = await response.text(); // o .json() si sabes que es JSON

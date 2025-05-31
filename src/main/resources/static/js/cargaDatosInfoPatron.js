@@ -292,11 +292,4 @@ btnComprarEmpezar.addEventListener("click", async () => {
         window.location.href = `/api/pasarelaPago/pedido?patronId=${patronId}`;
 
     }
-    /*
-    else if (btnComprarEmpezar.textContent === "Empezar"){
-
-    } else {
-
-    }
-     */
 });

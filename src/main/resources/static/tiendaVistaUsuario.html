@@ -138,6 +138,21 @@
                         btnSeguir.innerHTML = '<i class="bi bi-people-fill"></i> Siguiendo';
                         btnSeguir.classList.remove("btn-outline-primary");
                         btnSeguir.classList.add("btn-primary");
+
+                        try {
+                            const response = await fetch(`/api/notificaciones/seguir?idCreador=${creadorId}`, {
+                                method: "POST",
+                                credentials: "include"
+                            });
+
+                            if (!response.ok) {
+                                const errorText = await response.text();
+                                console.error("Error al enviar la notificacion:", errorText);
+                                return;
+                            }
+                        } catch (error) {
+                            console.error("Error al enviar notificacion:", error);
+                        }
                     }
                 } catch (error) {
                     console.error("Error al seguir/dejar de seguir:", error);

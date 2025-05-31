@@ -57,7 +57,7 @@ function guardarPatron(patron) {
       .map(tag => tag.trim())
       .filter(tag => tag !== '');
   patron.setTags(tags);
-  1
+  //1  <- TODO: no se porque estaba este 1, creo que lo puse sin querer, ¿quitar?
   // Instrucciones
   ////patron.instrucciones = recopilarInstrucciones();
   // Instrucciones — SERIALIZADAS como string JSON
