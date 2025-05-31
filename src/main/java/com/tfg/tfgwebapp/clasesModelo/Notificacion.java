@@ -1,5 +1,6 @@
 package com.tfg.tfgwebapp.clasesModelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,15 +22,17 @@ import lombok.Setter;
     @Enumerated(EnumType.STRING)
     private TipoNotificacion tipo;
 
-    //@Getter @Setter
-    //private String mensaje;
+    @Getter @Setter
+    private boolean leido;
 
     // campos adicionales según tipo
+    @ManyToOne
     @Getter @Setter
-    private Long idPatronRelacionado;
+    private Patron patronRelacionado;
 
+    @ManyToOne
     @Getter @Setter
-    private Long idUsuarioRelacionado;
+    private Usuario usuarioRelacionado;
 
     //Enumerates
     public enum TipoNotificacion {

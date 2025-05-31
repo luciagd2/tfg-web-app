@@ -28,25 +28,135 @@
     <div id="container-menu"></div>
 
     <div class="main-content">
-        <ul class="list-group lista-notificaciones" id="listaNotificaciones"></ul>
+        <div class="list-group lista-notificaciones" id="listaNotificaciones"></div>
     </div>
 
     <script src="js/estructuras.js"></script>
     <script>
         const plantillasNotificaciones = {
-            GUARDADO: notif => `Has guardado el patrón <strong>${notif.nombrePatron}</strong> correctamente.`,
-            COMPRA_EXITOSA: notif => `Tu compra del patrón <strong>${notif.nombrePatron}</strong> fue exitosa.`,
-            PATRON_GRATOS: notif => `El patrón <strong>${notif.nombrePatron}</strong> que tenías en guardado ahora es gratis.`,
-            CAMBIO_PRECIO: notif => `El patrón <strong>${notif.nombrePatron}</strong> que tenías en guardado ha cambiado de precio.`,
-            NUEVO_PATRON_CREADOR: notif => `<strong>${notif.nombreUsuario}</strong> ha publicado un nuevo patrón.`,
-            ACTUALIZADO_GUARDADO: notif => `El patrón <strong>{notif.nombrePatron}</strong> que tienes guardado ha sido actualizado por el creador.`,
-            ACTUALIZADO_COMPRADO: notif => `El patrón <strong>{notif.nombrePatron}</strong> que tienes comprado ha sido actualizado por el creador.`,
-            ELIMINAR_GUARDADO: notif => `El patrón <strong>{notif.nombrePatron}</strong> que tienes guardado ha sido eliminado por el creador.`,
-            COMPRA_AL_CREADOR: notif => `<strong>{notif.nombreUsuario}</strong> ha comprado tu patrón <strong>{patron}</strong>`,
-            GUARDADO_AL_CREADOR: notif => `<strong>{notif.nombreUsuario}</strong> ha guardado tu patrón <strong>{patron}</strong>`,
-            CALIFICACION: notif => `Tu patrón <strong>${notif.nombrePatron}</strong> ha sido calificado con <strong>${notif.estrellas} estrellas</strong> por <strong>${datos.usuario}</strong>.`,
-            NUEVO_SEGUIDOR: notif => `<strong>{notif.nombreUsuario}</strong> ha comenzado a seguirte.`,
+            GUARDADO: notif => `Has guardado el patrón <strong>${notif.patronRelacionado.titulo}</strong> correctamente.`,
+            COMPRA_EXITOSA: notif => `Tu compra del patrón <strong>${notif.patronRelacionado.titulo}</strong> fue exitosa.`,
+            PATRON_GRATIS: notif => `El patrón <strong>${notif.patronRelacionado.titulo}</strong> que tenías en guardado ahora es gratis.`,
+            CAMBIO_PRECIO: notif => `El patrón <strong>${notif.patronRelacionado.titulo}</strong> que tenías en guardado ha cambiado de precio.`,
+            NUEVO_PATRON_CREADOR: notif => `<strong>${notif.usuarioRelacionado.nombreUsuario}</strong> ha publicado un nuevo patrón.`,
+            ACTUALIZADO_GUARDADO: notif => `El patrón <strong>${notif.patronRelacionado.titulo}</strong> que tienes guardado ha sido actualizado por el creador.`,
+            ACTUALIZADO_COMPRADO: notif => `El patrón <strong>${notif.patronRelacionado.titulo}</strong> que tienes comprado ha sido actualizado por el creador.`,
+            ELIMINAR_GUARDADO: notif => `El patrón <strong>${notif.patronRelacionado.titulo}</strong> que tienes guardado ha sido eliminado por el creador.`,
+            COMPRA_AL_CREADOR: notif => `<strong>${notif.usuarioRelacionado.nombreUsuario}</strong> ha comprado tu patrón <strong>${notif.patronRelacionado.titulo}</strong>`,
+            GUARDADO_AL_CREADOR: notif => `<strong>${notif.usuarioRelacionado.nombreUsuario}</strong> ha guardado tu patrón <strong>${notif.patronRelacionado.titulo}</strong>`,
+            CALIFICACION: notif => `Tu patrón <strong>${notif.patronRelacionado.titulo}</strong> ha sido calificado con <strong>${notif.patronRelacionado.puntuacion} estrellas</strong> por <strong>${notif.usuarioRelacionado.nombreUsuario}</strong>.`,
+            NUEVO_SEGUIDOR: notif => `<strong>${notif.usuarioRelacionado.nombreUsuario}</strong> ha comenzado a seguirte.`,
         };
+
+        function crearToast(notif) {
+            console.log("Notificacion: ", notif);
+            const container = document.getElementById('listaNotificaciones');
+
+            const texto = plantillasNotificaciones[notif.tipo]?.(notif) || 'Tienes una nueva notificación';
+            const enlace = obtenerHrefRedireccion(notif);
+
+            const toast = document.createElement('div');
+            toast.id = notif.idNotificacion;
+            toast.className = 'toast align-items-center mb-2';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body" style="cursor:pointer; flex-grow: 1;">
+                        ${texto}
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+
+            // Evento de click en el cuerpo del toast
+            toast.querySelector('.toast-body').addEventListener('click', () => {
+                window.location.href = enlace;
+            });
+
+            // Evento al cerrar el toast con la X
+            toast.addEventListener('hidden.bs.toast', async () => {
+                try {
+                    const response = await fetch(`/api/notificaciones/marcar-leido?idNotificacion=${notif.idNotificacion}`, {
+                        method: "POST",
+                        credentials: "include"
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Estado:", response.status);
+                        console.error("Respuesta:", errorText);
+                        alert(`Error al marcar como leido: ${response.status}`);
+                        return;
+                    }
+
+                } catch (error) {
+                    console.error("Error al recuperar las reseñas del patrón:", error);
+                }
+            });
+
+            container.appendChild(toast);
+            new bootstrap.Toast(toast, { autohide: false }).show();
+        }
+
+        function obtenerHrefRedireccion(notif) {
+            /*
+            switch (notif.tipo) {
+                case 'GUARDADO':
+                    if (notif.usuario.esCreador) {
+                        return "tienda.html";
+                    } else {
+                        return "perfil.html";
+                    }
+                case 'COMPRA_EXITOSA':
+                case 'PATRON_GRATIS':
+                case 'CAMBIO_PRECIO':
+                case 'ACTUALIZADO_GUARDADO':
+                case 'ACTUALIZADO_COMPRADO':
+                case 'NUEVO_PATRON_CREADOR':
+                case 'CALIFICACION':
+                    return `/patrones/${notif.patronRelacionado.idPatron}`; // Ajusta según tu ruta //infoPatron
+                case 'ELIMINAR_GUARDADO':
+                case 'COMPRA_AL_CREADOR':
+                case 'GUARDADO_AL_CREADOR':
+                case 'NUEVO_SEGUIDOR':
+                default:
+                    return '#'; // nada
+            }
+             */
+            return '#';
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            fetch(`/api/notificaciones/obtener-no-leidas`, {
+                method: "GET",
+                credentials: "include"
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Error al recuperar las notificaciones: ${response.status}`);
+                }
+                return response.json()
+            })
+            .then((notificaciones) => {
+                notificaciones.forEach((notif) => {
+                    crearToast(notif);
+                })
+            })
+
+            const notificaciones = await response.json();
+            return notificaciones;
+        })
+    </script>
+
+
+
+
+
+    <script>
+
+
+/*
 
         function renderNotificacionesDesdeId(lista, contenedorId) {
             const contenedor = document.getElementById(contenedorId);
@@ -68,7 +178,7 @@
             });
         }
 
-        renderNotificacionesDesdeId(notificaciones, 'listaNotificaciones');
+        //renderNotificacionesDesdeId(notificaciones, 'listaNotificaciones');
 
 
         async function getNombrePatron(id) {
@@ -114,8 +224,8 @@
                 contenedor.appendChild(li);
             }
         }
-        cargarNotificaciones(JSON.parse(sessionStorage.getItem("usuario")).id);
-
+        //cargarNotificaciones(JSON.parse(sessionStorage.getItem("usuario")).id);
+*/
       </script>
       
 

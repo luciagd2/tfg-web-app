@@ -3,6 +3,7 @@ package com.tfg.tfgwebapp.controladores;
 import com.tfg.tfgwebapp.clasesModelo.Notificacion;
 import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioNotificacion;
+import com.tfg.tfgwebapp.repositorios.RepositorioPatron;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +28,36 @@ public class ControladorNotificaciones {
     @Autowired
     private RepositorioNotificacion repositorioNotificacion;
     private RepositorioUsuario repositorioUsuario;
+    @Autowired
+    private RepositorioPatron repositorioPatron;
 
     public ControladorNotificaciones(RepositorioNotificacion repositorioNotificacion, RepositorioUsuario repositorioUsuario) {
         this.repositorioNotificacion = repositorioNotificacion;
         this.repositorioUsuario = repositorioUsuario;
     }
 
-    @GetMapping("/{idUsuario}")
-    public List<Notificacion> obtenerNotificaciones(@PathVariable Long idUsuario) {
-        return repositorioNotificacion.findByUsuarioId(idUsuario);
+    @GetMapping("/obtener-no-leidas")
+    public ResponseEntity<?> obtenerNoLeidas() {
+        logger.info("Entrando en el método obtenerNoLeidas");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        System.out.println("Usuario: " + usuario);
+
+        List<Notificacion> notifs = repositorioNotificacion.findByUsuarioIdAndLeido(usuario.getId(), false);
+        System.out.println("Notifs: " + notifs);
+        return ResponseEntity.ok(notifs);
     }
 
     @PostMapping("/nuevoPatron")
@@ -63,13 +85,21 @@ public class ControladorNotificaciones {
 
             notificacion.setUsuario(seguidor);
             notificacion.setTipo(Notificacion.TipoNotificacion.NUEVO_PATRON_CREADOR);
-            notificacion.setIdUsuarioRelacionado(creador.getId());
-            notificacion.setIdPatronRelacionado(idPatron);
+            notificacion.setUsuarioRelacionado(creador);
+            notificacion.setPatronRelacionado(repositorioPatron.findById(idPatron).get());
 
             repositorioNotificacion.save(notificacion);
         }
         return ResponseEntity.ok().build();
     }
 
+
+    @PostMapping("/marcar-leido")
+    public ResponseEntity<?> marcarLeido(@RequestParam long idNotificacion) {
+        Optional<Notificacion> notif = repositorioNotificacion.findByIdNotificacion(idNotificacion);
+        notif.get().setLeido(true);
+        repositorioNotificacion.save(notif.get());
+        return ResponseEntity.ok().build();
+    }
 
 }
