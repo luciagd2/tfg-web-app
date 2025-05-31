@@ -94,6 +94,38 @@ public class ControladorNotificaciones {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/patronEliminado")
+    public ResponseEntity<?> guardarNotificacionPatronEliminado(@RequestParam long idPatron) {
+        logger.info("Entrando en el método guardarNotificacionNuevoPatron");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario creador = usuarioOpt.get();
+        List<Usuario> idsUsuariosGuardado = repositorioUsuario.findByPatronesGuardados_Id(idPatron);
+
+        for (Usuario usuario : idsUsuariosGuardado) {
+            Notificacion notificacion = new Notificacion();
+
+            notificacion.setUsuario(usuario);
+            notificacion.setTipo(Notificacion.TipoNotificacion.ELIMINADO_GUARDADO);
+            notificacion.setUsuarioRelacionado(creador);
+            notificacion.setPatronRelacionado(repositorioPatron.findById(idPatron).get());
+
+            repositorioNotificacion.save(notificacion);
+        }
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/nuevaReview")
     public ResponseEntity<?> guardarNotificacionNuevaReview(@RequestParam long idPatron, @RequestParam int puntuacion) {
         logger.info("Entrando en el método guardarNotificacionNuevaReview");
@@ -305,9 +337,9 @@ public class ControladorNotificaciones {
         }
 
         Usuario creador = usuarioOpt.get();
-        List<Usuario> idsUsuariosComprado = repositorioUsuario.findByPatronesGuardados_Id(idPatron);
+        List<Usuario> idsUsuariosGuardado = repositorioUsuario.findByPatronesGuardados_Id(idPatron);
 
-        for (Usuario usuario : idsUsuariosComprado) {
+        for (Usuario usuario : idsUsuariosGuardado) {
             Notificacion notificacion = new Notificacion();
 
             notificacion.setUsuario(usuario);
@@ -375,7 +407,7 @@ public class ControladorNotificaciones {
             Notificacion notificacion = new Notificacion();
 
             notificacion.setUsuario(usuario);
-            notificacion.setTipo(Notificacion.TipoNotificacion.CAMBIO_PRECIO);
+            notificacion.setTipo(Notificacion.TipoNotificacion.PATRON_GRATIS);
             notificacion.setUsuarioRelacionado(creador);
             notificacion.setPatronRelacionado(repositorioPatron.findById(idPatron).get());
 
@@ -406,7 +438,7 @@ public class ControladorNotificaciones {
         Notificacion notificacion = new Notificacion();
 
         notificacion.setUsuario(creador);
-        notificacion.setTipo(Notificacion.TipoNotificacion.PATRON_GRATIS);
+        notificacion.setTipo(Notificacion.TipoNotificacion.NUEVO_SEGUIDOR);
         notificacion.setUsuarioRelacionado(usuarioQueSigueA);
 
         repositorioNotificacion.save(notificacion);

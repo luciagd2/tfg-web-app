@@ -255,7 +255,7 @@
 
                 const patron = JSON.parse(localStorage.getItem("patronSeleccionado"))
                 const idPatron = patron.id;
-                formData.append("idPatron", idPatron;
+                formData.append("idPatron", idPatron);
                 //formData.append("id", localStorage.getItem("patronSeleccionado").getItem("id"));
                 formData.append("titulo",document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value.trim());
                 formData.append("precio",parseFloat(document.querySelector('#input-precio').value));
@@ -322,10 +322,37 @@
                         if (patron.precio !== parseFloat(document.querySelector('#input-precio').value)){
                             // Si ahora es gratis: notificacion de precio gratis
                             if (parseFloat(document.querySelector('#input-precio').value) === 0){
+                                try {
+                                    const response = await fetch(`/api/notificaciones/actualizadoGratis?idPatron=${idPatron}`, {
+                                        method: "POST",
+                                        credentials: "include"
+                                    });
 
+                                    if (!response.ok) {
+                                        const errorText = await response.text();
+                                        console.error("Error al enviar la notificacion:", errorText);
+                                        return;
+                                    }
+                                } catch (error) {
+                                    console.error("Error al enviar notificacion:", error);
+                                }
                             }
                             // notificacion de cambio de precio
                             else {
+                                try {
+                                    const response = await fetch(`/api/notificaciones/actualizadoPrecio?idPatron=${idPatron}`, {
+                                        method: "POST",
+                                        credentials: "include"
+                                    });
+
+                                    if (!response.ok) {
+                                        const errorText = await response.text();
+                                        console.error("Error al enviar la notificacion:", errorText);
+                                        return;
+                                    }
+                                } catch (error) {
+                                    console.error("Error al enviar notificacion:", error);
+                                }
 
                             }
                         }

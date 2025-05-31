@@ -33,13 +33,15 @@ public class ControladorPatrones {
     private final RepositorioUsuario repositorioUsuario;
     private final RepositorioPatron repositorioPatron;
     private final ServicioPatron servicioPatron;
+    private final ControladorNotificaciones controladorNotificaciones;
 
     // Inyección mediante constructor (recomendado)
     @Autowired
-    public ControladorPatrones(RepositorioUsuario repositorioUsuario, RepositorioPatron repositorioPatron, ServicioPatron servicioPatron) {
+    public ControladorPatrones(RepositorioUsuario repositorioUsuario, RepositorioPatron repositorioPatron, ServicioPatron servicioPatron, ControladorNotificaciones controladorNotificaciones) {
         this.repositorioUsuario = repositorioUsuario;
         this.repositorioPatron = repositorioPatron;
         this.servicioPatron = servicioPatron;
+        this.controladorNotificaciones = controladorNotificaciones;
     }
 
     @GetMapping("/encontrar")
@@ -314,6 +316,7 @@ public class ControladorPatrones {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body("El patrón tiene usuarios que lo han comprado o empezado");
             } else {
+                controladorNotificaciones.guardarNotificacionPatronEliminado(id);
                 servicioPatron.eliminarPatron(id);
                 return ResponseEntity.ok("Patrón eliminado");
             }

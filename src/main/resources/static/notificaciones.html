@@ -57,7 +57,7 @@
 
             const toast = document.createElement('div');
             toast.id = notif.idNotificacion;
-            toast.className = 'toast align-items-center mb-2';
+            toast.className = 'toast align-items-center mb-3';
             toast.setAttribute('role', 'alert');
             toast.setAttribute('aria-live', 'assertive');
             toast.setAttribute('aria-atomic', 'true');
@@ -100,7 +100,6 @@
         }
 
         function obtenerHrefRedireccion(notif) {
-            /*
             switch (notif.tipo) {
                 case 'GUARDADO':
                     if (notif.usuario.esCreador) {
@@ -115,7 +114,8 @@
                 case 'ACTUALIZADO_COMPRADO':
                 case 'NUEVO_PATRON_CREADOR':
                 case 'CALIFICACION':
-                    return `/patrones/${notif.patronRelacionado.idPatron}`; // Ajusta según tu ruta //infoPatron
+                    localStorage.setItem("patronSeleccionado", JSON.stringify(notif.patronRelacionado));
+                    return "infoPatron.html";
                 case 'ELIMINAR_GUARDADO':
                 case 'COMPRA_AL_CREADOR':
                 case 'GUARDADO_AL_CREADOR':
@@ -123,8 +123,6 @@
                 default:
                     return '#'; // nada
             }
-             */
-            return '#';
         }
 
         document.addEventListener("DOMContentLoaded", async () => {
@@ -148,86 +146,5 @@
             return notificaciones;
         })
     </script>
-
-
-
-
-
-    <script>
-
-
-/*
-
-        function renderNotificacionesDesdeId(lista, contenedorId) {
-            const contenedor = document.getElementById(contenedorId);
-            contenedor.innerHTML = ''; // limpiar
-
-            lista.forEach(({ id, datos }) => {
-                const plantilla = plantillasNotificaciones[id];
-                if (!plantilla) return;
-
-                let mensaje = plantilla;
-                for (const clave in datos) {
-                mensaje = mensaje.replace(new RegExp(`{${clave}}`, 'g'), datos[clave]);
-                }
-
-                const li = document.createElement('li');
-                li.className = 'list-group-item  mb-2';
-                li.innerHTML = mensaje;
-                contenedor.appendChild(li);
-            });
-        }
-
-        //renderNotificacionesDesdeId(notificaciones, 'listaNotificaciones');
-
-
-        async function getNombrePatron(id) {
-            if (!id) return null;
-            const res = await fetch(`/api/patrones/${id}`);
-            const data = await res.json();
-            return data.nombre;
-        }
-
-        async function getNombreUsuario(id) {
-            if (!id) return null;
-            const res = await fetch(`/api/usuarios/${id}`);
-            const data = await res.json();
-            return data.nombreUsuario;
-        }
-
-        async function enriquecerNotificacion(notif) {
-            if (notif.idPatronRelacionado) {
-                notif.nombrePatron = await getNombrePatron(notif.idPatronRelacionado);
-            }
-            if (notif.idUsuarioRelacionado) {
-                notif.nombreUsuario = await getNombreUsuario(notif.idUsuarioRelacionado);
-            }
-            return notif;
-        }
-
-        async function cargarNotificaciones(userId) {
-            const res = await fetch(`/api/notificaciones/${userId}`);
-            const notificaciones = await res.json();
-
-            const contenedor = document.getElementById("listaNotificaciones");
-            contenedor.innerHTML = "";
-
-            for (const notif of notificaciones) {
-                await enriquecerNotificacion(notif);
-
-                const plantilla = plantillasNotificaciones[notif.tipo];
-                if (!plantilla) continue;
-
-                const li = document.createElement("li");
-                li.className = "list-group-item mb-2";
-                li.innerHTML = plantilla(notif);
-                contenedor.appendChild(li);
-            }
-        }
-        //cargarNotificaciones(JSON.parse(sessionStorage.getItem("usuario")).id);
-*/
-      </script>
-      
-
 </body>
 </html>

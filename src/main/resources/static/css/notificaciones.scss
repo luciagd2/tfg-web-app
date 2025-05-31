@@ -14,8 +14,10 @@
     justify-content: center;
 }
 
-li{
+.toast{
     border-radius: 0.5rem;
     color: $color-primario-oscuro !important;
     background-color: $color-primario-claro !important;
+    border-color: $color-primario-claro !important;
+    width: 100%;
 }

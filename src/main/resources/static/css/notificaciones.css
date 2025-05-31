@@ -12,8 +12,10 @@
   justify-content: center;
 }
 
-li {
+.toast {
   border-radius: 0.5rem;
   color: #709279 !important;
   background-color: #d8e4d0 !important;
+  border-color: #d8e4d0 !important;
+  width: 100%;
 }/*# sourceMappingURL=notificaciones.css.map */
