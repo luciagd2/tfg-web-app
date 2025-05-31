@@ -237,6 +237,21 @@
                 }
 
                 const nuevaReview = await response.json(); // Esperamos recibir la reseña guardada con ruta de imagen
+
+                try {
+                    const response = await fetch(`/api/notificaciones/nuevaReview?idPatron=${patron}&puntuacion=${puntuacion}`, {
+                        method: "POST",
+                        credentials: "include"
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Error al enviar la notificacion:", errorText);
+                        return;
+                    }
+                } catch (error) {
+                    console.error("Error al enviar notificacion:", error);
+                }
                 window.location.href = "infoPatron.html";
 
             } catch (error) {

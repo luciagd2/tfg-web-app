@@ -243,7 +243,39 @@ btnGuardar.addEventListener("click", async () => {
             btnGuardar.textContent = 'Guardar';
         } else {
             btnGuardar.textContent = 'Guardado';
+            try {
+                const idPatron = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
+                const response = await fetch(`/api/notificaciones/patronGuardadoCreador?idPatron=${idPatron}`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Error al enviar la notificacion:", errorText);
+                    return;
+                }
+            } catch (error) {
+                console.error("Error al enviar notificacion:", error);
+            }
+
+            try {
+                const idPatron = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
+                const response = await fetch(`/api/notificaciones/patronGuardadoUsuario?idPatron=${idPatron}`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Error al enviar la notificacion:", errorText);
+                    return;
+                }
+            } catch (error) {
+                console.error("Error al enviar notificacion:", error);
+            }
         }
+
     } catch (error) {
         console.error("Error al guardar/dejar de guardar el patrón:", error);
         alert("Ha ocurrido un error, inténtalo de nuevo.");

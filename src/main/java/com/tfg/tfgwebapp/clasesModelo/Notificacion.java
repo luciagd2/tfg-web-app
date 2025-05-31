@@ -30,6 +30,9 @@ import lombok.Setter;
     @Getter @Setter
     private Patron patronRelacionado;
 
+    @Getter @Setter
+    private Integer puntuacionPatronRelacionado;
+
     @ManyToOne
     @Getter @Setter
     private Usuario usuarioRelacionado;
