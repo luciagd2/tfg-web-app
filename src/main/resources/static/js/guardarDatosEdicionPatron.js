@@ -3,6 +3,9 @@
 **********         LOS DATOS DEL PATRON DE EDICIONPATRON.HTML          **********
 *********************************************************************************/
 //TODO: Eliminar el código anterior (comentado con ////)
+
+//TODO: ¿obsoleto? los datos e instrucciones se cargan en el html, instrucciones seguro que si
+
 function guardarPatron(patron) {
 
   console.log("Dentro de guardarPatron");
@@ -71,6 +74,20 @@ function guardarPatron(patron) {
   alert("Patrón guardado correctamente.");
 }
 
+async function subirImagen(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("http://localhost:8080/api/imagenes/subir", {
+    method: "POST",
+    body: formData
+  });
+
+  if (!response.ok) throw new Error("Error al subir imagen");
+
+  const data = await response.json();
+  return data.url; // Por ejemplo: /imagenes/patrones/archivo.jpg
+}
 
 
 function recopilarInstrucciones() {
@@ -95,10 +112,18 @@ function recopilarInstrucciones() {
         contenido.push({ tipo: 'subtitulo', texto: el.querySelector('input').value });
       } else if (el.querySelector('textarea')) {
         contenido.push({ tipo: 'info', texto: el.querySelector('textarea').value });
-      } else if (el.classList.contains('input-group-imagen')) {
+      /*}else if (el.classList.contains('input-group-imagen')) {
         const previews = el.querySelectorAll('img.img-preview');
         previews.forEach(img => {
           contenido.push({ tipo: 'imagen', contenido: img.src }); // usar la URL directa, no base64
+        });
+      }*/
+      } else if (el.classList.contains('input-group-imagen')) {
+        const previews = el.querySelectorAll('img.img-preview');
+        previews.forEach(async img => {
+          const file = obtenerArchivoDeImgPreview(img); // <- Necesitas guardar el File original o usar un input hidden
+          const url = await subirImagen(file);
+          contenido.push({ tipo: 'imagen', contenido: url });
         });
       }
     });

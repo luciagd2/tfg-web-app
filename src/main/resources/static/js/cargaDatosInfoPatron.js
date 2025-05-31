@@ -34,10 +34,32 @@ async function cargarDatosInfoPatron(patron, reviews) {
     document.querySelector(".card-text").textContent = patron.descripcion;
 
     // Precio
+    const idPatron = patron.id;
     if (patron.precio > 0) {
         document.querySelector(".card-precio").textContent = patron.precio;
-        document.getElementById("btnComprarEmpezar").textContent = "Comprar"
-        document.getElementById("btnComprarEmpezar").href = "simulacionPasarelaPago.html";
+        const btnComprarEmpezar = document.getElementById("btnComprarEmpezar");
+        try {
+            const response = await fetch(`/api/patrones/estaComprado?idPatron=${idPatron}`, {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (response.ok) {
+                const estaGuardado = await response.json();
+                console.log(estaGuardado);
+                if (estaGuardado) {
+                    btnComprarEmpezar.textContent = "Empezar";
+                    btnComprarEmpezar.href = "instruccionesPatron.html";
+                }
+                else {
+                    btnComprarEmpezar.textContent = "Comprar";
+                    btnComprarEmpezar.href = "simulacionPasarelaPago.html";
+                }
+            }
+        } catch (error) {
+            console.error("Error al comprobar si sigue:", error);
+        }
+
     } else {
         document.querySelector(".card-precio").textContent = "Gratis";
         document.getElementById("btnComprarEmpezar").textContent = "Empezar"
@@ -46,7 +68,6 @@ async function cargarDatosInfoPatron(patron, reviews) {
     }
 
     const btnGuardar = document.getElementById("btnGuardar");
-    const idPatron = patron.id;
     try {
         const response = await fetch(`/api/patrones/estaGuardo?idPatron=${idPatron}`, {
             method: "GET",
@@ -279,17 +300,5 @@ btnGuardar.addEventListener("click", async () => {
     } catch (error) {
         console.error("Error al guardar/dejar de guardar el patrón:", error);
         alert("Ha ocurrido un error, inténtalo de nuevo.");
-    }
-});
-
-const btnComprarEmpezar = document.getElementById("btnComprarEmpezar");
-btnComprarEmpezar.addEventListener("click", async () => {
-    // Comprobamos si va a comprar/empezar/continuar
-    if (btnComprarEmpezar.textContent === "Comprar"){
-        const patronId = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
-        sessionStorage.setItem("patronCompra", localStorage.getItem("patronSeleccionado"));
-        // Redirigimos al simulador de pago
-        window.location.href = `/api/pasarelaPago/pedido?patronId=${patronId}`;
-
     }
 });

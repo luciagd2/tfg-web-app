@@ -1,5 +1,7 @@
 package com.tfg.tfgwebapp.controladores;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.tfg.tfgwebapp.clasesModelo.Patron;
 import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioPatron;
@@ -546,7 +548,7 @@ public class ControladorPatrones {
             @RequestParam String agujaLanera,
             @RequestParam String otros,
             @RequestParam String abreviaturas,
-            @RequestParam(required = false) List<MultipartFile> imagenes,
+            @RequestParam(required = false) String imagenes,
             @RequestParam List<String> tags,
             @RequestParam String instrucciones
 
@@ -570,8 +572,9 @@ public class ControladorPatrones {
 
         // Define ruta y nombre para la carpeta de destino de las imagenes de los patrones
         String carpetaDestino = "src/main/resources/static/imagenes/patrones/";
-        List<String> rutasRelativas = new ArrayList<>();
+        //List<String> rutasRelativas = new ArrayList<>();
         if (imagenes != null && !imagenes.isEmpty()) {
+            /*
             try {
                 for (MultipartFile imagen : imagenes) {
                     if (!imagen.isEmpty()) {
@@ -588,6 +591,15 @@ public class ControladorPatrones {
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar las imágenes.");
+            }
+            */
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                List<String> rutasRelativas = mapper.readValue(imagenes, new TypeReference<List<String>>() {});
+                patron.setImagenes(rutasRelativas);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al procesar URLs de imágenes.");
             }
         }
 

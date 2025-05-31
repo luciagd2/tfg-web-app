@@ -19,7 +19,7 @@
     <!-- Iconos -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <title>Busqueda</title>
+    <title>Edicion Patron</title>
 
 
     <style>
@@ -28,7 +28,6 @@
           overflow-y: auto !important;
         }
       </style>
-
 </head>
 <body class="wrapper overflow-hidden">
     <!-- BARRA DE NAVEGACION -->
@@ -268,11 +267,19 @@
                 formData.append("otros",document.querySelector('input[placeholder*="Marcadores"]').value.trim());
                 formData.append("abreviaturas",document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim());
                 const archivos = document.getElementById("input-imagenes-muestra").files;
-                for (let i = 0; i < archivos.length; i++) {
-                    formData.append("imagenes", archivos[i]);
+                console.log("Archivos primeros: ", archivos);
+                if (archivos !== null){
+                    const urlsImagenes = [];
+                    for (let i = 0; i < archivos.length; i++) {
+                        const result = await subirImagen(archivos[i]); // ← devuelve { url: "..." }
+                        urlsImagenes.push(result.url);
+                    }
+                    formData.append("imagenes", JSON.stringify(urlsImagenes));
                 }
                 formData.append("tags",tags);
-                formData.append("instrucciones",JSON.stringify(recopilarInstrucciones()));
+                //formData.append("instrucciones",JSON.stringify(recopilarInstrucciones()));
+                formData.append("instrucciones", JSON.stringify(await recopilarInstrucciones()));
+
 
                 try {
                     console.log("Justo antes del fetch a /api/patron/guardar")
@@ -356,7 +363,6 @@
                             }
                         }
 
-
                         window.location.href = "tienda.html";
                     } else {
                         const errorText = await response.text(); // o .json() si sabes que es JSON
@@ -372,17 +378,17 @@
         });
 
 
-        function recopilarInstrucciones() {
+        async function recopilarInstrucciones() {
             const secciones = document.querySelectorAll('#secciones-patron .card-seccion');
             const instrucciones = [];
 
-            secciones.forEach(seccion => {
+            for (const seccion of secciones) {
                 const titulo = seccion.querySelector('.txt-titulo').value;
                 const contenido = [];
 
                 const elementos = seccion.querySelectorAll('[id$="-contenido"] > *');
 
-                elementos.forEach(el => {
+                for (const el of elementos) {
                     if (el.classList.contains('input-group')) {
                         const span = el.querySelector('.input-group-text');
                         const input = el.querySelector('input');
@@ -393,19 +399,43 @@
                     } else if (el.classList.contains('d-flex') && el.querySelector('.txt-subtitulo')) {
                         contenido.push({ tipo: 'subtitulo', texto: el.querySelector('input').value });
                     } else if (el.querySelector('textarea')) {
-                        contenido.push({ tipo: 'info', texto: el.querySelector('textarea').value });
+                        contenido.push({tipo: 'info', texto: el.querySelector('textarea').value});
                     } else if (el.classList.contains('input-group-imagen')) {
-                        const previews = el.querySelectorAll('img.img-preview');
-                        previews.forEach(img => {
-                            contenido.push({ tipo: 'imagen', contenido: img.src }); // usar la URL directa, no base64
-                        });
+                        /*const previews = el.querySelectorAll('img.img-preview');
+                        previews.forEach(async img => {
+                            const file = img.src;
+                            const url = await subirImagen(file);
+                            contenido.push({tipo: 'imagen', contenido: url});
+                        });*/
+
+                        const archivos = el.querySelector(".input-img-instruccion").files;
+                        console.log("Archivos: ", archivos);
+                        for (let i = 0; i < archivos.length; i++) {
+                            const result = await subirImagen(archivos[i]);
+                            //urlsImagenes.push(result.url);
+                            contenido.push({tipo: 'imagen', contenido: result.url})
+                        }
                     }
-                });
+                }
 
                 instrucciones.push({ titulo, contenido });
-            });
+            }
 
             return instrucciones;
+        }
+
+        async function subirImagen(file) {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const response = await fetch("http://localhost:8080/api/imagenes/subir", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) throw new Error("Error al subir imagen");
+
+            return await response.json();
         }
     </script>
 </body>

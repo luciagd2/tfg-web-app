@@ -159,7 +159,7 @@ function cargarEdicionPatron(patron) {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
-        input.className = 'form-control';
+        input.className = 'input-img-instruccion form-control';
         input.multiple = true;
 
         const removeBtn = document.createElement('button');

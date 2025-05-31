@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Ficheros css de Bootstrap -->
+    <link rel="stylesheet" href="css-bootstrap/bootstrap.min.css">
+
+    <!-- Ficheros css propios -->
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/busqueda.css">
+    <link rel="stylesheet" href="css/patron.css">
+
+    <!-- Ficheros js de Bootstrap -->
+    <script defer src="js-bootstrap/bootstrap.bundle.min.js"></script>
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <title>Instrucciones Patron</title>
+
+
+    <style>
+        html, body {
+            height: auto;
+            overflow-y: auto !important;
+        }
+    </style>
+</head>
+<body class="wrapper overflow-hidden">
+<!-- BARRA DE NAVEGACION -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary menu">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">TFG-nombre</a>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <!-- <button type="button" class="btn btn-primary nav-link" onclick="guardarPatron()">Guardar</button>1 -->
+                <a href="/infoPatron.html" role="button" class="btn btn-primary nav-link">
+                    Salir
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="main-content">
+    <!-- ACCORDION CON LAS SECCIONES DE INFORACION E INSTRUCCIONES -->
+    <div class="container container-edicion-patron">
+        <div class="accordion acordion-edicion" id="accordionInformacion">
+            <!-- Item 1: Informacion -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelInformacion" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                        Información del patrón
+                    </button>
+                </h2>
+                <div id="panelInformacion" class="accordion-collapse collapse">
+                    <div class="card card-edicion">
+                        <div class="card-body card-edicion-body">
+                            <h5 class="card-title mb-3">Información general</h5>
+
+                            <div id="titulo-patron" class="mb-3">
+                                <label class="form-label">Título del patrón</label>
+                                <input type="text" readonly class="form-control" placeholder="Ej: Gorro básico de invierno">
+                            </div>
+
+                            <div id="autor-patron" class="mb-3">
+                                <label class="form-label">Autor</label>
+                                <input type="text" readonly class="form-control" placeholder="Tu nombre o alias" value="(se rellenará automáticamente)">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Descripción</label>
+                                <textarea readonly class="form-control" rows="3" placeholder="Breve descripción del patrón..."></textarea>
+                            </div>
+
+                            <div id="imagenes-muestra" class="input-group-imagen mb-3">
+                                <label class="form-label">Imagenes para la vista previa</label>
+                                <div class="input-group mb-2 div-input-images">
+                                    <input type="file" id="input-imagenes-muestra" accept="image/*" class="form-control" multiple>
+                                    <button class="btn btn-outline-danger" type="button" id="btn-borrar-imagenes">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </div>
+                                <div id="div-imagenes-muestra" class="d-flex flex-wrap gap-2 mt-2"></div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Idioma</label>
+                                    <input type="text" readonly class="form-control" id="idioma">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Unidad de medida</label>
+                                    <input type="text" readonly class="form-control" id="unidad">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nivel de dificultad</label>
+                                    <input type="text" readonly class="form-control" id="dificultad">
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <h5 class="mb-3">Materiales</h5>
+                            <div class="mb-2">
+                                <label class="form-label">Lanas</label>
+                                <input type="text" readonly class="form-control" placeholder="Ej: Lana acrílica gruesa, color rojo...">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Tamaño aguja de ganchillo</label>
+                                <input type="text" readonly class="form-control" placeholder="Ej: 5 mm">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Aguja lanera</label>
+                                <input type="text" readonly class="form-control" placeholder="Ej: Sí / No / Tamaño específico">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Otros materiales</label>
+                                <input type="text" readonly class="form-control" placeholder="Marcadores, botones, relleno...">
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-3">
+                                <label class="form-label">Abreviaturas usadas</label>
+                                <textarea readonly class="form-control" rows="3" placeholder="Ej: pb = punto bajo, cad = cadeneta..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">TAGS (separados por comas)</label>
+                                <input type="text" readonly class="form-control" placeholder="gorro, invierno, principiante, rápido...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Item 1: Instrucciones -->
+            <div class="accordion-item accordion-item-instrucciones">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelInstrucciones" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                        Instrucciones
+                    </button>
+                </h2>
+                <div id="panelInstrucciones" class="accordion-collapse collapse">
+                    <div id="secciones-patron"></div>
+                    <div class="d-flex justify-content-center div-btn-addSeccion my-4">
+                        <button class="btn btn-success btn-addSeccion mt-4" onclick="addSeccion()">
+                            <i class="bi bi-plus-circle"></i>
+                            Añadir sección
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Ficheros js propios -->
+<script src="js/estructuras.js">/*Para el menu*/</script>
+<script src="js/datosPatron.js">/*Para los datos de prueba*/</script>
+<script src="js/cargaDatos.js">/*Para guardar el patron seleccionado*/</script>
+<script src="js/visualizarPatron.js">/*Para la carga de datos del patron*/</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('input-imagenes-muestra');
+        const previewContainer = document.getElementById('div-imagenes-muestra');
+        const btnBorrar = document.getElementById('btn-borrar-imagenes');
+
+        input.onchange = function () {
+            previewContainer.innerHTML = '';
+            Array.from(input.files).reverse().forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement('img');
+                    img.className = 'img-preview';
+                    img.src = e.target.result;
+                    img.style.width = '100px';
+                    img.style.height = '100px';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '8px';
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        // Función del botón para borrar imágenes
+        btnBorrar.onclick = function () {
+            input.value = ''; // limpia el input de archivos
+            previewContainer.innerHTML = ''; // limpia las vistas previas
+        };
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('btn-guardar-cambios').addEventListener('click', async () => {
+            const tags = document.querySelector('input[placeholder*="gorro"]').value
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag !== '');
+
+            const formData = new FormData();
+
+            const patron = JSON.parse(localStorage.getItem("patronSeleccionado"))
+            const idPatron = patron.id;
+            formData.append("idPatron", idPatron);
+            //formData.append("id", localStorage.getItem("patronSeleccionado").getItem("id"));
+            formData.append("titulo",document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value.trim());
+            formData.append("precio",parseFloat(document.querySelector('#input-precio').value));
+            formData.append("dificultad",document.querySelector('select#dificultad').value);
+            formData.append("descripcion",document.querySelector('textarea[placeholder*="Breve"]').value.trim());
+            formData.append("idioma",document.querySelector('select#idioma').value);
+            formData.append("unidad",document.querySelector('select#unidad').value);
+            formData.append("lanas",document.querySelector('input[placeholder*="Lana"]').value.trim());
+            formData.append("agujaGanchillo",document.querySelector('input[placeholder*="5 mm"]').value.trim());
+            formData.append("agujaLanera",document.querySelector('input[placeholder*="Sí / No"]').value.trim());
+            formData.append("otros",document.querySelector('input[placeholder*="Marcadores"]').value.trim());
+            formData.append("abreviaturas",document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim());
+            const archivos = document.getElementById("input-imagenes-muestra").files;
+            for (let i = 0; i < archivos.length; i++) {
+                formData.append("imagenes", archivos[i]);
+            }
+            formData.append("tags",tags);
+            formData.append("instrucciones",JSON.stringify(recopilarInstrucciones()));
+
+            try {
+                console.log("Justo antes del fetch a /api/patron/guardar")
+                const response = await fetch("/api/patrones/guardar", {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include"
+                });
+                if (response.ok) {
+                    alert("Patron guardado correctamente");
+                    const patron = await response.json();
+                    localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
+
+                    // Notificaciones de patron actualizado para comprados y guardados
+                    try {
+                        const response = await fetch(`/api/notificaciones/actualizadoComprados?idPatron=${idPatron}`, {
+                            method: "POST",
+                            credentials: "include"
+                        });
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            console.error("Error al enviar la notificacion:", errorText);
+                            return;
+                        }
+                    } catch (error) {
+                        console.error("Error al enviar notificacion:", error);
+                    }
+
+                    try {
+                        const response = await fetch(`/api/notificaciones/actualizadoGuardados?idPatron=${idPatron}`, {
+                            method: "POST",
+                            credentials: "include"
+                        });
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            console.error("Error al enviar la notificacion:", errorText);
+                            return;
+                        }
+                    } catch (error) {
+                        console.error("Error al enviar notificacion:", error);
+                    }
+
+                    // Si cambia el precio
+                    if (patron.precio !== parseFloat(document.querySelector('#input-precio').value)){
+                        // Si ahora es gratis: notificacion de precio gratis
+                        if (parseFloat(document.querySelector('#input-precio').value) === 0){
+                            try {
+                                const response = await fetch(`/api/notificaciones/actualizadoGratis?idPatron=${idPatron}`, {
+                                    method: "POST",
+                                    credentials: "include"
+                                });
+
+                                if (!response.ok) {
+                                    const errorText = await response.text();
+                                    console.error("Error al enviar la notificacion:", errorText);
+                                    return;
+                                }
+                            } catch (error) {
+                                console.error("Error al enviar notificacion:", error);
+                            }
+                        }
+                        // notificacion de cambio de precio
+                        else {
+                            try {
+                                const response = await fetch(`/api/notificaciones/actualizadoPrecio?idPatron=${idPatron}`, {
+                                    method: "POST",
+                                    credentials: "include"
+                                });
+
+                                if (!response.ok) {
+                                    const errorText = await response.text();
+                                    console.error("Error al enviar la notificacion:", errorText);
+                                    return;
+                                }
+                            } catch (error) {
+                                console.error("Error al enviar notificacion:", error);
+                            }
+
+                        }
+                    }
+
+
+                    window.location.href = "tienda.html";
+                } else {
+                    const errorText = await response.text(); // o .json() si sabes que es JSON
+                    console.error("Estado:", response.status);
+                    console.error("Respuesta:", errorText);
+                    alert(`Error al guardar patron: ${response.status}`);
+                }
+            } catch (error) {
+                console.error("Error al guardar el patrón:", error);
+                alert("Hubo un error al guardar los cambios. Revisa la consola.");
+            }
+        });
+    });
+
+
+    function recopilarInstrucciones() {
+        const secciones = document.querySelectorAll('#secciones-patron .card-seccion');
+        const instrucciones = [];
+
+        secciones.forEach(seccion => {
+            const titulo = seccion.querySelector('.txt-titulo').value;
+            const contenido = [];
+
+            const elementos = seccion.querySelectorAll('[id$="-contenido"] > *');
+
+            elementos.forEach(el => {
+                if (el.classList.contains('input-group')) {
+                    const span = el.querySelector('.input-group-text');
+                    const input = el.querySelector('input');
+                    if (span && input) {
+                        // Es una vuelta
+                        contenido.push({ tipo: 'vuelta', texto: input.value });
+                    }
+                } else if (el.classList.contains('d-flex') && el.querySelector('.txt-subtitulo')) {
+                    contenido.push({ tipo: 'subtitulo', texto: el.querySelector('input').value });
+                } else if (el.querySelector('textarea')) {
+                    contenido.push({ tipo: 'info', texto: el.querySelector('textarea').value });
+                } else if (el.classList.contains('input-group-imagen')) {
+                    const previews = el.querySelectorAll('img.img-preview');
+                    previews.forEach(img => {
+                        contenido.push({ tipo: 'imagen', contenido: img.src }); // usar la URL directa, no base64
+                    });
+                }
+            });
+
+            instrucciones.push({ titulo, contenido });
+        });
+
+        return instrucciones;
+    }
+</script>
+</body>
+</html>
