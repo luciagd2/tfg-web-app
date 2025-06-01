@@ -35,7 +35,7 @@ function cargarEdicionPatron(patron) {
 
     //Imagenes para la vista previa
     const previewContainer = document.getElementById('div-imagenes-muestra');
-    if (Array.isArray(patron.imagenes)) {1
+    if (Array.isArray(patron.imagenes)) {
         patron.imagenes.forEach(src => {
             const img = document.createElement('img');
             img.className = 'img-preview';
@@ -169,7 +169,7 @@ function cargarEdicionPatron(patron) {
         removeBtn.onclick = () => wrapper.remove();
 
         const previewContainer = document.createElement('div');
-        previewContainer.className = 'd-flex flex-wrap gap-2 mt-2';
+        previewContainer.className = 'div-img-instruccion d-flex flex-wrap gap-2 mt-2';
 
         input.onchange = function () {
             previewContainer.innerHTML = '';
@@ -196,6 +196,7 @@ function cargarEdicionPatron(patron) {
         container.appendChild(wrapper);
 
         // Si se pasaron URLs (imágenes ya guardadas), mostrarlas
+        urls = JSON.parse(urls);
         if (urls.length > 0) {
             previewContainer.innerHTML = '';
             urls.forEach(url => {

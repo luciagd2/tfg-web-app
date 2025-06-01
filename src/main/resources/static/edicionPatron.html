@@ -267,15 +267,19 @@
                 formData.append("otros",document.querySelector('input[placeholder*="Marcadores"]').value.trim());
                 formData.append("abreviaturas",document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim());
                 const archivos = document.getElementById("input-imagenes-muestra").files;
-                console.log("Archivos primeros: ", archivos);
-                if (archivos !== null){
-                    const urlsImagenes = [];
+                const urlsImagenes = [];
+                if (archivos.length !== 0){ //ha seleccionado nuevas imagenes
                     for (let i = 0; i < archivos.length; i++) {
                         const result = await subirImagen(archivos[i]); // ← devuelve { url: "..." }
                         urlsImagenes.push(result.url);
                     }
-                    formData.append("imagenes", JSON.stringify(urlsImagenes));
+                } else { //coger las imagenes que hay de antes en el div
+                    const imagenes = document.querySelectorAll('#div-imagenes-muestra .img-preview');
+                    imagenes.forEach(img => {
+                        urlsImagenes.push(img.src);
+                    });
                 }
+                formData.append("imagenes", JSON.stringify(urlsImagenes));
                 formData.append("tags",tags);
                 //formData.append("instrucciones",JSON.stringify(recopilarInstrucciones()));
                 formData.append("instrucciones", JSON.stringify(await recopilarInstrucciones()));
@@ -401,20 +405,21 @@
                     } else if (el.querySelector('textarea')) {
                         contenido.push({tipo: 'info', texto: el.querySelector('textarea').value});
                     } else if (el.classList.contains('input-group-imagen')) {
-                        /*const previews = el.querySelectorAll('img.img-preview');
-                        previews.forEach(async img => {
-                            const file = img.src;
-                            const url = await subirImagen(file);
-                            contenido.push({tipo: 'imagen', contenido: url});
-                        });*/
-
                         const archivos = el.querySelector(".input-img-instruccion").files;
                         console.log("Archivos: ", archivos);
-                        for (let i = 0; i < archivos.length; i++) {
-                            const result = await subirImagen(archivos[i]);
-                            //urlsImagenes.push(result.url);
-                            contenido.push({tipo: 'imagen', contenido: result.url})
+                        const urlsImagenes = [];
+                        if (archivos.length !== 0){ //ha seleccionado nuevas imagenes
+                            for (let i = 0; i < archivos.length; i++) {
+                                const result = await subirImagen(archivos[i]);
+                                urlsImagenes.push(result.url);
+                            }
+                        } else { //coger las imagenes que hay de antes en el div
+                            const imagenes = document.querySelectorAll('.div-img-instruccion .img-preview');
+                            imagenes.forEach(img => {
+                                urlsImagenes.push(img.src);
+                            });
                         }
+                        contenido.push({tipo: 'imagen', contenido: JSON.stringify(urlsImagenes)})
                     }
                 }
 

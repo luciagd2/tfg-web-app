@@ -77,14 +77,33 @@
                             </div>
 
                             <div id="imagenes-muestra" class="input-group-imagen mb-3">
-                                <label class="form-label">Imagenes para la vista previa</label>
+                                <!--<label class="form-label">Imagenes para la vista previa</label>
                                 <div class="input-group mb-2 div-input-images">
                                     <input type="file" id="input-imagenes-muestra" accept="image/*" class="form-control" multiple>
                                     <button class="btn btn-outline-danger" type="button" id="btn-borrar-imagenes">
                                         <i class="bi bi-trash3"></i>
                                     </button>
+                                </div>-->
+                                <label class="form-label">Vista previa</label>
+                                <div id="div-imagenes-muestra" class="d-flex flex-wrap gap-2 mt-2" style="justify-content: center">
+                                    <div class="div-carousel" style="max-width: 30rem">
+                                        <div id="carouselFotos" class="carousel slide" data-bs-ride="carousel">
+                                            <div class="carousel-indicators">
+                                            </div>
+                                            <div class="carousel-inner">
+                                            </div>
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselFotos" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Previous</span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#carouselFotos" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Next</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div id="div-imagenes-muestra" class="d-flex flex-wrap gap-2 mt-2"></div>
+
                             </div>
 
                             <div class="row">
@@ -130,8 +149,8 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">TAGS (separados por comas)</label>
-                                <input type="text" readonly class="form-control" placeholder="gorro, invierno, principiante, rápido...">
+                                <label class="form-label">TAGS</label>
+                                <div class="div-tags gap-1"></div>
                             </div>
                         </div>
                     </div>
@@ -167,6 +186,7 @@
 
 
 <script>
+    /*
     document.addEventListener('DOMContentLoaded', function () {
         const input = document.getElementById('input-imagenes-muestra');
         const previewContainer = document.getElementById('div-imagenes-muestra');
@@ -196,6 +216,7 @@
             previewContainer.innerHTML = ''; // limpia las vistas previas
         };
     });
+    -*/
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -223,9 +244,19 @@
             formData.append("otros",document.querySelector('input[placeholder*="Marcadores"]').value.trim());
             formData.append("abreviaturas",document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim());
             const archivos = document.getElementById("input-imagenes-muestra").files;
-            for (let i = 0; i < archivos.length; i++) {
-                formData.append("imagenes", archivos[i]);
+            const urlsImagenes = [];
+            if (archivos.length !== 0){ //ha seleccionado nuevas imagenes
+                for (let i = 0; i < archivos.length; i++) {
+                    const result = await subirImagen(archivos[i]); // ← devuelve { url: "..." }
+                    urlsImagenes.push(result.url);
+                }
+            } else { //coger las imagenes que hay de antes en el div
+                const imagenes = document.querySelectorAll('#div-imagenes-muestra .img-preview');
+                imagenes.forEach(img => {
+                    urlsImagenes.push(img.src);
+                });
             }
+            formData.append("imagenes", JSON.stringify(urlsImagenes));
             formData.append("tags",tags);
             formData.append("instrucciones",JSON.stringify(recopilarInstrucciones()));
 
@@ -350,10 +381,21 @@
                 } else if (el.querySelector('textarea')) {
                     contenido.push({ tipo: 'info', texto: el.querySelector('textarea').value });
                 } else if (el.classList.contains('input-group-imagen')) {
-                    const previews = el.querySelectorAll('img.img-preview');
-                    previews.forEach(img => {
-                        contenido.push({ tipo: 'imagen', contenido: img.src }); // usar la URL directa, no base64
-                    });
+                    const archivos = el.querySelector(".input-img-instruccion").files;
+                    console.log("Archivos: ", archivos);
+                    const urlsImagenes = [];
+                    if (archivos.length !== 0){ //ha seleccionado nuevas imagenes
+                        for (let i = 0; i < archivos.length; i++) {
+                            const result = await subirImagen(archivos[i]);
+                            urlsImagenes.push(result.url);
+                        }
+                    } else { //coger las imagenes que hay de antes en el div
+                        const imagenes = document.querySelectorAll('.div-img-instruccion .img-preview');
+                        imagenes.forEach(img => {
+                            urlsImagenes.push(img.src);
+                        });
+                    }
+                    contenido.push({tipo: 'imagen', contenido: JSON.stringify(urlsImagenes)})
                 }
             });
 

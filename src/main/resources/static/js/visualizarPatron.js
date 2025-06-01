@@ -23,7 +23,6 @@ function cargarEdicionPatron(patron) {
     document.querySelector('#idioma').value = patron.idioma || '';
     document.querySelector('#unidad').value = patron.unidad || '';
     document.querySelector('#dificultad').value = patron.dificultad || '';
-    document.querySelector('input[aria-label="Euro"]').value = patron.precio || '';
 
     document.querySelector('input[placeholder*="Lana"]').value = patron.lanas || '';
     document.querySelector('input[placeholder*="5 mm"]').value = patron.agujaGanchillo || '';
@@ -31,22 +30,37 @@ function cargarEdicionPatron(patron) {
     document.querySelector('input[placeholder*="Marcadores"]').value = patron.otros || '';
 
     document.querySelector('textarea[placeholder*="pb = punto bajo"]').value = patron.abreviaturas || '';
-    document.querySelector('input[placeholder*="gorro"]').value = (patron.tags.join(', ') || []);
+    const tagContainer = document.querySelector(".div-tags");
+    tagContainer.innerHTML = "";
+    patron.tags.forEach(tag => {
+        const p = document.createElement("p");
+        p.classList.add("txt-tags");
+        p.textContent = tag;
+        tagContainer.appendChild(p);
+    });
 
-    //Imagenes para la vista previa
-    const previewContainer = document.getElementById('div-imagenes-muestra');
-    if (Array.isArray(patron.imagenes)) {1
-        patron.imagenes.forEach(src => {
-            const img = document.createElement('img');
-            img.className = 'img-preview';
-            img.src = src;
-            img.style.width = '100px';
-            img.style.height = '100px';
-            img.style.objectFit = 'cover';
-            img.style.borderRadius = '8px';
-            previewContainer.appendChild(img);
-        });
-    };
+    // Carrusel de imágenes para la vista previa
+    const carouselInner = document.querySelector("#carouselFotos .carousel-inner");
+    const carouselIndicators = document.querySelector(".carousel-indicators");
+    carouselInner.innerHTML = "";
+    carouselIndicators.innerHTML = "";
+    patron.imagenes.forEach((img, index) => {
+        const div = document.createElement("div");
+        div.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+        div.innerHTML = `<img src="${img}" class="d-block w-100 rounded-3" alt="...">`;
+        carouselInner.appendChild(div);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.setAttribute("data-bs-target", "#carouselFotos");
+        button.setAttribute("data-bs-slide-to", index);
+        button.setAttribute("aria-label", `Slide ${index + 1}`);
+        if (index === 0) {
+            button.className = "active";
+            button.setAttribute("aria-current", "true");
+        }
+        carouselIndicators.appendChild(button);
+    });
 
     // Instrucciones
     let instrucciones = [];
@@ -64,14 +78,14 @@ function cargarEdicionPatron(patron) {
             addSeccion();
             const ultima = document.querySelectorAll('#secciones-patron > .card');
             const nuevaSeccion = ultima[ultima.length - 1];
-            nuevaSeccion.querySelector('.txt-titulo').value = seccion.titulo;
+            nuevaSeccion.querySelector('h3.txt-titulo').textContent = seccion.titulo;
 
             const contenedor = nuevaSeccion.querySelector('[id$="-contenido"]');
 
             seccion.contenido.forEach(item => {
                 if (item.tipo === 'subtitulo') {
                     addSubtitle(contenedor.id);
-                    contenedor.lastChild.querySelector('input').value = item.texto;
+                    contenedor.lastChild.querySelector('h5').textContent = item.texto;
                 } else if (item.tipo === 'info') {
                     addInfo(contenedor.id);
                     contenedor.lastChild.querySelector('textarea').value = item.texto;
@@ -101,22 +115,9 @@ function addSeccion() {
     seccion.innerHTML = `
         <div class="card-body card-body-seccion">
             <div class="d-flex justify-content-between align-items-center mb-3 titulo-seccion">
-                <h5 class="mb-0">
-                    <input type="text" class="form-control txt-titulo mb-3" placeholder="Título de la sección">
-                </h5>
-                <button class="btn btn-outline-danger" onclick="removeElement(this, 'seccion')">
-                    <i class="bi bi-trash3"></i>
-                </button>
+                <h3 class="mb-0 txt-titulo" style="color: #fffbf3"></h3>
             </div>
-            
-            <div id="${seccionId}-contenido" data-round-count="0"></div>
-
-            <div class="btn-group mb-3" role="group">
-                <button class="btn btn-outline-primary btn-sm" onclick="addSubtitle('${seccionId}-contenido')">Añadir subtítulo</button>
-                <button class="btn btn-outline-secondary btn-sm" onclick="addInfo('${seccionId}-contenido')">Añadir información</button>
-                <button class="btn btn-outline-success btn-sm" onclick="addRound('${seccionId}-contenido')">Añadir vuelta</button>
-                <button class="btn btn-outline-dark btn-sm" onclick="addImagen('${seccionId}-contenido')">Añadir imagen</button>
-            </div>            
+            <div id="${seccionId}-contenido" data-round-count="0"></div>     
         </div>
         `;
     document.getElementById('secciones-patron').appendChild(seccion);
@@ -128,8 +129,7 @@ function addSubtitle(seccionId) {
     div.className = 'mb-2 d-flex align-items-center';
     div.setAttribute('data-type', 'subtitle');
     div.innerHTML = `
-            <input type="text" class="form-control txt-subtitulo me-2" placeholder="Subtítulo">
-            <button class="btn btn-outline-danger" onclick="removeElement(this, '')"><i class="bi bi-trash3"></i></button>
+            <h5 class="txt-subtitulo" style="color: #fffbf3"></h5>
         `;
     container.appendChild(div);
     container.setAttribute('data-round-count', '0');
@@ -141,8 +141,7 @@ function addInfo(seccionId) {
     const div = document.createElement('div');
     div.className = 'mb-2 d-flex align-items-center';
     div.innerHTML = `
-        <textarea class="form-control" placeholder="Información adicional"></textarea>
-        <button class="btn btn-outline-danger" onclick="removeElement(this, '')"><i class="bi bi-trash3"></i></button>
+        <textarea readonly class="form-control" placeholder="Información adicional"></textarea>
         `;
     container.appendChild(div);
 }
@@ -153,66 +152,32 @@ function addImagen(seccionId, urls = []) {
     wrapper.className = 'input-group-imagen mb-3';
     wrapper.setAttribute('data-type', 'imagen');
 
-    const divInputGroup = document.createElement('div');
-    divInputGroup.className = 'input-group mb-2 div-input-images';
-
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.className = 'form-control';
-    input.multiple = true;
-
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'btn btn-outline-danger';
-    removeBtn.type = 'button';
-    removeBtn.innerHTML = '<i class="bi bi-trash3"></i>';
-    removeBtn.onclick = () => wrapper.remove();
-
     const previewContainer = document.createElement('div');
-    previewContainer.className = 'd-flex flex-wrap gap-2 mt-2';
+    previewContainer.className = 'div-img-instruccion d-flex flex-wrap gap-2 mt-2';
+    previewContainer.style.justifyContent = 'center';
 
-    input.onchange = function () {
-        previewContainer.innerHTML = '';
-        Array.from(input.files).reverse().forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const img = document.createElement('img');
-                img.className = 'img-preview';
-                img.src = e.target.result;
-                img.style.width = '100px';
-                img.style.height = '100px';
-                img.style.objectFit = 'cover';
-                img.style.borderRadius = '8px';
-                previewContainer.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        });
-    };
-
-    divInputGroup.appendChild(input);
-    divInputGroup.appendChild(removeBtn);
-    wrapper.appendChild(divInputGroup);
     wrapper.appendChild(previewContainer);
     container.appendChild(wrapper);
 
     // Si se pasaron URLs (imágenes ya guardadas), mostrarlas
+    urls = JSON.parse(urls);
     if (urls.length > 0) {
         previewContainer.innerHTML = '';
         urls.forEach(url => {
             const img = document.createElement('img');
             img.className = 'img-preview';
             img.src = url;
-            img.style.width = '100px';
-            img.style.height = '100px';
+            img.style.width = '20vw';
+            img.style.maxWidth = '20vw';
+            img.style.height = '20vw';
+            img.style.maxHeight = '20vw';
             img.style.objectFit = 'cover';
             img.style.borderRadius = '8px';
             previewContainer.appendChild(img);
         });
     }
 }
-
-
-
+1
 function addRound(seccionId) {
     const seccionContent = document.getElementById(seccionId);
     const children = Array.from(seccionContent.children);
@@ -254,9 +219,11 @@ function addRound(seccionId) {
 
     const input = document.createElement('input');
     input.type = 'text';
+    input.readOnly = true;
     input.className = 'form-control';
     input.placeholder = 'Instrucciones de la vuelta';
 
+    /*
     const removeBtn = document.createElement('button');
     removeBtn.className = 'btn btn-outline-danger';
     removeBtn.type = 'button';
@@ -264,10 +231,10 @@ function addRound(seccionId) {
     removeBtn.onclick = function () {
         removeElement(this);
     };
-
+    */
     group.appendChild(span);
     group.appendChild(input);
-    group.appendChild(removeBtn);
+    //group.appendChild(removeBtn);
 
     seccionContent.appendChild(group);
 }
