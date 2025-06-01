@@ -16,8 +16,8 @@ body{
     height: 100%;
 }
 .main-content{
-    height: 100vh;
-    margin-top: 12vh;
+    height: 93vh;
+    overflow-y: auto;
     display: flex !important;
     flex-direction: column;
 }
@@ -28,6 +28,10 @@ body{
     overflow-y: auto;  /* Habilita el scroll vertical solo en esta sección */
     box-sizing: border-box;
     margin: 0;
+}
+
+.container-menu {
+    max-height: 7vh;
 }
 
 ///BARRA DE NAVEGACION

@@ -50,7 +50,7 @@
             </div>
             
 
-            <!-- OBCIONES TIENDA -->
+            <!-- OPCIONES TIENDA -->
             <div class="contenedor-biblioteca">
                 <h3>Tienda</h3>
                 <div class="contenedor-btns">
@@ -84,30 +84,30 @@
                 </div>
             </div><!-- /contenedor-tienda -->
             
-            <!-- OBCIONES BIBLIOTECA -->
+            <!-- OPCIONES BIBLIOTECA -->
             <div class="contenedor-biblioteca">
                 <h3>Biblioteca</h3>
                 <div class="contenedor-btns-biblioteca">
-                    <input type="radio" class="btn-check" name="biblioteca" id="guardados" autocomplete="off" checked>
+                    <input type="radio" class="btn-check" name="optiones" id="guardados" autocomplete="off" checked>
                     <label class="btn boton-check" for="guardados">
                         <i class="bi bi-bookmark-fill"></i>
                         Guardados
                     </label>
-                    
-                    <input type="radio" class="btn-check" name="biblioteca" id="comprados" autocomplete="off">
-                        <label class="btn boton-check" for="comprados">
+
+                    <input type="radio" class="btn-check" name="optiones" id="comprados" autocomplete="off">
+                    <label class="btn boton-check" for="comprados">
                         <i class="bi bi-cart-check-fill"></i>
                         Comprados
                     </label>
-                    
-                    <input type="radio" class="btn-check" name="biblioteca" id="favoritos" autocomplete="off">
-                    <label class="btn boton-check" for="favoritos">
+
+                    <input type="radio" class="btn-check" name="optiones" id="empezados" autocomplete="off">
+                    <label class="btn boton-check" for="empezados">
                         <i class="bi bi-heart-fill"></i>
-                        Favoritos
+                        Empezados
                     </label>
                 </div>
                 <div class="contenedor-cards gap-4" id="contenedor-cards-biblioteca">
-                    <!-- CARDS DE LOS PATRONES AQUI -->
+                    <!-- CARDS PARA LOS PATRONES -->
                 </div>
 
             </div> <!-- /contenedor-biblioteca -->
@@ -172,7 +172,7 @@
     </div>
 
     <script src="js/estructuras.js"></script>
-    <script src="js/datosPatron.js"></script>
+    <script src="js/cargarPatronesBiblioteca.js"></script>
     <script>
         // INFORMACION DE PERFIL
         document.getElementById('img-usuario').src = JSON.parse(sessionStorage.getItem("usuario")).imagenPerfil;
@@ -653,6 +653,37 @@
                 }
 
 
+            });
+        });
+    </script>
+    <script>
+        // EVENTE LISTENER PARA VER PATRONES EN BIBLIOTECA
+        document.addEventListener("DOMContentLoaded", () => {
+            const btnGuardados = document.getElementById("guardados");
+            const btnComprados = document.getElementById("comprados");
+            const btnEmpezados = document.getElementById("empezados");
+            const container = document.getElementById("contenedor-cards-biblioteca");
+
+            // Cargar guardados por defecto
+            cargarPatrones("/api/patrones/patrones-biblioteca-guardados", container);
+
+            // Eventos para radio buttons
+            btnGuardados.addEventListener("change", () => {
+                if (btnGuardados.checked) {
+                    cargarPatrones("/api/patrones/patrones-biblioteca-guardados", container);
+                }
+            });
+
+            btnComprados.addEventListener("change", () => {
+                if (btnComprados.checked) {
+                    cargarPatrones("/api/patrones/patrones-biblioteca-comprados", container);
+                }
+            });
+
+            btnEmpezados.addEventListener("change", () => {
+                if (btnEmpezados.checked) {
+                    cargarPatrones("/api/patrones/patrones-biblioteca-empezados", container);
+                }
             });
         });
     </script>

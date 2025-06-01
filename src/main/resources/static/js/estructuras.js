@@ -18,7 +18,7 @@ function cargarMenu() {
     }
 
     const menuHTML = `
-    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top menu">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary menu">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">TFG-nombre</a>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
