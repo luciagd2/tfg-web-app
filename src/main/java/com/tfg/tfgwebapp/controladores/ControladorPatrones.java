@@ -572,27 +572,7 @@ public class ControladorPatrones {
 
         // Define ruta y nombre para la carpeta de destino de las imagenes de los patrones
         String carpetaDestino = "src/main/resources/static/imagenes/patrones/";
-        //List<String> rutasRelativas = new ArrayList<>();
         if (imagenes != null && !imagenes.isEmpty()) {
-            /*
-            try {
-                for (MultipartFile imagen : imagenes) {
-                    if (!imagen.isEmpty()) {
-                        String nombreArchivo = System.currentTimeMillis() + "_" + imagen.getOriginalFilename();
-                        Path rutaArchivo = Paths.get(carpetaDestino, nombreArchivo);
-                        Files.write(rutaArchivo, imagen.getBytes());
-
-                        // Ruta relativa para guardar en el objeto Patron
-                        String rutaRelativa = "./imagenes/patrones/" + nombreArchivo;
-                        rutasRelativas.add(rutaRelativa);
-                    }
-                }
-                patron.setImagenes(rutasRelativas);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar las imágenes.");
-            }
-            */
             try {
                 ObjectMapper mapper = new ObjectMapper();
                 List<String> rutasRelativas = mapper.readValue(imagenes, new TypeReference<List<String>>() {});
@@ -789,7 +769,7 @@ public class ControladorPatrones {
 
         // Guardamos el paton en la lista de patrones comprados
         usuario.getPatronesComprados().add(patron);
-        System.out.println("Patrones guardados tras añadir: " + usuario.getPatronesGuardados());
+        System.out.println("Patrones guardados tras añadir: " + usuario.getPatronesComprados());
 
         repositorioUsuario.save(usuario);
         return ResponseEntity.ok().build();
@@ -823,7 +803,108 @@ public class ControladorPatrones {
             }
             return ResponseEntity.ok(patrones);
         } catch (Exception e) {
-            System.out.println("Error al conseguir los patrones guardados");
+            System.out.println("Error al conseguir los patrones comprados");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/estaEmpezado")
+    public ResponseEntity<?> estaEmpezado(@RequestParam Long idPatron) {
+        logger.info("Entrando en el método estaEmpezado");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        Optional<Patron> patronOpt = repositorioPatron.findById(idPatron);
+
+        if (patronOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Patron patron = patronOpt.get();
+
+        if (usuario.getPatronesEmpezados().contains(patron)) {
+            return ResponseEntity.ok(true);
+        } else{
+            return ResponseEntity.ok(false);
+        }
+    }
+
+    @PostMapping("/guardarEmpezado")
+    public ResponseEntity<?> guardarEmpezado(@RequestParam Long idPatron) {
+        logger.info("Entrando en el método guardarEmpezado");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        }
+
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        Optional<Patron> patronOpt = repositorioPatron.findById(idPatron);
+
+        if (patronOpt.isEmpty()) {
+            System.out.println("Patron no encontrado");
+            return ResponseEntity.notFound().build();
+        }
+        Patron patron = patronOpt.get();
+        System.out.println("Patron encontrado: " + patron);
+
+        // Guardamos el paton en la lista de patrones comprados
+        usuario.getPatronesEmpezados().add(patron);
+        System.out.println("Patrones guardados tras añadir: " + usuario.getPatronesEmpezados());
+
+        repositorioUsuario.save(usuario);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/patrones-biblioteca-empezados")
+    @EntityGraph(attributePaths = {"reviews"})
+    public ResponseEntity<List<Patron>> obtenerPatronesBibliotecaEmpezados() {
+        System.out.println("En controlador obtenerPatronesBibliotecaEmpezados");
+        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
+
+        if (!usuarioOpt.isPresent()) {
+            System.out.println("Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        try {
+            List<Patron> patrones = usuario.getPatronesEmpezados();
+            System.out.println("Patrones en lista");
+            if (patrones == null || patrones.isEmpty()) {
+                patrones = Collections.emptyList();
+            }
+            return ResponseEntity.ok(patrones);
+        } catch (Exception e) {
+            System.out.println("Error al conseguir los patrones empezados");
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

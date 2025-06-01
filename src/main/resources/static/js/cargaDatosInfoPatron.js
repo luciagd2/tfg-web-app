@@ -2,21 +2,17 @@
 ** FICHERO PARA LAS FUNCIONES QUE DEFINEN LA CARGA DE DATOS DE INFOPATRON.HTML **
 *********************************************************************************/
 
-//RECUPERAR EL PATRON SELECCIONADO PARA MOSTRAR LOS DATOS DESPUES
-document.addEventListener("DOMContentLoaded", () => {
+//RECUPERAR EL PATRON SELECCIONADO PARA MOSTRAR LOS DATOS DESPUÉS
+document.addEventListener("DOMContentLoaded", async () => {
     const patronGuardado = localStorage.getItem("patronSeleccionado");
-    const reviewsGuardadas = localStorage.getItem("reviewsPatron");
     if (patronGuardado) {
-        if (reviewsGuardadas){
-            const patron = JSON.parse(patronGuardado);
-            const reviews = JSON.parse(reviewsGuardadas);
-            //const patronId = patron.id;
-            cargarDatosInfoPatron(patron, reviews);
-        }
+        const patron = JSON.parse(patronGuardado);
+        const reviews = await obtenerReviews(patron.id);
+        cargarDatosInfoPatron(patron, reviews);
     } else {
-      console.error("No se encontró ningún patrón.");
+        console.error("No se encontró ningún patrón.");
     }
-});
+})
 
 //CARGA DE DATOS PATRONES
 async function cargarDatosInfoPatron(patron, reviews) {
@@ -33,39 +29,87 @@ async function cargarDatosInfoPatron(patron, reviews) {
     // Descripción
     document.querySelector(".card-text").textContent = patron.descripcion;
 
-    // Precio
+    // Id del patron
     const idPatron = patron.id;
+    //Comprobamos si esta comprado
+    let estaComprado = "";
+    try {
+        const response = await fetch(`/api/patrones/estaComprado?idPatron=${idPatron}`, {
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (response.ok) {
+            estaComprado = await response.json();
+            console.log("Esta comprado:", estaComprado);
+        }
+    } catch (error) {
+        console.error("Error al comprobar si el patron está comprado:", error);
+    }
+    //Comprobamos si esta empezado
+    let estaEmpezado = "";
+    try {
+        const response = await fetch(`/api/patrones/estaEmpezado?idPatron=${idPatron}`, {
+            method: "GET",
+            credentials: "include"
+        });
+        if (response.ok) {
+            estaEmpezado = await response.json();
+            console.log("Esta empezado:", estaEmpezado);
+        }
+    } catch (error) {
+        console.error("Error al comprobar el patron está empezado:", error);
+    }
+
+    //Text content y acciones dependiendo del precio y de si está empezado
     if (patron.precio > 0) {
         document.querySelector(".card-precio").textContent = patron.precio;
         const btnComprarEmpezar = document.getElementById("btnComprarEmpezar");
-        try {
-            const response = await fetch(`/api/patrones/estaComprado?idPatron=${idPatron}`, {
-                method: "GET",
-                credentials: "include"
-            });
-
-            if (response.ok) {
-                const estaGuardado = await response.json();
-                console.log(estaGuardado);
-                if (estaGuardado) {
-                    btnComprarEmpezar.textContent = "Empezar";
-                    btnComprarEmpezar.href = "instruccionesPatron.html";
-                }
-                else {
-                    btnComprarEmpezar.textContent = "Comprar";
-                    btnComprarEmpezar.href = "simulacionPasarelaPago.html";
-                }
+        if (estaComprado) {
+            if (estaEmpezado) {
+                btnComprarEmpezar.textContent = "Continuar";
             }
-        } catch (error) {
-            console.error("Error al comprobar si sigue:", error);
+            else {
+                console.log("No esta empezado asi que ponemos el texto");
+                btnComprarEmpezar.textContent = "Empezar";
+                document.getElementById("btnComprarEmpezar").addEventListener("click", async function () {
+                    try {
+                        const response = await fetch(`/api/patrones/guardarEmpezado?idPatron=${idPatron}`, {
+                            method: "POST",
+                            credentials: "include"
+                        });
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            console.error("Error:", response.status, errorText);
+                            alert(`Error al guardar en la lista de empezados el patrón`);
+                            return;
+                        }
+                        btnComprarEmpezar.innerText = "Continuar";
+                        alert("¡Empezado con éxito!");
+                    } catch (error) {
+                        console.error("Error al guardar/dejar de guardar el patrón:", error);
+                        //alert("Ha ocurrido un error, inténtalo de nuevo.");
+                    }
+                });
+            }
+            btnComprarEmpezar.href = "instruccionesPatron.html";
         }
-
+        else {
+            btnComprarEmpezar.textContent = "Comprar";
+            btnComprarEmpezar.href = "simulacionPasarelaPago.html";
+        }
     } else {
         document.querySelector(".card-precio").textContent = "Gratis";
-        document.getElementById("btnComprarEmpezar").textContent = "Empezar"
+        if (estaEmpezado){
+            document.getElementById("btnComprarEmpezar").textContent = "Continuar";
+        } else {
+            console.log("Gratis + no esta empezado asi que ponemos el texto");
+            document.getElementById("btnComprarEmpezar").textContent = "Empezar";
+        }
         //document.getElementById("btnComprarEmpezar").href = "";
         //TODO: vista de patron con instrucciones
     }
+
 
     const btnGuardar = document.getElementById("btnGuardar");
     try {
@@ -80,25 +124,6 @@ async function cargarDatosInfoPatron(patron, reviews) {
                 btnGuardar.textContent = 'Guardado';
             } else {
                 btnGuardar.textContent = 'Guardar';
-            }
-        }
-    } catch (error) {
-        console.error("Error al comprobar si sigue:", error);
-    }
-
-    const btnComprarEmpezar = document.getElementById("btnComprarEmpezar");
-    try {
-        const response = await fetch(`/api/patrones/estaComprado?idPatron=${idPatron}`, {
-            method: "GET",
-            credentials: "include"
-        });
-
-        if (response.ok) {
-            const estaGuardado = await response.json();
-            if (estaGuardado) {
-                btnComprarEmpezar.textContent = 'Empezar';
-            } else {
-                btnComprarEmpezar.textContent = 'Comprar';
             }
         }
     } catch (error) {
@@ -209,17 +234,6 @@ async function cargarDatosInfoPatron(patron, reviews) {
     });
 
 }
-
-document.addEventListener("DOMContentLoaded", async () => {
-    const patronGuardado = localStorage.getItem("patronSeleccionado");
-    if (patronGuardado) {
-      const patron = JSON.parse(patronGuardado);
-      const reviews = await obtenerReviews(patron.id);
-      cargarDatosInfoPatron(patron, reviews);
-    } else {
-      console.error("No se encontró ningún patrón.");
-    }
-});
 
 async function obtenerReviews(patronId){
     try {
