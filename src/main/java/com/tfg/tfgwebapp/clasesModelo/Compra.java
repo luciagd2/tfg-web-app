@@ -11,24 +11,20 @@ import java.time.LocalDateTime;
 @Entity
 public class Compra {
     @Id
-    @Setter
-    @Getter
+    @Setter @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JsonIgnore
-    @Setter
-    @Getter
+    @Setter @Getter
     private Usuario usuario;
 
     @ManyToOne
     @JsonIgnore
-    @Setter
-    @Getter
+    @Setter @Getter
     private Patron patron;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     private LocalDateTime fecha;
 }

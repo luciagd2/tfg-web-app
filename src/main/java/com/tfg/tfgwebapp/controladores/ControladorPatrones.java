@@ -6,6 +6,7 @@ import com.tfg.tfgwebapp.clasesModelo.Patron;
 import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioPatron;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
+import com.tfg.tfgwebapp.seguridad.Autenticacion;
 import com.tfg.tfgwebapp.servicios.ServicioPatron;
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
@@ -38,18 +39,29 @@ public class ControladorPatrones {
     private final RepositorioPatron repositorioPatron;
     private final ServicioPatron servicioPatron;
     private final ControladorNotificaciones controladorNotificaciones;
+    private final Autenticacion autenticacion;
 
     // Inyección mediante constructor (recomendado)
     @Autowired
-    public ControladorPatrones(RepositorioUsuario repositorioUsuario, RepositorioPatron repositorioPatron, ServicioPatron servicioPatron, ControladorNotificaciones controladorNotificaciones) {
+    public ControladorPatrones(RepositorioUsuario repositorioUsuario,
+                               RepositorioPatron repositorioPatron,
+                               ServicioPatron servicioPatron,
+                               ControladorNotificaciones controladorNotificaciones,
+                               Autenticacion autenticacion
+    ) {
         this.repositorioUsuario = repositorioUsuario;
         this.repositorioPatron = repositorioPatron;
         this.servicioPatron = servicioPatron;
         this.controladorNotificaciones = controladorNotificaciones;
+        this.autenticacion = autenticacion;
     }
 
     @GetMapping("/encontrar")
-    public ResponseEntity<Patron> encontrarPatron(@RequestParam long id) {
+    public ResponseEntity<?> encontrarPatron(@RequestParam long id) {
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
+        }
         try {
             Patron patron = (Patron) repositorioPatron.findPatronById(id);
 
@@ -72,23 +84,13 @@ public class ControladorPatrones {
 
     @GetMapping("/getAllPatronesPublicados")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> getAllPatronesPublicados() {
+    public ResponseEntity<?> getAllPatronesPublicados() {
         System.out.println("En controlador getAllPatronesPublicados");
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
-
-        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            System.out.println("Usuario no encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Usuario usuario = usuarioOpt.get();
 
         List<Patron> patrones = new ArrayList<>();
         try {
@@ -107,12 +109,18 @@ public class ControladorPatrones {
 
     @GetMapping("/getMejorValorados")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> getTop10PatronesMejorValorados() {
+    public ResponseEntity<?> getTop10PatronesMejorValorados() {
         System.out.println("En controlador getMejorValorados");
 
+        /*
         Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
         if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        */
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
         try {
@@ -134,12 +142,18 @@ public class ControladorPatrones {
 
     @GetMapping("/getUltimosPatrones")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> getUltimos20Patrones() {
+    public ResponseEntity<?> getUltimos20Patrones() {
         System.out.println("En controlador getUltimosPatrones");
 
+        /*
         Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
         if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        */
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
         try {
@@ -153,29 +167,16 @@ public class ControladorPatrones {
         }
     }
 
-
     @GetMapping("/getAllFiltros")
     @EntityGraph(attributePaths = {"reviews", "tags"})
-    public ResponseEntity<List<Patron>> getAllFiltros(
+    public ResponseEntity<?> getAllFiltros(
             @RequestParam String filtros
     ) {
         System.out.println("En controlador getAllFiltros");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
-
-        Usuario usuario = repositorioUsuario.findByEmail(((UserDetails) auth.getPrincipal()).getUsername())
-                .orElse(null);
-        if (usuario == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        String[] flags = filtros.split(",");
-        boolean principiante = Boolean.parseBoolean(flags[0]);
-        boolean intermedio   = Boolean.parseBoolean(flags[1]);
-        boolean avanzado     = Boolean.parseBoolean(flags[2]);
-        boolean puntuacion = Boolean.parseBoolean(flags[3]);
 
         try {
         String[] filtroStrings = filtros.split(",");
@@ -219,23 +220,14 @@ public class ControladorPatrones {
 
     @GetMapping("/getAllBusqueda")
     @EntityGraph(attributePaths = {"reviews", "tags"})
-    public ResponseEntity<List<Patron>> getAllBusqueda(
+    public ResponseEntity<?> getAllBusqueda(
             @RequestParam String query
     ) {
         System.out.println("En controlador getAllBusqueda");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
-        Usuario usuario = repositorioUsuario.findByEmail(((UserDetails) auth.getPrincipal()).getUsername())
-                .orElse(null);
-        if (usuario == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        if (usuario == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
         try {
@@ -255,19 +247,13 @@ public class ControladorPatrones {
 
     @GetMapping("/getAllBusquedaFiltros")
     @EntityGraph(attributePaths = {"reviews", "tags"})
-    public ResponseEntity<List<Patron>> buscarConFiltros(
+    public ResponseEntity<?> buscarConFiltros(
             @RequestParam String query,
             @RequestParam String filtros
     ) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Usuario usuario = repositorioUsuario.findByEmail(((UserDetails) auth.getPrincipal()).getUsername())
-                .orElse(null);
-        if (usuario == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
         try {
@@ -312,10 +298,12 @@ public class ControladorPatrones {
     }
 
     @PostMapping("/estado-publicacion")
-    public ResponseEntity<?> cambiarEstadoPublicacion(
-            @RequestParam long id
-            //@RequestParam Patron.Estado nuevoEstado
-    ) {
+    public ResponseEntity<?> cambiarEstadoPublicacion(@RequestParam long id) {
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
+        }
+
         try {
             Patron patron = (Patron) repositorioPatron.findPatronById(id);
             boolean enUso = servicioPatron.patronTieneUsuarios(id);
@@ -340,7 +328,6 @@ public class ControladorPatrones {
 
             return ResponseEntity.ok(patron);
 
-            //return ResponseEntity.ok(patron);
         } catch (Exception e) {
             System.out.println("Error al cambiar el estado del patron");
             e.printStackTrace();
@@ -350,12 +337,21 @@ public class ControladorPatrones {
 
     @PostMapping("/estado-inactivo")
     public ResponseEntity<?> cambiarEstadoInactivo(@RequestParam Long id) {
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
+        }
         servicioPatron.cambiarEstadoPatron(id, Patron.Estado.Inactivo);
         return ResponseEntity.ok("Estado cambiado a inactivo");
     }
 
     @PostMapping("/eliminar")
     public ResponseEntity<?> eliminarPatron(@RequestParam long id) {
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
+        }
+
         try {
             Patron patron = (Patron) repositorioPatron.findPatronById(id);
             boolean enUso = servicioPatron.patronTieneUsuarios(id);
@@ -383,23 +379,15 @@ public class ControladorPatrones {
 
     @GetMapping("/patrones-tienda-publicados")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> obtenerPatronesUsuarioPublicados() {
+    public ResponseEntity<?> obtenerPatronesUsuarioPublicados() {
         System.out.println("En controlador obtenerPatronesUsuario");
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            System.out.println("Usuario no encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         List<Patron> patrones = new ArrayList<>();
         try {
@@ -418,23 +406,15 @@ public class ControladorPatrones {
 
     @GetMapping("/patrones-tienda-borradores")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> obtenerPatronesUsuarioBorradores() {
+    public ResponseEntity<?> obtenerPatronesUsuarioBorradores() {
         System.out.println("En controlador obtenerPatronesUsuario");
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            System.out.println("Usuario no encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         List<Patron> patrones = new ArrayList<>();
         try {
@@ -453,23 +433,15 @@ public class ControladorPatrones {
 
     @GetMapping("/patrones-tienda-inactivos")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> obtenerPatronesUsuarioInactivos() {
+    public ResponseEntity<?> obtenerPatronesUsuarioInactivos() {
         System.out.println("En controlador obtenerPatronesUsuario");
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            System.out.println("Usuario no encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         List<Patron> patrones = new ArrayList<>();
         try {
@@ -488,25 +460,15 @@ public class ControladorPatrones {
 
     @GetMapping("/patrones-tienda-otro")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> obtenerPatronesOtrosPublicados(
+    public ResponseEntity<?> obtenerPatronesOtrosPublicados(
             @RequestParam Long otroUsuario
     ) {
         System.out.println("En controlador obtenerPatronesUsuario");
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
-
-        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            System.out.println("Usuario no encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Usuario usuario = usuarioOpt.get();
 
         List<Patron> patrones = new ArrayList<>();
         Usuario creador = repositorioUsuario.findById(otroUsuario).get();
@@ -525,9 +487,16 @@ public class ControladorPatrones {
     }
 
     @PostMapping("/nuevo")
-    public ResponseEntity<Patron> crearPatron(
+    public ResponseEntity<?> crearPatron(
             @RequestParam Long idCreador
     ) {
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
+        }
+
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
+
         Patron patron = new Patron();
         patron.setCreador(repositorioUsuario.findById(idCreador).get());
         repositorioPatron.save(patron);
@@ -554,24 +523,16 @@ public class ControladorPatrones {
 
             ) throws IOException {
         logger.info("Entrando en el método guardarPatron");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
-
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
 
         Patron patron = (Patron) repositorioPatron.findPatronById(idPatron);
 
         // Define ruta y nombre para la carpeta de destino de las imagenes de los patrones
-        String carpetaDestino = "src/main/resources/static/imagenes/patrones/";
+        String carpetaDestino = "src/main/resources/static/imagenes/patrones/"; //TODO: eliminar esta linea
         if (imagenes != null && !imagenes.isEmpty()) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
@@ -582,7 +543,6 @@ public class ControladorPatrones {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al procesar URLs de imágenes.");
             }
         }
-
 
         patron.setTitulo(titulo);
         patron.setPrecio(precio);
@@ -606,20 +566,13 @@ public class ControladorPatrones {
     @GetMapping("/estaGuardo")
     public ResponseEntity<?> estaGuardo(@RequestParam Long idPatron) {
         logger.info("Entrando en el método estaGuardado");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         Optional<Patron> patronOpt = repositorioPatron.findById(idPatron);
 
@@ -638,20 +591,13 @@ public class ControladorPatrones {
     @PostMapping("/guardarBiblioteca")
     public ResponseEntity<?> guardarBiblioteca(@RequestParam Long idPatron) {
         logger.info("Entrando en el método guardar");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         Optional<Patron> patronOpt = repositorioPatron.findById(idPatron);
 
@@ -676,23 +622,15 @@ public class ControladorPatrones {
 
     @GetMapping("/patrones-biblioteca-guardados")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> obtenerPatronesBibliotecaGuardados() {
+    public ResponseEntity<?> obtenerPatronesBibliotecaGuardados() {
         System.out.println("En controlador obtenerPatronesBibliotecaGuardados");
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            System.out.println("Usuario no encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         try {
             List<Patron> patrones = usuario.getPatronesGuardados();
@@ -711,20 +649,13 @@ public class ControladorPatrones {
     @GetMapping("/estaComprado")
     public ResponseEntity<?> estaComprado(@RequestParam Long idPatron) {
         logger.info("Entrando en el método estaComprado");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         Optional<Patron> patronOpt = repositorioPatron.findById(idPatron);
 
@@ -743,20 +674,13 @@ public class ControladorPatrones {
     @PostMapping("/guardarComprado")
     public ResponseEntity<?> guardarComprado(@RequestParam Long idPatron) {
         logger.info("Entrando en el método guardarComprado");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         Optional<Patron> patronOpt = repositorioPatron.findById(idPatron);
 
@@ -777,23 +701,15 @@ public class ControladorPatrones {
 
     @GetMapping("/patrones-biblioteca-comprados")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> obtenerPatronesBibliotecaComprados() {
+    public ResponseEntity<?> obtenerPatronesBibliotecaComprados() {
         System.out.println("En controlador obtenerPatronesBibliotecaComprados");
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            System.out.println("Usuario no encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         try {
             List<Patron> patrones = usuario.getPatronesComprados();
@@ -812,20 +728,13 @@ public class ControladorPatrones {
     @GetMapping("/estaEmpezado")
     public ResponseEntity<?> estaEmpezado(@RequestParam Long idPatron) {
         logger.info("Entrando en el método estaEmpezado");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         Optional<Patron> patronOpt = repositorioPatron.findById(idPatron);
 
@@ -844,20 +753,13 @@ public class ControladorPatrones {
     @PostMapping("/guardarEmpezado")
     public ResponseEntity<?> guardarEmpezado(@RequestParam Long idPatron) {
         logger.info("Entrando en el método guardarEmpezado");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         Optional<Patron> patronOpt = repositorioPatron.findById(idPatron);
 
@@ -878,23 +780,15 @@ public class ControladorPatrones {
 
     @GetMapping("/patrones-biblioteca-empezados")
     @EntityGraph(attributePaths = {"reviews"})
-    public ResponseEntity<List<Patron>> obtenerPatronesBibliotecaEmpezados() {
+    public ResponseEntity<?> obtenerPatronesBibliotecaEmpezados() {
         System.out.println("En controlador obtenerPatronesBibliotecaEmpezados");
-        Authentication usuarioAuth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (usuarioAuth == null || !usuarioAuth.isAuthenticated() || usuarioAuth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) usuarioAuth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            System.out.println("Usuario no encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         try {
             List<Patron> patrones = usuario.getPatronesEmpezados();

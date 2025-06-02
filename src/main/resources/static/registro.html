@@ -30,12 +30,6 @@
   <div class="container formulario">
     <h2 class="text-center mb-4">Registro de Usuario</h2>
       <form>
-          <!--
-        <div class="mb-3">
-          <label for="nombre" class="form-label">Nombre</label>
-          <input type="text" class="form-control" id="nombre" required>
-        </div>
-        -->
         <div class="mb-3">
           <label for="email" class="form-label">Correo electrónico</label>
           <input type="email" class="form-control" id="email" required>
@@ -53,15 +47,6 @@
       </form>
   </div>
   <script>
-      // SIMULACION ANTES DE TENER BACKEND
-      // TODO: BORRAR
-      /*
-      document.querySelector('form').addEventListener('submit', function (e) {
-        e.preventDefault(); // Evita el envío real por ahora
-        // Redireccionar
-        window.location.href = "completarPerfil.html";
-      });
-      */
       document.querySelector('form').addEventListener('submit', async function (e) {
           e.preventDefault();
 

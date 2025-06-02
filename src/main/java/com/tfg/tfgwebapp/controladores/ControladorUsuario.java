@@ -2,6 +2,7 @@ package com.tfg.tfgwebapp.controladores;
 
 import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
+import com.tfg.tfgwebapp.seguridad.Autenticacion;
 import com.tfg.tfgwebapp.servicios.ServicioAutenticacion;
 import com.tfg.tfgwebapp.servicios.ServiciosUsuario;
 
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +31,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Controlador REST para la gestión de usuarios.
+ * <p>
+ * Proporciona endpoints para:
+ * <ul>
+ *     <li>Autenticar al usuario y generar su sesión</li>
+ *     <li>Registar un nuevo usuario y completar su perfil</li>
+ *     <li>Actualizar los datos del perfil de un usuario</li>
+ *     <li>Encontrar usuario</li>
+ *     <li>Gestionar el seguimiento entre usuarios</li>
+ *     <li>Encontra los seguidores de un usuario</li>
+ *     <li>Comprobar si un usuario es seguidor de otro</li>
+ * </ul>
+ *
+ * Todos los métodos, a excepción de {@link #login(Map, HttpServletRequest)}, requieren que el
+ * usuario esté autenticado. La autenticación se gestiona mediante el componente {@link Autenticacion}.
+ */
 @RestController
 @RequestMapping("/api/usuarios")
 public class ControladorUsuario {
@@ -41,12 +57,14 @@ public class ControladorUsuario {
     private final RepositorioUsuario repositorioUsuario;
     private final ServiciosUsuario serviciosUsuario;
     private final ServicioAutenticacion servicioAutenticacion;
+    private final Autenticacion autenticacion;
 
     @Autowired
-    public ControladorUsuario(RepositorioUsuario repositorioUsuario, ServiciosUsuario serviciosUsuario, ServicioAutenticacion servicioAutenticacion) {
+    public ControladorUsuario(RepositorioUsuario repositorioUsuario, ServiciosUsuario serviciosUsuario, ServicioAutenticacion servicioAutenticacion, Autenticacion autenticacion) {
         this.repositorioUsuario = repositorioUsuario;
         this.serviciosUsuario = serviciosUsuario;
         this.servicioAutenticacion = servicioAutenticacion;
+        this.autenticacion = autenticacion;
     }
 
     /**
@@ -66,8 +84,6 @@ public class ControladorUsuario {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> datos, HttpServletRequest request) {
         Optional<Usuario> user = serviciosUsuario.login(datos.get("email"), datos.get("password"));
-        System.out.println("Usuario: "+user);
-        System.out.println("Usuario presente: "+user.isPresent());
 
         if (user.isPresent()) {
             // Crea la autenticación con los detalles del usuario
@@ -120,7 +136,9 @@ public class ControladorUsuario {
     /**
      * Completa el perfil del usuario autenticado.
      * <p>
-     * Este método permite al usuario establecer un nombre de usuario personalizado,
+     * Verifica que el usuario esté autenticado utilizando el componente
+     * {@link Autenticacion}. Si la autenticación falla, devuelve un estado HTTP 401.
+     * Si el usuario está autenticado correctamente, permite al usuario establecer un nombre de usuario personalizado,
      * indicar si es creador y, opcionalmente, subir una imagen de perfil. La imagen se guarda
      * localmente y su ruta relativa se almacena en el objeto {@link Usuario}.
      *
@@ -138,20 +156,13 @@ public class ControladorUsuario {
             @RequestParam(required = false) MultipartFile imagen
     ) throws IOException {
         logger.info("Entrando en el método completarPerfil");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         // Ahora actualizas el usuario con los datos recibidos
         usuario.setNombreUsuario(username);
@@ -180,9 +191,11 @@ public class ControladorUsuario {
     /**
      * Actualiza el perfil del usuario autenticado.
      * <p>
-     * Este endpoint permite modificar opcionalmente el nombre de usuario, la descripción
-     * y la imagen de perfil. Solo los campos enviados serán actualizados; los que no se
-     * incluyan en la petición permanecerán sin cambios.
+     * Verifica que el usuario esté autenticado utilizando el componente
+     * {@link Autenticacion}. Si la autenticación falla, devuelve un estado HTTP 401.
+     * Si el usuario está autenticado correctamente, permite modificar opcionalmente el
+     * nombre de usuario, la descripción y la imagen de perfil. Solo los campos enviados
+     * serán actualizados; los que no se incluyan en la petición permanecerán sin cambios.
      *
      * @param nombreUsuario       (Opcional) Nuevo nombre de usuario a guardar.
      * @param imagen              (Opcional) Nueva imagen de perfil. Se guarda localmente y se almacena la ruta.
@@ -197,20 +210,13 @@ public class ControladorUsuario {
                                 @RequestParam(required = false) String descripcionUsuario
     ) throws IOException {
         logger.info("Entrando en el método guardarPerfil");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         // Ahora actualizas el usuario con los datos recibidos
         if (nombreUsuario != null && !nombreUsuario.isEmpty()) {
@@ -233,44 +239,58 @@ public class ControladorUsuario {
         return ResponseEntity.ok(usuario);
     }
 
+    /**
+     * Encuentra el usuario con el ID indicado.
+     * <p>
+     * Verifica que el usuario esté autenticado utilizando el componente
+     * {@link Autenticacion}. Si la autenticación falla, devuelve un estado HTTP 401.
+     * Si el usuario está autenticado correctamente, busca el usuario correspondiente al ID proporcionado.
+     *
+     * @param idUsuario ID del usuario que se desea encontrar.
+     * @return {@link ResponseEntity} con los datos del usuario encontrado si existe y el solicitante está autenticado,
+     *         {@link ResponseEntity} con estado 404 si el usuario no existe,
+     *         o estado 401 si el solicitante no está autenticado.
+     * @throws IOException en caso de error de entrada/salida (no se utiliza en la implementación actual, pero está declarado).
+     */
     @GetMapping("/perfil/encontrar")
     public ResponseEntity<?> encontrarUsuario(@RequestParam Long idUsuario
     ) throws IOException {
         logger.info("Entrando en el método encontrarUsuario");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
-        }
-
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
         Usuario usuario = repositorioUsuario.findById(idUsuario).get();
+
         return ResponseEntity.ok(usuario);
     }
 
+    /**
+     * Permite a un usuario autenticado seguir o dejar de seguir a un creador.
+     * <p>
+     * Verifica que el usuario esté autenticado utilizando el componente
+     * {@link Autenticacion}. Si la autenticación falla, devuelve un estado HTTP 401.
+     * Si el usuario está autenticado correctamente, comprueba si el usuario aun no
+     * sigue al creador, y en este caso se añade su ID a la lista de seguidores del creador.
+     * Si ya lo sigue, se elimina.
+     *
+     * @param idCreador ID del usuario creador al que se desea seguir o dejar de seguir.
+     * @return {@link ResponseEntity} con estado 200 OK si la operación se realiza correctamente,
+     *         404 si el creador no existe,
+     *         o 401 si el usuario no está autenticado.
+     */
     @PostMapping("/seguimiento")
     public ResponseEntity<?> seguimientoUsuario(@RequestParam Long idCreador) {
         logger.info("Entrando en el método seguimientoUsuario");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         Optional<Usuario> creadorOpt = repositorioUsuario.findById(idCreador);
 
@@ -289,23 +309,33 @@ public class ControladorUsuario {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Verifica si el usuario autenticado está siguiendo a un determinado creador.
+     * <p>
+     * Verifica que el usuario esté autenticado utilizando el componente
+     * {@link Autenticacion}. Si la autenticación falla, devuelve un estado HTTP 401.
+     * Si el usuario está autenticado correctamente, consulta la lista de seguidores del
+     * creador y determina si incluye al usuario autenticado.
+     *
+     * @param idCreador ID del creador que se desea comprobar si está siendo seguido.
+     * @return {@link ResponseEntity} con:
+     *         <ul>
+     *             <li>{@code true} si el usuario está siguiendo al creador.</li>
+     *             <li>{@code false} si no lo está siguiendo.</li>
+     *             <li>404 Not Found si el creador no existe.</li>
+     *             <li>401 Unauthorized si el usuario no está autenticado.</li>
+     *         </ul>
+     */
     @GetMapping("/sigueA")
     public ResponseEntity<?> sigueA(@RequestParam Long idCreador) {
         logger.info("Entrando en el método sigueA");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 
         Optional<Usuario> creadorOpt = repositorioUsuario.findById(idCreador);
 
@@ -320,23 +350,31 @@ public class ControladorUsuario {
         }
     }
 
+    /**
+     * Obtiene la lista de usuarios que siguen al usuario autenticado (creador).
+     * <p>
+     *
+     * Verifica que el usuario esté autenticado utilizando el componente
+     * {@link Autenticacion}. Si la autenticación falla, devuelve un estado HTTP 401.
+     * Si el usuario está autenticado correctamente, devuelve la información de todos los
+     * usuarios cuyos IDs estén registrados como seguidores del usuario actual.
+     *
+     * @return {@link ResponseEntity} con:
+     *         <ul>
+     *             <li>Una lista de usuarios que siguen al usuario autenticado, con estado 200 OK.</li>
+     *             <li>401 Unauthorized si el usuario no está autenticado.</li>
+     *         </ul>
+     */
     @GetMapping("/seguidores")
     public ResponseEntity<?> getSeguidores() {
         logger.info("Entrando en el método getSeguidores");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado");
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
         }
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(userDetails.getUsername());
-
-        if (!usuarioOpt.isPresent()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-        }
-
-        Usuario creador = usuarioOpt.get();
+        Usuario creador = (Usuario) respuestaAutenticacion.getBody();
 
         List<Long> idsSeguidores = creador.getIdsSeguidores();
 

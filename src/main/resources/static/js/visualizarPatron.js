@@ -103,7 +103,6 @@ function cargarEdicionPatron(patron) {
     }
 }
 
-
 // LOGICA PARA LA CREACION DINAMICA DE SECCIONES Y SUS COMPONENTES
 let contadorSecciones = 0;
 
@@ -223,44 +222,11 @@ function addRound(seccionId) {
     input.className = 'form-control';
     input.placeholder = 'Instrucciones de la vuelta';
 
-    /*
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'btn btn-outline-danger';
-    removeBtn.type = 'button';
-    removeBtn.innerHTML = '<i class="bi bi-trash3"></i>';
-    removeBtn.onclick = function () {
-        removeElement(this);
-    };
-    */
     group.appendChild(span);
     group.appendChild(input);
-    //group.appendChild(removeBtn);
 
     seccionContent.appendChild(group);
 }
-
-
-function removeElement(button, tipo) {
-    if (tipo === 'seccion') {
-        const seccion = button.closest('.card');
-        if (seccion) {
-            const confirmed = confirm('¿Estás seguro de que quieres eliminar esta sección completa?');
-            if (confirmed) {
-                seccion.remove();
-            }
-        }
-    } else {
-        const element = button.closest('.input-group, .d-flex, div.mb-2, div.mb-3');
-        if (element) {
-            const container = element.parentElement;
-            const siblings = Array.from(container.children);
-            const deletedIndex = siblings.indexOf(element); // Captura el índice antes de eliminar
-            element.remove();
-            renumberRounds(container, deletedIndex);
-        }
-    }
-}
-
 
 function renumberRounds(container, deletedIndex) {
     const elements = Array.from(container.children);

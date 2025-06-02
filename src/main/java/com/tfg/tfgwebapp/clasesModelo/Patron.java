@@ -10,99 +10,80 @@ import java.util.List;
 
 @Entity
 public class Patron {
-    @Setter
-    @Getter
+    @Setter @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     private String titulo;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     private double precio;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     @Enumerated(EnumType.STRING)
     private Estado estado;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_creador", nullable = false)
     private Usuario creador;
 
     //Información
-    @Setter
-    @Getter
+    @Setter @Getter
     @Enumerated(EnumType.STRING)
     private Dificultad dificultad;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     private String descripcion;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     @Enumerated(EnumType.STRING)
     private Idioma idioma;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     @Enumerated(EnumType.STRING)
     private Unidad unidad;
 
     //Materiales
-    @Setter
-    @Getter
+    @Setter @Getter
     private String lanas;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     private String agujaGanchillo;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     private String agujaLanera;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     private String otros;
 
     //Otros
-    @Setter
-    @Getter
+    @Setter @Getter
     private String abreviaturas;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     @ElementCollection
     @CollectionTable(name = "patron_tags", joinColumns = @JoinColumn(name = "patron_id"))
     @Column(name = "tag")
     private List<String> tags = new ArrayList<>();
 
-    @Setter
-    @Getter
+    @Setter @Getter
     @ElementCollection
     @CollectionTable(name = "patron_imagenes", joinColumns = @JoinColumn(name = "patron_id"))
     @Column(name = "imagen")
     private List<String> imagenes = new ArrayList<>();
 
-    @Setter
-    @Getter
+    @Setter @Getter
     @OneToMany(mappedBy = "patron", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Review> reviews = new ArrayList<>();
 
     //Instrucciones
-    @Setter
-    @Getter
+    @Setter @Getter
     @Column(columnDefinition = "TEXT")
     private String instrucciones;
-
 
     //Enumerates
     public enum Dificultad {

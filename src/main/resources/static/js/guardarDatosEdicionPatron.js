@@ -12,63 +12,31 @@ function guardarPatron(patron) {
   //const patron = {};
 
   // Título y autor
-  ////patron.titulo = document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value.trim();
   patron.setTitulo(document.querySelector('input[placeholder="Ej: Gorro básico de invierno"]').value.trim());
 
-  //TODO: Eliminar, el usuario no cambia
-  /*
-  patron.usuario = {
-    nombre: document.querySelector('input[placeholder="Tu nombre o alias"]').value.trim(),
-    imagen: localStorage.getItem("patronSeleccionado").usuario.imagen
-  };
-  */
-
   // Información general
-  ////
-  /*patron.informacion = {
-    descripcion: document.querySelector('textarea[placeholder*="Breve"]').value.trim(),
-    idioma: document.querySelector('select#idioma').value,
-    unidad: document.querySelector('select#unidad').value,
-    dificultad: document.querySelector('select#dificultad').value
-  };
-  */
   patron.setDescripcion(document.querySelector('textarea[placeholder*="Breve"]').value.trim());
   patron.setIdioma(document.querySelector('select#idioma').value);
   patron.setUnidad(document.querySelector('select#unidad').value);
   patron.setDificultad(document.querySelector('select#dificultad').value);
 
   // Materiales
-  ////
-  /*patron.materiales = {
-    lanas: document.querySelector('input[placeholder*="Lana"]').value.trim(),
-    agujaGanchillo: document.querySelector('input[placeholder*="5 mm"]').value.trim(),
-    agujaLanera: document.querySelector('input[placeholder*="Sí / No"]').value.trim(),
-    otros: document.querySelector('input[placeholder*="Marcadores"]').value.trim()
-  };
-  */
   patron.setLanas(document.querySelector('input[placeholder*="Lana"]').value.trim());
   patron.setAgujaGanchillo(document.querySelector('input[placeholder*="5 mm"]').value.trim());
   patron.setAgujadaLanera(document.querySelector('input[placeholder*="Sí / No"]').value.trim());
   patron.setOtros(document.querySelector('input[placeholder*="Marcadores"]').value.trim());
 
   // Abreviaturas y tags
-  ////patron.abreviaturas = document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim();
   patron.setAbreviaturas(document.querySelector('textarea[placeholder*="pb = punto bajo"]').value.trim());
-  ////patron.tags = document.querySelector('input[placeholder*="gorro"]').value.split(',').map(t => t.trim());
   const tags = document.querySelector('input[placeholder*="gorro"]').value
       .split(',')
       .map(tag => tag.trim())
       .filter(tag => tag !== '');
   patron.setTags(tags);
   //1  <- TODO: no se porque estaba este 1, creo que lo puse sin querer, ¿quitar?
-  // Instrucciones
-  ////patron.instrucciones = recopilarInstrucciones();
   // Instrucciones — SERIALIZADAS como string JSON
   const instruccionesArray = recopilarInstrucciones();
   patron.instrucciones = JSON.stringify(instruccionesArray);
-
-
-  // Opción: guardar en localStorage (o enviarlo al servidor con fetch/post)
   localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
 
   alert("Patrón guardado correctamente.");
@@ -112,12 +80,6 @@ function recopilarInstrucciones() {
         contenido.push({ tipo: 'subtitulo', texto: el.querySelector('input').value });
       } else if (el.querySelector('textarea')) {
         contenido.push({ tipo: 'info', texto: el.querySelector('textarea').value });
-      /*}else if (el.classList.contains('input-group-imagen')) {
-        const previews = el.querySelectorAll('img.img-preview');
-        previews.forEach(img => {
-          contenido.push({ tipo: 'imagen', contenido: img.src }); // usar la URL directa, no base64
-        });
-      }*/
       } else if (el.classList.contains('input-group-imagen')) {
         const previews = el.querySelectorAll('img.img-preview');
         previews.forEach(async img => {

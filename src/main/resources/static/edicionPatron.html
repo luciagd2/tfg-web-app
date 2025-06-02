@@ -281,9 +281,7 @@
                 }
                 formData.append("imagenes", JSON.stringify(urlsImagenes));
                 formData.append("tags",tags);
-                //formData.append("instrucciones",JSON.stringify(recopilarInstrucciones()));
                 formData.append("instrucciones", JSON.stringify(await recopilarInstrucciones()));
-
 
                 try {
                     console.log("Justo antes del fetch a /api/patron/guardar")

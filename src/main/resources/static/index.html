@@ -44,34 +44,6 @@
     </div>
 
     <script>
-        // SIMULACION ANTES DE TENER BACKEND
-        // TODO: BORRAR
-        /*
-        document.getElementById("loginForm").addEventListener("submit", function (e) {
-          e.preventDefault();
-    
-          const email = document.getElementById("email").value;
-          const password = document.getElementById("password").value;
-    
-          // Simulación de login (cambiar por la petición real!!!)
-          const usuariosSimulados = [
-            { id: 1, name: "usu1", email: "usu1@tienda.com", type: "tienda" },
-            { id: 2, name: "usu2", email: "usu2@normal.com", type: "normal" }
-          ];
-    
-          const user = usuariosSimulados.find(u => u.email === email);
-          
-          if (user && password === "usu") {
-            // Guardamos el usuario en localStorage
-            localStorage.setItem("usuario", JSON.stringify(user));
-    
-            // Redireccionamos
-              window.location.href = "inicio.html";
-          } else {
-            alert("Correo o contraseña incorrectos.");
-          }
-        });
-        */
         document.getElementById("loginForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
@@ -101,8 +73,6 @@
                 alert("Error de conexión con el servidor.");
             }
         });
-
     </script>
-    
 </body>
 </html>

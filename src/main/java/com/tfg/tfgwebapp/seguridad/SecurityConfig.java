@@ -1,4 +1,4 @@
-package com.tfg.tfgwebapp.config;
+package com.tfg.tfgwebapp.seguridad;
 
 import com.tfg.tfgwebapp.servicios.ServicioAutenticacion;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +11,7 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.*;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Clase de configuración de seguridad para la aplicación.

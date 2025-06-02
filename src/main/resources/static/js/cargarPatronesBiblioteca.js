@@ -4,7 +4,6 @@
  **************************************************************************/
 
 const cargarPatrones = (endpoint, container) => {
-    //const container = document.getElementById("contenedor-cards");
     container.innerHTML = "";
 
     fetch(endpoint, {

@@ -16,20 +16,31 @@ import java.util.List;
 public class Usuario {
 
     @Id
+    @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter @Setter
     private String email;
+
+    @Getter @Setter
     private String password;
+
+    @Getter @Setter
     private String nombreUsuario;
+
+    @Getter @Setter
     private String descripcionUsuario;
+
+    @Getter @Setter
     private boolean esCreador;
+
+    @Getter @Setter
     @Column(length = 500)
     private String imagenPerfil;
 
     // Usuarios a los que este usuario sigue
-    @Getter
-    @Setter
+    @Getter @Setter
     @ElementCollection
     @CollectionTable(
             name = "usuario_seguidores",
@@ -39,8 +50,7 @@ public class Usuario {
     private List<Long> idsSeguidores = new ArrayList<>();
 
     // Patrones empezados
-    @Getter
-    @Setter
+    @Getter @Setter
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -51,8 +61,7 @@ public class Usuario {
     private List<Patron> patronesEmpezados = new ArrayList<>();
 
     // Patrones guardados
-    @Getter
-    @Setter
+    @Getter @Setter
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -63,8 +72,7 @@ public class Usuario {
     private List<Patron> patronesGuardados = new ArrayList<>();
 
     // Patrones comprados
-    @Getter
-    @Setter
+    @Getter @Setter
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -73,55 +81,5 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "patron_id")
     )
     private List<Patron> patronesComprados = new ArrayList<>();
-
-    // Getters y Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getNombreUsuario() {
-        return nombreUsuario;
-    }
-
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
-    }
-
-    public String getDescripcionUsuario() {
-        return descripcionUsuario;
-    }
-
-    public void setDescripcionUsuario(String descripcionUsuario) {
-        this.descripcionUsuario = descripcionUsuario;
-    }
-
-    public boolean isEsCreador() { return esCreador;}
-
-    public void setEsCreador(boolean esCreador) { this.esCreador = esCreador;}
-
-    public String getImagenPerfil() { return imagenPerfil;}
-
-    public void setImagenPerfil(String imagenPerfil) { this.imagenPerfil = imagenPerfil;}
 }
 

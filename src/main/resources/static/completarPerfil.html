@@ -97,12 +97,6 @@
         if (imagenPerfil) {
             formData.append("imagen", imagenPerfil);
         }
-
-        // TODO: borrar, muestra todo lo que se ha añadido al FormData
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ':', pair[1]);
-        }
-
         try {
             const response = await fetch("/api/usuarios/perfil", {
                 method: "POST",
@@ -116,7 +110,7 @@
                 sessionStorage.setItem("usuario", JSON.stringify(user));
                 window.location.href = "inicio.html";
             } else {
-                const errorText = await response.text(); // o .json() si sabes que es JSON
+                const errorText = await response.text();
                 console.error("Estado:", response.status);
                 console.error("Respuesta:", errorText);
                 alert(`Error al guardar perfil: ${response.status}`);

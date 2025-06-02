@@ -6,6 +6,7 @@ import com.tfg.tfgwebapp.clasesModelo.Usuario;
 import com.tfg.tfgwebapp.repositorios.RepositorioPatron;
 import com.tfg.tfgwebapp.repositorios.RepositorioReview;
 import com.tfg.tfgwebapp.repositorios.RepositorioUsuario;
+import com.tfg.tfgwebapp.seguridad.Autenticacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +29,29 @@ public class ControladorReviews {
     private final RepositorioReview repositorioReview;
     private final RepositorioPatron repositorioPatron;
     private final RepositorioUsuario repositorioUsuario;
+    private final Autenticacion autenticacion;
 
     // Inyección mediante constructor (recomendado)
     @Autowired
-    public ControladorReviews(RepositorioReview repositorioReview, RepositorioPatron repositorioPatron, RepositorioUsuario repositorioUsuario) {
+    public ControladorReviews(RepositorioReview repositorioReview,
+                              RepositorioPatron repositorioPatron,
+                              RepositorioUsuario repositorioUsuario,
+                              Autenticacion autenticacion
+    ) {
         this.repositorioReview = repositorioReview;
         this.repositorioPatron = repositorioPatron;
         this.repositorioUsuario = repositorioUsuario;
+        this.autenticacion = autenticacion;
     }
 
     @GetMapping("/getReviews")
-    public ResponseEntity<List<Review>> getReviews(@RequestParam long patronId) {
+    public ResponseEntity<?> getReviews(@RequestParam long patronId) {
+
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
+        }
+
         try {
             List<Review> reviews = repositorioReview.findReviewsByPatronId(patronId);
 
@@ -54,16 +67,19 @@ public class ControladorReviews {
     @PostMapping("/nuevaReview")
     public ResponseEntity<?> guardarNuevaReview(
             @RequestParam long idPatron,
-            @RequestParam long idUsuario,
             @RequestParam int puntuacion,
             @RequestParam(required = false) String mensaje,
             @RequestParam(required = false) MultipartFile imagen
     ) throws IOException {
 
-        Review nuevaReview = new Review();
+        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            return respuestaAutenticacion;
+        }
 
+        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
+        Review nuevaReview = new Review();
         Patron patron = repositorioPatron.findById(idPatron).get();
-        Usuario usuario = repositorioUsuario.findById(idUsuario).get();
 
         nuevaReview.setPatron(patron);
         nuevaReview.setPuntuacion(puntuacion);

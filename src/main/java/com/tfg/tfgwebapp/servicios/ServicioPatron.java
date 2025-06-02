@@ -27,13 +27,6 @@ public class ServicioPatron {
     @GetMapping("/patrones/patrones-tienda")
     public List<Patron> obtenerPatrones(Usuario usuario) {
         System.out.println("En servicio obtenerPatrones con usuario " + usuario+ "con id: " + usuario.getId());
-        //List<Patron> patrones = repositorioPatron.findByIdCreador(usuario.getId());
-        //return ResponseEntity.ok(patrones);
-        /*
-        if (usuario == null) {
-            System.out.println("Usuario no encontrado (servicio obtenerPatrones)");
-            return Collections.emptyList();
-        }*/
         System.out.println("Usuario encontrado (servicio obtenerPatrones)");
         return repositorioPatron.findPatronByCreador(usuario);
     }

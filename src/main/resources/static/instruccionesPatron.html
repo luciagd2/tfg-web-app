@@ -77,13 +77,6 @@
                             </div>
 
                             <div id="imagenes-muestra" class="input-group-imagen mb-3">
-                                <!--<label class="form-label">Imagenes para la vista previa</label>
-                                <div class="input-group mb-2 div-input-images">
-                                    <input type="file" id="input-imagenes-muestra" accept="image/*" class="form-control" multiple>
-                                    <button class="btn btn-outline-danger" type="button" id="btn-borrar-imagenes">
-                                        <i class="bi bi-trash3"></i>
-                                    </button>
-                                </div>-->
                                 <label class="form-label">Vista previa</label>
                                 <div id="div-imagenes-muestra" class="d-flex flex-wrap gap-2 mt-2" style="justify-content: center">
                                     <div class="div-carousel" style="max-width: 30rem">
@@ -183,41 +176,6 @@
 <script src="js/datosPatron.js">/*Para los datos de prueba*/</script>
 <script src="js/cargaDatos.js">/*Para guardar el patron seleccionado*/</script>
 <script src="js/visualizarPatron.js">/*Para la carga de datos del patron*/</script>
-
-
-<script>
-    /*
-    document.addEventListener('DOMContentLoaded', function () {
-        const input = document.getElementById('input-imagenes-muestra');
-        const previewContainer = document.getElementById('div-imagenes-muestra');
-        const btnBorrar = document.getElementById('btn-borrar-imagenes');
-
-        input.onchange = function () {
-            previewContainer.innerHTML = '';
-            Array.from(input.files).reverse().forEach(file => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = document.createElement('img');
-                    img.className = 'img-preview';
-                    img.src = e.target.result;
-                    img.style.width = '100px';
-                    img.style.height = '100px';
-                    img.style.objectFit = 'cover';
-                    img.style.borderRadius = '8px';
-                    previewContainer.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            });
-        };
-
-        // Función del botón para borrar imágenes
-        btnBorrar.onclick = function () {
-            input.value = ''; // limpia el input de archivos
-            previewContainer.innerHTML = ''; // limpia las vistas previas
-        };
-    });
-    -*/
-</script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-guardar-cambios').addEventListener('click', async () => {
@@ -341,8 +299,6 @@
 
                         }
                     }
-
-
                     window.location.href = "tienda.html";
                 } else {
                     const errorText = await response.text(); // o .json() si sabes que es JSON
@@ -356,7 +312,6 @@
             }
         });
     });
-
 
     function recopilarInstrucciones() {
         const secciones = document.querySelectorAll('#secciones-patron .card-seccion');
