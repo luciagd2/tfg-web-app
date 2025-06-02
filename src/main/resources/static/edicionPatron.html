@@ -53,7 +53,7 @@
             <h1 class="modal-title fs-5" id="salirEditarLabel">Estas a punto de salir</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="color: #fffbf3">
             ¿Quieres guardar tu progreso?
             </div>
             <div class="modal-footer">
@@ -367,10 +367,11 @@
 
                         window.location.href = "tienda.html";
                     } else {
-                        const errorText = await response.text(); // o .json() si sabes que es JSON
+                        const errorText = await response.text();
                         console.error("Estado:", response.status);
                         console.error("Respuesta:", errorText);
-                        alert(`Error al guardar patron: ${response.status}`);
+                        //alert(`Error al guardar patron: ${response.status}`);
+                        alert(`Faltan datos importantes de la información del patrón por rellenar.`)
                     }
                 } catch (error) {
                     console.error("Error al guardar el patrón:", error);

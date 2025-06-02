@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -169,6 +170,7 @@ public class ControladorUsuario {
         usuario.setEsCreador(esCreador);
 
         if (imagen != null && !imagen.isEmpty()) {
+            System.out.println("Guardando imagen");
             // Define ruta y nombre
             String carpetaDestino = "src/main/resources/static/imagenes/perfiles/";
             // TODO: borrar la creacion de la carpeta, ya existe
@@ -206,8 +208,8 @@ public class ControladorUsuario {
      */
     @PostMapping("/perfil/guardar")
     public ResponseEntity<?> guardarPerfil(@RequestParam(required = false) String nombreUsuario,
-                                @RequestParam(required = false) MultipartFile imagen,
-                                @RequestParam(required = false) String descripcionUsuario
+                                           @RequestParam(name = "imagen", required = false) MultipartFile imagen,
+                                           @RequestParam(required = false) String descripcionUsuario
     ) throws IOException {
         logger.info("Entrando en el método guardarPerfil");
 
@@ -222,14 +224,18 @@ public class ControladorUsuario {
         if (nombreUsuario != null && !nombreUsuario.isEmpty()) {
             usuario.setNombreUsuario(nombreUsuario);
         }
+        System.out.println("Antes de comprobar imagen: " + imagen.getName());
         if (imagen != null && !imagen.isEmpty()) {
+            System.out.println("Despues de comprobar imagen");
             // Define ruta y nombre
             String carpetaDestino = "src/main/resources/static/imagenes/perfiles/";
+
             String nombreArchivo = System.currentTimeMillis() + "_" + imagen.getOriginalFilename();
             Path rutaArchivo = Paths.get(carpetaDestino, nombreArchivo);
             Files.write(rutaArchivo, imagen.getBytes());
             // Guarda la ruta relativa en el usuario
-            usuario.setImagenPerfil("./imagenes/perfiles/" + nombreArchivo);
+            System.out.println("Nombre archivo: " + nombreArchivo);
+            usuario.setImagenPerfil("imagenes/perfiles/" + nombreArchivo);
         }
         if (descripcionUsuario != null && !descripcionUsuario.isEmpty()) {
             usuario.setDescripcionUsuario(descripcionUsuario);

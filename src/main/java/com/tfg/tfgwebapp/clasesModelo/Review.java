@@ -11,7 +11,7 @@ public class Review {
     public Review() {}
 
     @Id
-    @Getter
+    @Getter @Setter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idReview;
 

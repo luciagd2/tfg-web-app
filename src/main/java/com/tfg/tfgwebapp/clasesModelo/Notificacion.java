@@ -52,6 +52,4 @@ import lombok.Setter;
         CALIFICACION,
         NUEVO_SEGUIDOR
     }
-
-    // getters y setters
 }

@@ -118,6 +118,11 @@ body {
   text-decoration: none;
 }
 
+.card-patron img {
+  max-height: 18rem;
+  object-fit: cover;
+}
+
 .dificultad-titulo {
   display: flex;
   flex-wrap: wrap;

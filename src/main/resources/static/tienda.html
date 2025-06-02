@@ -153,15 +153,7 @@
             </div>
             <div class="modal-body">
               <ul class="list-group">
-                <li class="list-group-item d-flex align-items-center mb-2">
-                  <img src="imagenes/osito-derecha.png" alt="Usuario 1" class="rounded-circle me-2" style="width: 40px; height: 40px;">
-                  <span>usuario_1</span>
-                </li>
-                <li class="list-group-item d-flex align-items-center mb-2">
-                  <img src="imagenes/lana-y-espacio-abajo.jpg" alt="Usuario 2" class="rounded-circle me-2" style="width: 40px; height: 40px;">
-                  <span>usuario_2</span>
-                </li>
-                <!-- Añade más seguidores aquí -->
+                <!-- Seguidores aquí -->
               </ul>
             </div>
             <div class="modal-footer">
@@ -193,12 +185,7 @@
                 formData.append("nombreUsuario", nuevoNombre);
             }
             if (nuevaImagen) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.querySelector('.info-perfil img').src = e.target.result;
-                    formData.append("imagen", nuevaImagen);
-                }
-                reader.readAsDataURL(nuevaImagen);
+                formData.append("imagen", nuevaImagen);
             }
             if (nuevaDescripcion) {
                 document.querySelector('#description-usuario').textContent = nuevaDescripcion;

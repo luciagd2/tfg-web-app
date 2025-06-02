@@ -114,12 +114,7 @@
                 formData.append("nombreUsuario", nuevoNombre);
             }
             if (nuevaImagen) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.querySelector('.info-perfil img').src = e.target.result;
-                    formData.append("imagen", nuevaImagen);
-                }
-                reader.readAsDataURL(nuevaImagen);
+                formData.append("imagen", nuevaImagen);
             }
 
             try {
