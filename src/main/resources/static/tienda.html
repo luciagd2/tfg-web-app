@@ -553,7 +553,7 @@
             document.getElementById('btn-crear').addEventListener('click', async () => {
                 //Añador nuevo patron a la base de datos
                 const formData = new FormData();
-                formData.append("idCreador", (JSON.parse(localStorage.getItem("usuario"))).id);
+                //formData.append("idCreador", (JSON.parse(localStorage.getItem("usuario"))).id);
 
                 try {
                     const response = await fetch('/api/patrones/nuevo', {

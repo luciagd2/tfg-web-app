@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -54,7 +55,9 @@ public class ControladorReviews {
 
         try {
             List<Review> reviews = repositorioReview.findReviewsByPatronId(patronId);
-
+            if(reviews != null && !reviews.isEmpty()) {
+                Collections.reverse(reviews);
+            }
             System.out.println("En encontrar reviews, response.ok: "+ reviews);
             return ResponseEntity.ok(reviews);
         } catch (Exception e) {
