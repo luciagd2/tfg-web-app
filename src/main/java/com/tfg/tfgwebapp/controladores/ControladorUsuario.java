@@ -129,6 +129,7 @@ public class ControladorUsuario {
             request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
             return ResponseEntity.ok("Usuario registrado y autenticado correctamente");
+
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya existe");
         }

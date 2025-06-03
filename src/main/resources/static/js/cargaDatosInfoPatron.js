@@ -96,6 +96,8 @@ async function cargarDatosInfoPatron(patron, reviews) {
         }
         else {
             btnComprarEmpezar.textContent = "Comprar";
+            console.log("Patron: ", patron);
+            sessionStorage.setItem("patronCompra", JSON.stringify(patron));
             btnComprarEmpezar.href = "simulacionPasarelaPago.html";
         }
     } else {

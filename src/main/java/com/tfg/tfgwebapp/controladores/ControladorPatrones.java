@@ -488,17 +488,17 @@ public class ControladorPatrones {
 
     @PostMapping("/nuevo")
     public ResponseEntity<?> crearPatron(
-            @RequestParam Long idCreador
     ) {
         ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
         if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
             return respuestaAutenticacion;
         }
 
-        Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
+        Usuario creador = (Usuario) respuestaAutenticacion.getBody();
 
         Patron patron = new Patron();
-        patron.setCreador(repositorioUsuario.findById(idCreador).get());
+        patron.setCreador(creador);
+        patron.setEstado(Patron.Estado.Borrador);
         repositorioPatron.save(patron);
         return ResponseEntity.status(HttpStatus.CREATED).body(patron);
     }
