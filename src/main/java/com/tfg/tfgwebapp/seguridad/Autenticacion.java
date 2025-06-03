@@ -13,15 +13,38 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Componente Spring que maneja la lógica de autenticación de usuarios.
+ * <p>
+ * Esta clase se encarga de validar si el usuario actual está autenticado
+ * y, en caso afirmativo, obtiene los datos del usuario desde el repositorio
+ * de usuarios para ser retornados como respuesta.
+ * <p>
+ * Depende del componente RepositorioUsuario para acceder a los datos de los usuarios.
+ */
 @Component
 public class Autenticacion {
     private final RepositorioUsuario repositorioUsuario;
 
+    /**
+     * Constructor que inyecta el repositorio de usuarios.
+     *
+     * @param repositorioUsuario Repositorio para acceder a los datos de los usuarios.
+     */
     @Autowired
     public Autenticacion(RepositorioUsuario repositorioUsuario) {
         this.repositorioUsuario = repositorioUsuario;
     }
 
+    /**
+     * Verifica si el usuario actual está autenticado y obtiene su información.
+     *
+     * @return ResponseEntity<?> una respuesta HTTP:
+     * <ul>
+     *     <li>200 OK con el objeto Usuario si la autenticación es válida.</li>
+     *     <li>401 UNAUTHORIZED con un mensaje si el usuario no está autenticado o no se encuentra en la base de datos.</li>
+     * </ul>
+     */
     public ResponseEntity<?> autenticar() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
