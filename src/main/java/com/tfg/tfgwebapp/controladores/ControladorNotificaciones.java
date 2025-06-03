@@ -388,7 +388,7 @@ public class ControladorNotificaciones {
     }
 
     /**
-     * Crea y guarda una notificación de tipo {@code ACTUALIZADO_COMPRADO} para el usuario
+     * Crea y guarda una notificación de tipo {@code ACTUALIZADO_GUARDADO} para el usuario
      * que tiene guardado el patrón.
      * <p>
      * Verifica que el usuario esté autenticado mediante el componente

@@ -15,9 +15,28 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controlador REST para gestionar la subida de imágenes asociadas a los patrones.
+ *
+ * <p>Permite a los usuarios subir archivos de imagen que luego podrán asociarse
+ * a los patrones creados por ellos en la plataforma.
+ *
+ * <p>Las imágenes se almacenan en una carpeta del sistema de archivos local, y se devuelve
+ * una URL relativa que puede ser usada por el cliente para mostrar la imagen.
+ */
 @RestController
 @RequestMapping("/api/imagenes")
 public class ControladorImagenes {
+
+    /**
+     * Endpoint para subir una imagen.
+     *
+     * <p>El archivo se guarda en la carpeta local definida, y se genera un nombre único
+     * basado en la hora actual en milisegundos para evitar colisiones de nombres.
+     *
+     * @param imagen Imagen enviada por el cliente en formato multipart.
+     * @return ResponseEntity con la URL relativa de la imagen guardada, o error si falla la operación.
+     */
     @PostMapping("/subir")
     public ResponseEntity<?> subirImagen(@RequestParam("file") MultipartFile imagen) {
         try {

@@ -22,6 +22,19 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Controlador REST para gestionar las reviews (valoraciones y comentarios) de los patrones.
+ *
+ * <p>Este controlador ofrece endpoints para:
+ * <lu>
+ *   <li>Obtener las reviews asociadas a un patrón específico.</li>
+ *   <li>Crear una nueva review para un patrón.</li>
+ * </lu>
+ *
+ * <p>Todos los endpoints requieren autenticación previa del usuario mediante el componente {@link Autenticacion}.
+ *
+ * <p>Inyecta los repositorios necesarios para acceder a datos de Review, Patron y Usuario.
+ */
 @RestController
 @RequestMapping("/api/reviews")
 public class ControladorReviews {
@@ -45,6 +58,13 @@ public class ControladorReviews {
         this.autenticacion = autenticacion;
     }
 
+    /**
+     * Obtiene la lista de reviews asociadas a un patrón identificado por su ID.
+     * Las reviews se devuelven en orden inverso (las más recientes primero).
+     *
+     * @param patronId ID del patrón del cual obtener las reviews.
+     * @return ResponseEntity con la lista de reviews o error si no está autenticado o falla la consulta.
+     */
     @GetMapping("/getReviews")
     public ResponseEntity<?> getReviews(@RequestParam long patronId) {
 
@@ -67,6 +87,17 @@ public class ControladorReviews {
         }
     }
 
+    /**
+     * Crea y guarda una nueva review para un patrón.
+     * Permite incluir puntuación, mensaje opcional e imagen opcional.
+     *
+     * @param idPatron ID del patrón al que se asocia la review.
+     * @param puntuacion Puntuación numérica asignada en la review.
+     * @param mensaje Mensaje o comentario opcional de la review.
+     * @param imagen Imagen opcional asociada a la review (multipart file).
+     * @return ResponseEntity con la review guardada o error si falla autenticación o guardado.
+     * @throws IOException si hay error al guardar la imagen en el sistema de archivos.
+     */
     @PostMapping("/nuevaReview")
     public ResponseEntity<?> guardarNuevaReview(
             @RequestParam long idPatron,
