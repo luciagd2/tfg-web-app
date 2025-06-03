@@ -1,9 +1,7 @@
 package com.tfg.tfgwebapp.clasesModelo;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +9,12 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entidad que representa a un usuario en la plataforma.
+ *
+ * <p>Un usuario puede actuar como consumidor (comprar, guardar y empezar patrones)
+ * y también como creador de contenido (si {@code esCreador} es true).
+ */
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Usuario {
