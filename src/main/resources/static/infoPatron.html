@@ -226,8 +226,6 @@
                     return;
                 }
 
-                const nuevaReview = await response.json(); // Esperamos recibir la reseña guardada con ruta de imagen
-
                 try {
                     const response = await fetch(`/api/notificaciones/nuevaReview?idPatron=${patron}&puntuacion=${puntuacion}`, {
                         method: "POST",
@@ -253,7 +251,6 @@
 
     <!-- Ficheros js propios -->
     <script src="js/estructuras.js">/*Para el menu y para guardar el patron seleccionado*/</script>
-    <script src="js/datosPatron.js">/*Para los datos de prueba*/</script>
     <script src="js/cargaDatosInfoPatron.js">//Para cargar de datos del patron</script>
     <script>
         window.onload = async () => {

@@ -230,7 +230,7 @@ async function cargarDatosInfoPatron(patron, reviews) {
             window.location.href = "tiendaVistaUsuario.html";
 
         } catch (error) {
-            console.error("Error al recuperar las reseñas del patrón:", error);
+            console.error("Error al cargar la tienda del creador:", error);
         }
 
     });

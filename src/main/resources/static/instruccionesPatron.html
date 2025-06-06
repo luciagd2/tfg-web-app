@@ -173,10 +173,9 @@
 
 <!-- Ficheros js propios -->
 <script src="js/estructuras.js">/*Para el menu*/</script>
-<script src="js/datosPatron.js">/*Para los datos de prueba*/</script>
-<script src="js/cargaDatos.js">/*Para guardar el patron seleccionado*/</script>
 <script src="js/visualizarPatron.js">/*Para la carga de datos del patron*/</script>
 <script>
+    /*
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('btn-guardar-cambios').addEventListener('click', async () => {
             const tags = document.querySelector('input[placeholder*="gorro"]').value
@@ -219,7 +218,6 @@
             formData.append("instrucciones",JSON.stringify(recopilarInstrucciones()));
 
             try {
-                console.log("Justo antes del fetch a /api/patron/guardar")
                 const response = await fetch("/api/patrones/guardar", {
                     method: "POST",
                     body: formData,
@@ -359,6 +357,7 @@
 
         return instrucciones;
     }
+    */
 </script>
 </body>
 </html>

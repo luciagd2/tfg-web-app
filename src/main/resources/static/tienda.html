@@ -596,13 +596,12 @@
                         credentials: "include"
                     });
                     if (response.ok) {
-                        alert("Patron creado correctamente");
+                        alert("Estado de publicación cambiado correctamente");
                         const patron = await response.json();
                         localStorage.setItem("patronSeleccionado", JSON.stringify(patron));
 
                         if(JSON.parse(localStorage.getItem("patronSeleccionado")).estado === "Publicado"){
                             // Añadir a notificaciones
-                            const formDataNotif = new FormData();
                             try {
                                 const response = await fetch(`/api/notificaciones/nuevoPatron?idPatron=${JSON.parse(localStorage.getItem("patronSeleccionado")).id}`, {
                                     method: 'POST',
@@ -628,7 +627,7 @@
 
                         window.location.href="edicionPatron.html";
                     } else {
-                        const errorText = await response.text(); // o .json() si sabes que es JSON
+                        const errorText = await response.text();
                         console.error("Estado:", response.status);
                         console.error("Respuesta:", errorText);
                         alert(`Error al crear patron: ${response.status}`);
