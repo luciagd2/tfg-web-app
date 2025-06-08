@@ -66,44 +66,50 @@ public interface RepositorioPatron extends JpaRepository<Patron, Long> {
         List<Patron> findAllOrderByPuntuacionMediaDesc();
 
         /**
-         * Obtiene patrones filtrados por dificultad y ordenados por puntuación promedio descendente.
+         * Obtiene patrones filtrados por dificultad y por un query con palabras clave.
          *
+         * @param query String de palabras clave.
          * @param dificultades Lista de dificultades.
          * @return Lista de patrones publicados que coinciden con las dificultades dadas.
          */
-        @Query("SELECT p FROM Patron p LEFT JOIN p.reviews r WHERE p.estado = 'Publicado' AND p.dificultad IN :dificultades GROUP BY p ORDER BY AVG(r.puntuacion) DESC")
-        List<Patron> findAllByDificultadInOrderByPuntuacionMediaDesc(@Param("dificultades") List<Patron.Dificultad> dificultades);
+        @Query(value = """
+            SELECT DISTINCT p.*
+            FROM patron p
+            LEFT JOIN usuario u ON p.id_creador = u.id
+            LEFT JOIN patron_tags pt ON p.id = pt.patron_id
+            LEFT JOIN review r ON p.id = r.id_patron
+            WHERE p.estado = 'Publicado'
+              AND p.dificultad IN (:dificultades)
+              AND (
+                LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR
+                LOWER(u.nombre_usuario) LIKE LOWER(CONCAT('%', :query, '%')) OR
+                LOWER(pt.tag) LIKE LOWER(CONCAT('%', :query, '%'))
+              )
+            GROUP BY p.id
+            ORDER BY AVG(r.puntuacion) DESC
+            """, nativeQuery = true)
+        List<Patron> findAllFiltradosByPuntuacionMediaDesc( @Param("dificultades") List<String> dificultades, @Param("query") String query);
 
-        //Query por busqueda
-        @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.tags t " +
-                "WHERE p.estado = 'Publicado' AND (" +
-                "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-                "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-                "LOWER(t) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
-        List<Patron> searchByTituloAutorOTags(@Param("searchTerm") String searchTerm);
-
-        //Query por busqueda y filtros
-        @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.tags t " +
-                "WHERE p.estado = 'Publicado' AND (" +
-                "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-                "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-                "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))")
-        List<Patron> buscarPorTexto(@Param("query") String query);
-
-        @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.reviews r LEFT JOIN p.tags t " +
-                "WHERE p.estado = 'Publicado' AND p.dificultad IN :dificultades AND (" +
-                "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-                "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-                "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))" +
-                "GROUP BY p ORDER BY AVG(r.puntuacion) DESC")
-        List<Patron> buscarPorTextoYFiltrosOrdenado(@Param("query") String query, @Param("dificultades") List<Patron.Dificultad> dificultades);
-
-        @Query("SELECT DISTINCT p FROM Patron p LEFT JOIN p.tags t " +
-                "WHERE p.estado = 'Publicado' AND p.dificultad IN :dificultades AND (" +
-                "LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-                "LOWER(p.creador.nombreUsuario) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-                "LOWER(t) LIKE LOWER(CONCAT('%', :query, '%')))")
-        List<Patron> buscarPorTextoYFiltros(@Param("query") String query, @Param("dificultades") List<Patron.Dificultad> dificultades);
+        /**
+         * Obtiene patrones filtrados por dificultad, un query con palabras clave y ordenados por puntuación promedio descendente.
+         *
+         * @param query String de palabras clave.
+         * @param dificultades Lista de dificultades.
+         * @return Lista de patrones publicados que coinciden con las dificultades dadas.
+         */
+        @Query(value = """
+            SELECT DISTINCT p.* FROM patron p
+            LEFT JOIN usuario u ON p.id_creador = u.id
+            LEFT JOIN patron_tags pt ON p.id = pt.patron_id
+            WHERE p.estado = 'Publicado'
+              AND p.dificultad IN (:dificultades)
+              AND (
+                LOWER(p.titulo) LIKE LOWER(CONCAT('%', :query, '%')) OR
+                LOWER(u.nombre_usuario) LIKE LOWER(CONCAT('%', :query, '%')) OR
+                LOWER(pt.tag) LIKE LOWER(CONCAT('%', :query, '%'))
+              )
+            """, nativeQuery = true)
+        List<Patron> findAllFiltrados( @Param("dificultades") List<String> dificultades, @Param("query") String query);
 
         /**
          * Obtiene los últimos 20 patrones publicados, ordenados por ID descendente.

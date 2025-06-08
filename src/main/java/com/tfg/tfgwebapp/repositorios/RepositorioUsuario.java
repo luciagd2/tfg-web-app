@@ -55,4 +55,12 @@ public interface RepositorioUsuario extends JpaRepository<Usuario, Long> {
      * @return Lista de usuarios que han guardado el patrón.
      */
     List<Usuario> findByPatronesGuardados_Id(Long idPatron);
+
+    /**
+     * Busca todos los usuarios que tienen comprado un patrón específico.
+     *
+     * @param idPatron ID del patrón.
+     * @return Lista de usuarios que han guardado el patrón.
+     */
+    List<Usuario> findByPatronesComprados_Id(Long idPatron);
 }

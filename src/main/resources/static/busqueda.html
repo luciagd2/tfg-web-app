@@ -199,6 +199,7 @@
             // Recuperamos los filtros
             const filtros = localStorage.getItem("filtrosBusqueda");
             console.log('Estado de filtrosBusqueda: ', filtros);
+            /*
             if (filtros !== null) {
                 try {
                     const filtrosJSON = JSON.parse(filtros);
@@ -215,7 +216,15 @@
                 url = `/api/patrones/getAllBusqueda?query=${encodeURIComponent(inputBusqueda)}`;
                 cargarPatrones(url);
             }
-
+            */
+            try {
+                const filtrosJSON = JSON.parse(filtros);
+                const filtroString = filtrosJSON.join(',');
+                url = `/api/patrones/busqueda?query=${encodeURIComponent(inputBusqueda)}&filtros=${encodeURIComponent(filtroString)}`;
+                cargarPatrones(url);
+            } catch (e) {
+                console.error("Error al realizar la búsqueda", e);
+            }
         });
 
         // EVENT LISTENER PARA EL BOTON DE APLICAR FILTROS/ORDEN
@@ -229,15 +238,24 @@
             filtroBtns[3].classList.contains('active')  // Mejor puntuación
           ];
 
+          // Guardamos los filtros a aplicar en el localStorage
           localStorage.setItem("filtrosBusqueda", JSON.stringify(filtros));
+          console.log('Filtros: ', filtros);
 
           // Cerrar modal
           const modal = bootstrap.Modal.getInstance(document.getElementById('modalFiltros'));
           modal.hide();
 
+          //Si hay alguna palabra para filtrar la busqueda
+          const inputBusqueda = document.getElementById('inputBusqueda').value.trim();
+          console.log('InputBusqueda: ', inputBusqueda);
+
           // Llamada a la API con los filtros
-          const filtroString = filtros.join(',');
-          const url = `/api/patrones/getAllFiltros?filtros=${encodeURIComponent(filtroString)}`;
+          //const filtroString = filtros.join(',');
+          //console('Filtros string: ', filtroString);
+
+          //const url = `/api/patrones/getAllFiltros?filtros=${encodeURIComponent(filtroString)}`;
+          url = `/api/patrones/busqueda?query=${encodeURIComponent(inputBusqueda)}&filtros=${encodeURIComponent(filtros)}`;
           cargarPatrones(url);
         });
 

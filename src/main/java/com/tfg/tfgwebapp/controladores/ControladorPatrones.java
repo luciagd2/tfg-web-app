@@ -253,14 +253,14 @@ public class ControladorPatrones {
     }
 
     /**
-     * Devuelve una lista de patrones filtrados por nivel de dificultad y/u
-     * ordenados por puntuación.
+     * Devuelve una lista de patrones filtrados por nivel de dificultad, ordenados por puntuación y/o
+     * palablas clave.
      * <br><br>
      * Este método:
      * <ul>
      *   <li>Verifica que el usuario esté autenticado.</li>
-     *   <li>Recibe un string de filtros con 4 valores booleanos separados por comas.</li>
-     *   <li>Filtra los patrones según los filtros seleccionados:
+     *   <li>Recibe un string de filtros con 4 valores booleanos separados por comas y un string de palablas clave.</li>
+     *   <li>Filtra los patrones según los filtros seleccionados y las palabras clave:
      *     <ul>
      *       <li><code>filtro[0]</code>: Principiante</li>
      *       <li><code>filtro[1]</code>: Intermedio</li>
@@ -268,10 +268,11 @@ public class ControladorPatrones {
      *       <li><code>filtro[3]</code>: Puntuación media descendente</li>
      *     </ul>
      *   </li>
-     *   <li>Devuelve los resultados según los filtros seleccionados.</li>
+     *   <li>Devuelve los resultados según los parámetros.</li>
      *   <li>Incluye carga anticipada de reseñas y etiquetas mediante <code>@EntityGraph</code>.</li>
      * </ul>
      *
+     * @param query <b>(String)</b> String de palabras clave.
      * @param filtros <b>(String)</b> Cadena con 4 valores booleanos separados por comas que indican los filtros aplicados.
      *
      * @return ResponseEntity<?>
@@ -282,100 +283,19 @@ public class ControladorPatrones {
      *   <li><code>500 INTERNAL_SERVER_ERROR</code> si ocurre un error durante la ejecución.</li>
      * </ul>
      */
-    @GetMapping("/getAllFiltros")
+    @GetMapping ("/busqueda")
     @EntityGraph(attributePaths = {"reviews", "tags"})
-    public ResponseEntity<?> getAllFiltros(
-            @RequestParam String filtros
-    ) {
-        System.out.println("En controlador getAllFiltros");
-        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
-        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
-            return respuestaAutenticacion;
-        }
-
-        try {
-        String[] filtroStrings = filtros.split(",");
-        if (filtroStrings.length != 4) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        boolean[] filtroBools = new boolean[4];
-        for (int i = 0; i < 4; i++) {
-            filtroBools[i] = Boolean.parseBoolean(filtroStrings[i].trim());
-        }
-
-        List<Patron.Dificultad> dificultadesFiltradas = new ArrayList<>();
-        if (filtroBools[0]) dificultadesFiltradas.add(Patron.Dificultad.Principiante);
-        if (filtroBools[1]) dificultadesFiltradas.add(Patron.Dificultad.Intermedio);
-        if (filtroBools[2]) dificultadesFiltradas.add(Patron.Dificultad.Avanzado);
-
-        List<Patron> patrones;
-
-        if (!dificultadesFiltradas.isEmpty()) {
-            if (filtroBools[3]) {
-                patrones = repositorioPatron.findAllByDificultadInOrderByPuntuacionMediaDesc(dificultadesFiltradas);
-            } else {
-                patrones = repositorioPatron.findAllByDificultadIn(dificultadesFiltradas);
-            }
-        } else {
-            if (filtroBools[3]) {
-                patrones = repositorioPatron.findAllOrderByPuntuacionMediaDesc();
-            } else {
-                patrones = repositorioPatron.findAll();
-            }
-        }
-
-        return ResponseEntity.ok(patrones);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/getAllBusqueda")
-    @EntityGraph(attributePaths = {"reviews", "tags"})
-    public ResponseEntity<?> getAllBusqueda(
-            @RequestParam String query
-    ) {
-        System.out.println("En controlador getAllBusqueda");
-
-        ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
-        if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
-            return respuestaAutenticacion;
-        }
-
-        try {
-            if (query == null || query.trim().isEmpty()) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            List<Patron> patrones = repositorioPatron.searchByTituloAutorOTags(query.trim());
-            System.out.println("Patrones en lista: " + patrones);
-            return ResponseEntity.ok(patrones);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/getAllBusquedaFiltros")
-    @EntityGraph(attributePaths = {"reviews", "tags"})
-    public ResponseEntity<?> buscarConFiltros(
+    public ResponseEntity<?> busqueda(
             @RequestParam String query,
             @RequestParam String filtros
-    ) {
+    ){
+        System.out.println("En controlador busqueda");
         ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
         if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
             return respuestaAutenticacion;
         }
 
         try {
-            if (query == null || query.trim().isEmpty() || filtros == null) {
-                return ResponseEntity.badRequest().build();
-            }
-
             String[] filtroStrings = filtros.split(",");
             if (filtroStrings.length != 4) {
                 return ResponseEntity.badRequest().build();
@@ -386,22 +306,30 @@ public class ControladorPatrones {
                 filtroBools[i] = Boolean.parseBoolean(filtroStrings[i].trim());
             }
 
-            List<Patron.Dificultad> dificultadesFiltradas = new ArrayList<>();
-            if (filtroBools[0]) dificultadesFiltradas.add(Patron.Dificultad.Principiante);
-            if (filtroBools[1]) dificultadesFiltradas.add(Patron.Dificultad.Intermedio);
-            if (filtroBools[2]) dificultadesFiltradas.add(Patron.Dificultad.Avanzado);
+            List<String> dificultades = new ArrayList<>();
+            if (filtroBools[0]) dificultades.add("Principiante");
+            if (filtroBools[1]) dificultades.add("Intermedio");
+            if (filtroBools[2]) dificultades.add("Avanzado");
+
+            // Si no hay filtros de dificultad seleccionados -> se aplican todos
+            if (dificultades.isEmpty()) {
+                dificultades.add("Principiante");
+                dificultades.add("Intermedio");
+                dificultades.add("Avanzado");
+            }
+
+            System.out.println("Filtros: " + filtroBools[0]+", "+filtroBools[1]+", "+filtroBools[2]+", "+filtroBools[3]);
+            System.out.println("Dificultades: " + dificultades);
 
             List<Patron> patrones;
 
-            if (!dificultadesFiltradas.isEmpty()) {
-                if (filtroBools[3]) {
-                    patrones = repositorioPatron.buscarPorTextoYFiltrosOrdenado(query, dificultadesFiltradas);
-                } else {
-                    patrones = repositorioPatron.buscarPorTextoYFiltros(query, dificultadesFiltradas);
-                }
-            } else {
-                // Sin filtros de dificultad, usar búsqueda general
-                patrones = repositorioPatron.buscarPorTexto(query);
+            // Necesita orden
+            if (filtroBools[3]) {
+                patrones = repositorioPatron.findAllFiltradosByPuntuacionMediaDesc(dificultades, query.trim());
+            }
+            // No necesita orden
+            else {
+                patrones = repositorioPatron.findAllFiltrados(dificultades, query.trim());
             }
 
             return ResponseEntity.ok(patrones);
