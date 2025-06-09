@@ -69,6 +69,8 @@
               });
 
               if (response.ok) {
+                  const user = await response.json();
+                  sessionStorage.setItem("usuario", JSON.stringify(user));
                   window.location.href = "completarPerfil.html";
               } else {
                   alert("Error al registrar usuario.");

@@ -33,14 +33,19 @@ public class ServiciosUsuario {
     /**
      * Registra un nuevo usuario si no existe ya uno con el mismo email.
      *
-     * @param usuario Objeto Usuario a registrar.
+     * @param email String del correo del usuario a registrar.
+     * @param password String de la contraseña del usuario a registrar.
      * @return true si el usuario fue registrado exitosamente; false si ya existía un usuario con el mismo email.
      */
-    public boolean registrar(Usuario usuario) {
-        if (repositorioUsuario.findByEmail(usuario.getEmail()).isPresent()) {
-            return false; // Usuario ya existe
+    public Optional<Usuario> registrar(String email, String password) {
+        if (repositorioUsuario.findByEmail(email).isPresent()) {
+            return Optional.empty();
         }
+        Usuario usuario = new Usuario();
+        usuario.setEmail(email);
+        usuario.setPassword(password);
         repositorioUsuario.save(usuario);
-        return true;
+        System.out.println("Usuario registrado: " + repositorioUsuario.findByEmail(email));
+        return repositorioUsuario.findByEmail(email).filter(u -> u.getPassword().equals(password));
     }
 }

@@ -46,8 +46,9 @@
             credentials: "include"
         });
 
+        console.log("Resultado pago: ", result)
         // Redirigimos a la URL que devuelve el servidor
-        if (response.redirected && result.value === "success") {
+        if (response.redirected && result === "success") {
             try {
                     const idPatron = JSON.parse(localStorage.getItem("patronSeleccionado")).id;
                     const response = await fetch(`/api/notificaciones/patronCompraCreador?idPatron=${idPatron}`, {

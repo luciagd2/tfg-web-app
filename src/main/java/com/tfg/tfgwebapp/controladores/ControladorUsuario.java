@@ -112,15 +112,21 @@ public class ControladorUsuario {
      * contexto de seguridad en la sesión HTTP. En caso de que el usuario ya exista,
      * devuelve una respuesta de conflicto.
      *
-     * @param usuario Objeto {@link Usuario} recibido en el cuerpo de la petición. Debe contener
-     *                los datos necesarios para el registro (nombre, email, contraseña, etc.).
+     * @param datos Mapa que contiene las credenciales del usuario. Incluye:
+     *              "email": correo del usuario,
+     *              "password": contraseña del usuario
      * @param request Objeto HttpServletRequest utilizado para establecer la sesión del usuario registrado.
      * @return Una respuesta HTTP 200 si el usuario se registró y autenticó correctamente,
      *         o HTTP 409 (Conflict) si el usuario ya existe en la base de datos.
      */
     @PostMapping("/registro")
-    public ResponseEntity<?> registrar(@RequestBody Usuario usuario, HttpServletRequest request) {
-        boolean registrado = serviciosUsuario.registrar(usuario);
+    public ResponseEntity<?> registrar(@RequestBody Map<String, String> datos, HttpServletRequest request) {
+        //boolean registrado = serviciosUsuario.registrar(usuario);
+        Optional<Usuario> user = serviciosUsuario.registrar(datos.get("email"), datos.get("password"));
+
+        System.out.println("Usuario presente: " + user.isPresent());
+        return login(datos, request);
+        /*
         if (registrado) {
             // Autenticar al usuario después del registro
             UserDetails userDetails = servicioAutenticacion.loadUserByUsername(usuario.getEmail());
@@ -132,7 +138,7 @@ public class ControladorUsuario {
 
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya existe");
-        }
+        }*/
     }
 
     /**
@@ -158,11 +164,13 @@ public class ControladorUsuario {
             @RequestParam(required = false) MultipartFile imagen
     ) throws IOException {
         logger.info("Entrando en el método completarPerfil");
-
         ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
+        System.out.println("Respuesta autenticacion: " + respuestaAutenticacion);
         if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
+            System.out.println("Respuesta autenticacion: no successful");
             return respuestaAutenticacion;
         }
+        System.out.println("Respuesta autenticacion: successful");
 
         Usuario usuario = (Usuario) respuestaAutenticacion.getBody();
 

@@ -19,7 +19,8 @@ function cargarMenu() {
     const menuHTML = `
     <nav class="navbar navbar-expand-lg bg-body-tertiary menu">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">TFG-nombre</a>
+          <!--<a class="navbar-brand" href="#">TFG-nombre</a>-->
+          <a class="navbar-brand" href="#"></a>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
               <a class="nav-link ${paginaActual === "inicio.html" ? "active" : ""}" href="inicio.html" aria-current="${paginaActual === "inicio.html" ? "page" : ""}">Inicio</a>

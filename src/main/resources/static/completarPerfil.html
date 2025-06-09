@@ -76,9 +76,10 @@
     document.getElementById("form-completar-perfil").addEventListener("submit", async function (e) {
         e.preventDefault();
 
-        const usuario = JSON.parse(localStorage.getItem("usuario"));
+        const usuario = JSON.parse(sessionStorage.getItem("usuario"));
         if (!usuario) {
             alert("Usuario no autenticado");
+            console.log("Usuario no autenticado. Error en js.")
             return;
         }
 

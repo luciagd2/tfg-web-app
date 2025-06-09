@@ -64,7 +64,6 @@
                     const user = await response.json();
                     sessionStorage.setItem("usuario", JSON.stringify(user));
                     window.location.href = "inicio.html";
-                    console.log('Usuario: ', user);
                 }  else {
                     alert("Credenciales inválidas");
                 }
