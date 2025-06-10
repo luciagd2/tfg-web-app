@@ -98,6 +98,9 @@
       document.addEventListener("DOMContentLoaded", () => {
         const container = document.getElementById("contenedor-cards");
 
+        const filtrosIniciales = [false, false, false, false];
+        localStorage.setItem('filtrosBusqueda', JSON.stringify(filtrosIniciales));
+
         const cargarPatrones = (endpoint) => {
           container.innerHTML = "";
 
@@ -261,8 +264,9 @@
 
         // EVENT LISTENER PARA EL BOTON DE ELIMINAR FILTROS/ORDEN
         document.getElementById('eliminarFiltros').addEventListener('click', () => {
-          localStorage.removeItem('filtrosBusqueda');
-          localStorage.removeItem('ordenBusqueda');
+          //localStorage.removeItem('filtrosBusqueda');
+            const filtros = [false, false, false, false];
+            localStorage.setItem('filtrosBusqueda', JSON.stringify(filtros));
 
           // Opcional: Limpia selección visual
           document.querySelectorAll('.toggle-btn.active').forEach(btn => btn.classList.remove('active'));
