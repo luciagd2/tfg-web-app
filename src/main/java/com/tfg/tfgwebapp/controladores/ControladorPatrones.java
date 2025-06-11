@@ -502,7 +502,7 @@ public class ControladorPatrones {
     @GetMapping("/patrones-tienda-publicados")
     @EntityGraph(attributePaths = {"reviews"})
     public ResponseEntity<?> obtenerPatronesUsuarioPublicados() {
-        System.out.println("En controlador obtenerPatronesUsuario");
+        System.out.println("En controlador obtenerPatronesUsuarioPublicados");
 
         ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
         if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
@@ -546,7 +546,7 @@ public class ControladorPatrones {
     @GetMapping("/patrones-tienda-borradores")
     @EntityGraph(attributePaths = {"reviews"})
     public ResponseEntity<?> obtenerPatronesUsuarioBorradores() {
-        System.out.println("En controlador obtenerPatronesUsuario");
+        System.out.println("En controlador obtenerPatronesUsuarioBorradores");
 
         ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
         if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
@@ -590,7 +590,7 @@ public class ControladorPatrones {
     @GetMapping("/patrones-tienda-inactivos")
     @EntityGraph(attributePaths = {"reviews"})
     public ResponseEntity<?> obtenerPatronesUsuarioInactivos() {
-        System.out.println("En controlador obtenerPatronesUsuario");
+        System.out.println("En controlador obtenerPatronesUsuarioInactivos");
 
         ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
         if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
@@ -634,7 +634,7 @@ public class ControladorPatrones {
     @GetMapping("/patrones-tienda-otro")
     @EntityGraph(attributePaths = {"reviews"})
     public ResponseEntity<?> obtenerPatronesOtrosPublicados(@RequestParam Long otroUsuario) {
-        System.out.println("En controlador obtenerPatronesUsuario");
+        System.out.println("En controlador obtenerPatronesOtrosPublicados");
 
         ResponseEntity<?> respuestaAutenticacion = autenticacion.autenticar();
         if (!respuestaAutenticacion.getStatusCode().is2xxSuccessful()) {
