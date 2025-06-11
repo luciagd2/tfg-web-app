@@ -107,7 +107,27 @@ async function cargarDatosInfoPatron(patron, reviews) {
         } else {
             console.log("Gratis + no esta empezado asi que ponemos el texto");
             document.getElementById("btnComprarEmpezar").textContent = "Empezar";
+            document.getElementById("btnComprarEmpezar").addEventListener("click", async function () {
+                try {
+                    const response = await fetch(`/api/patrones/guardarEmpezado?idPatron=${idPatron}`, {
+                        method: "POST",
+                        credentials: "include"
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("Error:", response.status, errorText);
+                        alert(`Error al guardar en la lista de empezados el patrón`);
+                        return;
+                    }
+                    btnComprarEmpezar.innerText = "Continuar";
+                    alert("¡Empezado con éxito!");
+                } catch (error) {
+                    console.error("Error al guardar/dejar de guardar el patrón:", error);
+                    //alert("Ha ocurrido un error, inténtalo de nuevo.");
+                }
+            });
         }
+        btnComprarEmpezar.href = "instruccionesPatron.html";
         //document.getElementById("btnComprarEmpezar").href = "";
         //TODO: vista de patron con instrucciones
     }
