@@ -16,13 +16,38 @@
 </head>
 <body>
 
-<div style="display: flex; flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; margin-top: 22%">
+<div style="display: flex; flex-direction: column; flex-wrap: wrap; justify-content: center; align-items: center; margin-top: 12%">
     <h1>Simulador de pago</h1>
     <p id="info-patron"></p>
-    <form id="formPago">
+    <form id="formPago" class="w-25" novalidate>
         <input type="hidden" id="patronId" name="patronId" />
-        <button type="submit" name="result" value="success" class="btn">Pago exitoso</button>
-        <button type="submit" name="result" value="failure" class="btn">Pago fallido</button>
+        <div class="mb-3">
+            <label for="cardNumber" class="form-label">Número de tarjeta</label>
+            <input type="text" class="form-control" id="cardNumber" pattern="\d{16}" maxlength="16" required>
+            <div class="invalid-feedback">
+                Introduce un número de tarjeta válido de 16 dígitos.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="expiryDate" class="form-label">Fecha de caducidad (MM/AA)</label>
+            <input type="text" class="form-control" id="expiryDate" pattern="(0[1-9]|1[0-2])\/\d{2}" placeholder="MM/AA" required>
+            <div class="invalid-feedback">
+                Introduce una fecha válida en formato MM/AA.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="cvv" class="form-label">CVV</label>
+            <input type="text" class="form-control" id="cvv" pattern="\d{3}" maxlength="3" required>
+            <div class="invalid-feedback">
+                El CVV debe tener exactamente 3 dígitos.
+            </div>
+        </div>
+
+        <button type="submit" name="result" value="success" class="btn"
+                style="display: flex; justify-self: center;">Realizar pago</button>
+        <!--<button type="submit" name="result" value="failure" class="btn">Pago fallido</button>-->
     </form>
 </div>
 
@@ -37,6 +62,17 @@
     // Interceptamos el envío del formulario
     document.getElementById("formPago").addEventListener("submit", async function(e) {
         e.preventDefault();
+
+        const form = e.target;
+
+        // Validación con Bootstrap
+        if (!form.checkValidity()) {
+            form.classList.add("was-validated");
+            return;
+        }
+
+        form.classList.add("was-validated"); // Marca como validado
+
 
         const result = e.submitter.value; // success o failure
 
