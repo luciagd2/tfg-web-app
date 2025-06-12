@@ -66,7 +66,7 @@
     </div> 
 
     <script src="js/estructuras.js"></script>
-    <script src="js/datosPatron.js"></script>
+    <!--<script src="js/datosPatron.js"></script>-->
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
             console.log("Script cargado");
@@ -260,8 +260,8 @@
             };
 
             // Cargar publicados por defecto
-            const usuarioTienda = JSON.parse(localStorage.getItem("creadorSeleccionado"));
-            cargarPatrones(`/api/patrones/patrones-tienda-publicados?otroUsuario=${usuarioTienda.id}`);
+            //const usuarioTienda = JSON.parse(localStorage.getItem("creadorSeleccionado"));
+            cargarPatrones(`/api/patrones/patrones-tienda-otro?otroUsuario=${creadorId}`);
         });
     </script>
 
